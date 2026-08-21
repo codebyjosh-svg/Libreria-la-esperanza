@@ -1,20 +1,21 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
- */
+
 package org.esperanza.system;
 
-/**
- *
- * @author informatica
- */
-public class main {
+import javafx.application.Application;
+import javafx.stage.Stage;
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        
+public class Main extends Application {
+
+    @Override
+    public void start(Stage stage) throws Exception {
+        // Aquí posteriormente se cargará el archivo FXML.
+
+        stage.setTitle("Mi Aplicación");
+
+        // Aquí agregaremos el FXMLLoader cuando tengamos el FXML.
     }
-    
+
+    public static void main(String[] args) {
+        launch(args);
+    }
 }
