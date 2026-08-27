@@ -20,7 +20,7 @@ public class main extends Application {
 
         Scene scene = new Scene(root);
 
-        stage.setTitle("Biblioteca");
+        stage.setTitle("Biblioteca la esperanza");
         stage.setScene(scene);
         stage.show();
     }
