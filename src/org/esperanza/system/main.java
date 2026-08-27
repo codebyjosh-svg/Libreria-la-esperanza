@@ -22,7 +22,7 @@ public class main {
             Pane root = new Pane();
             Scene scene = new Scene(root, 800, 600);
 
-            stage.setTitle("Biblioteca La Esperanza");
+            stage.setTitle("Libreria La Esperanza");
             stage.setScene(scene);
             stage.show();
         }
