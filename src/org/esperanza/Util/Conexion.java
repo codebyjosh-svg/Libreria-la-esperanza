@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public class Conexion {
+
     private static Conexion instancia;
 
     private static final String CONFIG_FILE = "/db.properties";
@@ -39,10 +40,9 @@ public class Conexion {
         } catch (IOException e) {
             throw new IllegalStateException("Error al leer " + CONFIG_FILE, e);
         }
-        //llenamos nuestras varibles finales con los datos de db.properties.
-        this.url = config.getProperty("db.url=jdbc:mysql://localhost:3306/Libreriadb_script_dml 1?serverTimezone=UTC");
-        this.user = config.getProperty("IN4CM");
-        this.password = config.getProperty("#NdimAM4");
+        this.url = config.getProperty("db.url");
+        this.user = config.getProperty("db.user");
+        this.password = config.getProperty("db.password");
 
         //comprobación de datos del properties nulos para cada atributo o datos nulos.
         if (url == null || user == null || password == null) {
@@ -63,6 +63,5 @@ public class Conexion {
     public Connection conectar() throws SQLException {
         return DriverManager.getConnection(url, user, password);
     }
-
 
 }
