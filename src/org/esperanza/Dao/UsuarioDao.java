@@ -35,6 +35,33 @@ public class UsuarioDao {
         return usuario;
     }
 
+    // NUEVO: usado por AutenticacionService para saber por que fallo el login
+    public Usuario buscarPorUsername(String username) {
+        Usuario usuario = null;
+        String sql = "{call sp_buscar_usuario(?)}";
+
+        try (Connection conexion = Conexion.getInstancia().conectar();
+                CallableStatement consultaCall = conexion.prepareCall(sql)) {
+
+            consultaCall.setString(1, username);
+
+            try (ResultSet tablaResultado = consultaCall.executeQuery()) {
+                if (tablaResultado.next()) {
+                    usuario = new Usuario();
+                    usuario.setId(tablaResultado.getInt("id"));
+                    usuario.setUsrname(tablaResultado.getString("username"));
+                    usuario.setRol(tablaResultado.getString("rol"));
+                    usuario.setActivo(tablaResultado.getBoolean("activo"));
+                    usuario.setNombre(tablaResultado.getString("nombre"));
+                    usuario.setApellido(tablaResultado.getString("apellido"));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al buscar usuario: " + e.getMessage());
+        }
+        return usuario;
+    }
+
     public boolean registrarUsuario(String username, String passwordHash, String rol, String nombre, String apellido, String correo) {
         String sql = "{call sp_registrar_usuario(?, ?, ?, ?, ?, ?)}";
 

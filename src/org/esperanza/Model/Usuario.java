@@ -1,25 +1,23 @@
 package org.esperanza.Model;
 
-/**
- *
- * @author Joshua
- */
 public class Usuario {
     private int id;
     private String usrname;
     private String rol;
     private String nombre;
     private String apellido;
+    private boolean activo;
 
     public Usuario() {
     }
 
-    public Usuario(int id, String usrname, String rol, String nombre, String apellido) {
+    public Usuario(int id, String usrname, String rol, String nombre, String apellido, boolean activo) {
         this.id = id;
         this.usrname = usrname;
         this.rol = rol;
         this.nombre = nombre;
         this.apellido = apellido;
+        this.activo = activo;
     }
 
     public int getId() {
@@ -60,5 +58,13 @@ public class Usuario {
 
     public void setApellido(String apellido) {
         this.apellido = apellido;
+    }
+
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
     }
 }
