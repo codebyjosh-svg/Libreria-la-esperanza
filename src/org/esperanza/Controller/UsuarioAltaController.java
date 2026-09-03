@@ -8,7 +8,6 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.esperanza.dao.UsuarioDao;
-import org.esperanza.util.PasswordUtil;
 
 public class UsuarioAltaController {
     @FXML private TextField txtUsername;
@@ -38,13 +37,13 @@ public class UsuarioAltaController {
             return;
         }
 
-        boolean guardado = usuarioDao.registrarUsuario(
-                username,
-                PasswordUtil.hashSHA256(txtPassword.getText()),
-                cmbRol.getValue(),
-                txtNombre.getText().trim(),
-                txtApellido.getText().trim(),
-                txtCorreo.getText().trim());
+    boolean guardado = usuarioDao.registrarUsuario(
+        username,
+        txtPassword.getText(),
+        cmbRol.getValue(),
+        txtNombre.getText().trim(),
+        txtApellido.getText().trim(),
+        txtCorreo.getText().trim());
 
         if (guardado) {
             Alert alerta = new Alert(Alert.AlertType.INFORMATION);
