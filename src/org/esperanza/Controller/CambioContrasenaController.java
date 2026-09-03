@@ -24,7 +24,8 @@ public class CambioContrasenaController {
     @FXML
     private Button btnCancelar;
 
-    private int idUsuarioActual = 1; 
+
+    private int idUsuarioActual = 2; 
 
     private UsuarioDao usuarioDao = new UsuarioDao();
 
