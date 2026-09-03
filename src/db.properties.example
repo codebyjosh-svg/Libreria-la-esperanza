@@ -1,5 +1,5 @@
 # Copia este archivo como db.properties y coloca tus datos locales.
 # NO subas db.properties con contraseñas reales a GitHub.
-db.url=jdbc:mysql://localhost:3306/TU_BASE_DE_DATOS?serverTimezone=UTC
-db.user=TU_USUARIO
-db.password=TU_PASSWORD
+db.url=jdbc:mysql://localhost:3306/libreriadb_in4cm?serverTimezone=UTC
+db.user=root
+db.password=#Ndim4AM

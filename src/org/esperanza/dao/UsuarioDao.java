@@ -1,21 +1,44 @@
-package org.esperanza.util;
+package org.esperanza.dao;
 
-import java.security.MessageDigest;
+import org.esperanza.util.Conexion;
+import org.esperanza.util.HashUtil;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-public class HashUtil {
-    public static String sha256(String input) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(input.getBytes("UTF-8"));
-            StringBuilder hexString = new StringBuilder();
-            for (byte b : hash) {
-                String hex = Integer.toHexString(0xff & b);
-                if (hex.length() == 1) hexString.append('0');
-                hexString.append(hex);
+public class UsuarioDao {
+
+    public boolean validarPasswordActual(int idUsuario, String passwordIngresada) {
+        String sql = "SELECT password FROM usuario WHERE id = ?";
+        String hashIngresado = HashUtil.sha256(passwordIngresada);
+        
+        try (Connection conn = Conexion.getInstancia().conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, idUsuario);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("password").equals(hashIngresado);
+                }
             }
-            return hexString.toString();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+        return false;
+    }
+
+    public boolean actualizarPassword(int idUsuario, String nuevaPassword) {
+        String sql = "UPDATE usuario SET password = ? WHERE id = ?";
+        String nuevoHash = HashUtil.sha256(nuevaPassword);
+        
+        try (Connection conn = Conexion.getInstancia().conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, nuevoHash);
+            stmt.setInt(2, idUsuario);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }
