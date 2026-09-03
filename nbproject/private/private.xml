@@ -3,11 +3,8 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Emilio/B_4/s_2/Libreria-la-esperanza/src/org/esperanza/Dao/Impl/Impl.java</file>
-            <file>file:/C:/Emilio/B_4/s_2/Libreria-la-esperanza/src/org/esperanza/system/main.java</file>
-            <file>file:/C:/Emilio/B_4/s_2/Libreria-la-esperanza/src/org/esperanza/util/Conexion.java</file>
-            <file>file:/C:/Emilio/B_4/s_2/Libreria-la-esperanza/src/org/esperanza/Controller/UsuarioAltaController.java</file>
-            <file>file:/C:/Emilio/B_4/s_2/Libreria-la-esperanza/src/org/esperanza/Dao/UsuarioDao.java</file>
+            <file>file:/C:/joshua_suy/B_4/s_dos/Libreria-la-esperanza/src/db.properties</file>
+            <file>file:/C:/joshua_suy/B_4/s_dos/Libreria-la-esperanza/src/org/esperanza/System/main.java</file>
         </group>
     </open-files>
 </project-private>
