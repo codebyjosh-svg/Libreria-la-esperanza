@@ -6,17 +6,18 @@ public class Usuario {
     private String rol;
     private String nombre;
     private String apellido;
+    private String correo;
     private boolean activo;
 
-    public Usuario() {
-    }
+    public Usuario() {}
 
-    public Usuario(int id, String usrname, String rol, String nombre, String apellido, boolean activo) {
+    public Usuario(int id, String usrname, String rol, String nombre, String apellido, String correo, boolean activo) {
         this.id = id;
         this.usrname = usrname;
         this.rol = rol;
         this.nombre = nombre;
         this.apellido = apellido;
+        this.correo = correo;
         this.activo = activo;
     }
 
@@ -58,6 +59,14 @@ public class Usuario {
 
     public void setApellido(String apellido) {
         this.apellido = apellido;
+    }
+
+    public String getCorreo() {
+        return correo;
+    }
+
+    public void setCorreo(String correo) {
+        this.correo = correo;
     }
 
     public boolean isActivo() {
