@@ -1,26 +1,21 @@
 package org.esperanza.util;
 
-import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
-public final class PasswordUtil {
-    private PasswordUtil() {}
-
-    public static String hashSHA256(String texto) {
-        if (texto == null) {
-            throw new IllegalArgumentException("La contraseña no puede ser null.");
-        }
+public class HashUtil {
+    public static String sha256(String input) {
         try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] hash = md.digest(texto.getBytes(StandardCharsets.UTF_8));
-            StringBuilder resultado = new StringBuilder(hash.length * 2);
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(input.getBytes("UTF-8"));
+            StringBuilder hexString = new StringBuilder();
             for (byte b : hash) {
-                resultado.append(String.format("%02x", b));
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
             }
-            return resultado.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("No se encontró SHA-256.", e);
+            return hexString.toString();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }
