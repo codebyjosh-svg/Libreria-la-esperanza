@@ -7,7 +7,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class main {
-
+ 
     public static class Ventana extends Application {
         @Override
         public void start(Stage stage) throws Exception {
