@@ -31,4 +31,22 @@ public class LibroDAOImpl implements LibroDAO {
         return libro;
     }
 
+    @Override
+    public List<Libro> buscarPorTitulo(String titulo) {
+        List<Libro> lista = new ArrayList<>();
+        String sql = "SELECT * FROM libros WHERE titulo LIKE ?";
+        try (Connection con = Conexion.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, "%" + titulo + "%");
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(extraerLibro(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return lista;
+    }
+
    
