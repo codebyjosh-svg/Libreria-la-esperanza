@@ -1,0 +1,92 @@
+.sidebar-scroll {
+    -fx-background: #1e293b;
+    -fx-background-color: #1e293b;
+}
+.sidebar-scroll > .viewport {
+    -fx-background-color: #1e293b;
+}
+.sidebar {
+    -fx-background-color: #1e293b;
+    -fx-padding: 20 0 20 0;
+}
+.sidebar-header {
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 20 20 20;
+}
+.menu-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #cbd5e1;
+    -fx-font-size: 13px;
+    -fx-padding: 12 20 12 20;
+    -fx-alignment: CENTER_LEFT;
+    -fx-cursor: hand;
+}
+.menu-button:hover {
+    -fx-background-color: #334155;
+    -fx-text-fill: white;
+}
+.topbar {
+    -fx-background-color: white;
+    -fx-padding: 15 25 15 25;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);
+}
+.topbar-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e293b;
+}
+.topbar-user {
+    -fx-text-fill: #64748b;
+    -fx-font-size: 13px;
+}
+.logout-button {
+    -fx-background-color: #ef4444;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 16 8 16;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+}
+.logout-button:hover {
+    -fx-background-color: #dc2626;
+}
+.content-area {
+    -fx-background-color: #f1f5f9;
+    -fx-padding: 25;
+}
+.content-title {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e293b;
+}
+.content-subtitle {
+    -fx-text-fill: #64748b;
+    -fx-font-size: 13px;
+}
+.action-card {
+    -fx-background-color: white;
+    -fx-padding: 20;
+    -fx-pref-width: 220;
+    -fx-background-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 6, 0, 0, 2);
+    -fx-cursor: hand;
+}
+.action-card:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0, 0, 4);
+}
+.action-card-icon {
+    -fx-font-size: 28px;
+}
+.action-card-title {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e293b;
+}
+.action-card-desc {
+    -fx-text-fill: #64748b;
+    -fx-font-size: 12px;
+    -fx-wrap-text: true;
+}
