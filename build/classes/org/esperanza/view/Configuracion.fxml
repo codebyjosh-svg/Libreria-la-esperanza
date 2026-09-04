@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.esperanza.Controller.ConfiguracionController"
+            stylesheets="@style/usuarios.css" styleClass="fondo">
+    <top><VBox spacing="5" styleClass="encabezado">
+        <padding><Insets top="18" right="24" bottom="15" left="24"/></padding>
+        <Label text="Configuración" styleClass="titulo"/>
+        <Label text="Cambio de contraseña del usuario de trabajo" styleClass="subtitulo"/>
+    </VBox></top>
+    <center><VBox spacing="14" maxWidth="480">
+        <padding><Insets top="28" right="30" bottom="28" left="30"/></padding>
+        <Label text="Usuario seleccionado:"/>
+        <Label fx:id="lblUsuario" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+        <Label text="Nueva contraseña:"/>
+        <PasswordField fx:id="txtNueva" promptText="Mínimo 6 caracteres"/>
+        <Label text="Confirmar contraseña:"/>
+        <PasswordField fx:id="txtConfirmar" promptText="Repite la nueva contraseña"/>
+        <Button text="Cambiar contraseña" onAction="#onCambiarContrasena" styleClass="btn-principal" prefHeight="42"/>
+    </VBox></center>
+</BorderPane>

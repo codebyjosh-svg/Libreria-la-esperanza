@@ -1,0 +1,33 @@
+========================================
+LIBRERÍA LA ESPERANZA - INSTRUCCIONES
+========================================
+
+1) CREAR BASE DE DATOS
+   - Abre MySQL Workbench.
+   - Ejecuta: usuarios_cris.sql
+   - El script crea la base de datos, usuarios y la tabla de auditoría.
+
+2) CONFIGURAR MYSQL
+   - Abre: src/db.properties
+   - Coloca la contraseña de tu servidor MySQL.
+   - Ejemplo:
+       db.url=jdbc:mysql://localhost:3306/libreria_esperanza
+       db.user=root
+       db.password=1234
+
+3) EN NETBEANS
+   - Clean and Build
+   - Run
+
+4) USO
+   - La aplicación abre directamente, SIN LOGIN.
+   - En el panel principal selecciona el usuario que utilizará el sistema.
+   - El sistema registra automáticamente el tiempo de uso.
+   - En Reportes se muestra el tiempo y los cambios realizados por cada usuario.
+   - En Configuración se puede cambiar la contraseña del usuario seleccionado.
+
+NOTA:
+   Como se eliminó el login, la selección del usuario sirve para identificar
+   quién está utilizando el sistema y permitir que los reportes sean por usuario.
+   Esto no sustituye una autenticación de seguridad.
+========================================

@@ -1,0 +1,4 @@
+# Copia este archivo como db.properties y ajusta los valores
+db.url=jdbc:mysql://localhost:3306/libreria_esperanza?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+db.user=root
+db.password=TU_PASSWORD

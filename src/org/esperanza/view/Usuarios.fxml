@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.esperanza.Controller.UsuariosController"
+            stylesheets="@style/usuarios.css" styleClass="fondo">
+    <top>
+        <VBox spacing="6" styleClass="encabezado">
+            <padding><Insets top="22" right="24" bottom="16" left="24"/></padding>
+            <Label text="Gestión de Usuarios" styleClass="titulo"/>
+            <Label text="Listado, alta y desactivación de usuarios" styleClass="subtitulo"/>
+        </VBox>
+    </top>
+    <center>
+        <VBox spacing="12">
+            <padding><Insets top="18" right="24" bottom="18" left="24"/></padding>
+            <TableView fx:id="tablaUsuarios" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
+                    <TableColumn fx:id="colUsuario" text="Usuario" prefWidth="110"/>
+                    <TableColumn fx:id="colNombre" text="Nombre" prefWidth="110"/>
+                    <TableColumn fx:id="colApellido" text="Apellido" prefWidth="110"/>
+                    <TableColumn fx:id="colRol" text="Rol" prefWidth="105"/>
+                    <TableColumn fx:id="colCorreo" text="Correo" prefWidth="180"/>
+                    <TableColumn fx:id="colActivo" text="Estado" prefWidth="85"/>
+                    <TableColumn fx:id="colAccion" text="Acción" prefWidth="105"/>
+                </columns>
+            </TableView>
+            <HBox spacing="10" alignment="CENTER_RIGHT">
+                <Label fx:id="lblMensaje" HBox.hgrow="ALWAYS"/>
+                <Button text="Actualizar" onAction="#onActualizar" styleClass="btn-secundario"/>
+                <Button text="+ Nuevo usuario" onAction="#onNuevoUsuario" styleClass="btn-principal"/>
+            </HBox>
+        </VBox>
+    </center>
+</BorderPane>

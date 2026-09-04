@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.esperanza.Controller.ReportesController"
+            stylesheets="@style/usuarios.css" styleClass="fondo">
+    <top><VBox spacing="5" styleClass="encabezado">
+        <padding><Insets top="18" right="24" bottom="15" left="24"/></padding>
+        <Label text="Reporte de uso por usuario" styleClass="titulo"/>
+        <Label text="Tiempo utilizado y cambios realizados por cada usuario" styleClass="subtitulo"/>
+    </VBox></top>
+    <center><VBox spacing="12">
+        <padding><Insets top="18" right="24" bottom="18" left="24"/></padding>
+        <TableView fx:id="tablaReportes" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="colUsuario" text="Usuario" prefWidth="120"/>
+                <TableColumn fx:id="colTiempo" text="Tiempo utilizado" prefWidth="150"/>
+                <TableColumn fx:id="colCambios" text="Cambios" prefWidth="80"/>
+                <TableColumn fx:id="colUltima" text="Última actividad" prefWidth="190"/>
+                <TableColumn fx:id="colDetalle" text="Cambios realizados" prefWidth="520"/>
+            </columns>
+        </TableView>
+        <HBox spacing="10">
+            <Label fx:id="lblResumen" HBox.hgrow="ALWAYS"/>
+            <Button text="Actualizar reporte" onAction="#onActualizar" styleClass="btn-principal"/>
+        </HBox>
+    </VBox></center>
+</BorderPane>
