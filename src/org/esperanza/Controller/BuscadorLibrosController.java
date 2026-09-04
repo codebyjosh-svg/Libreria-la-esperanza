@@ -5,36 +5,36 @@ import org.esperanza.Dao.Impl.LibroDAOImpl;
 import org.esperanza.Model.Libro;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.net.URL;
-import java.util.List;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
 public class BuscadorLibrosController implements Initializable {
+    private static final Logger LOGGER = Logger.getLogger(BuscadorLibrosController.class.getName());
 
     @FXML private ComboBox<String> cmbFiltro;
     @FXML private TextField txtBusqueda;
-    @FXML private Button btnBuscar;
-
     @FXML private TableView<Libro> tblLibros;
     @FXML private TableColumn<Libro, String> colIsbn;
     @FXML private TableColumn<Libro, String> colTitulo;
-    @FXML private TableColumn<Libro, Double> colPrecio; // Corregido de String a Double para que coincida con el modelo
+    @FXML private TableColumn<Libro, Double> colPrecio;
     @FXML private TableColumn<Libro, Integer> colStock;
 
     private LibroDAO libroDAO;
-    private ObservableList<Libro> listaLibrosObservable;
+    private ObservableList<Libro> listaLibrosMaster = FXCollections.observableArrayList();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         libroDAO = new LibroDAOImpl();
         
-        cmbFiltro.getItems().addAll("ISBN", "Título", "Autor");
+        cmbFiltro.getItems().addAll("ISBN", "Título");
         cmbFiltro.getSelectionModel().selectFirst();
 
         colIsbn.setCellValueFactory(new PropertyValueFactory<>("isbn"));
@@ -42,43 +42,35 @@ public class BuscadorLibrosController implements Initializable {
         colPrecio.setCellValueFactory(new PropertyValueFactory<>("precio"));
         colStock.setCellValueFactory(new PropertyValueFactory<>("stockActual"));
 
-        cargarTodosLosLibros();
-    }
+        // Cargar datos originales
+        listaLibrosMaster.addAll(libroDAO.listarTodos());
 
-    @FXML
-    private void buscarLibro(ActionEvent event) {
-        String criterio = txtBusqueda.getText().trim();
-        String filtro = cmbFiltro.getValue();
-        listaLibrosObservable = FXCollections.observableArrayList();
+        // Configuración de FilteredList para búsqueda dinámica
+        FilteredList<Libro> filteredData = new FilteredList<>(listaLibrosMaster, b -> true);
 
-        if (criterio.isEmpty()) {
-            cargarTodosLosLibros();
-            return;
-        }
-
-        switch (filtro) {
-            case "ISBN":
-                Libro libro = libroDAO.buscarPorIsbn(criterio);
-                if (libro != null) {
-                    listaLibrosObservable.add(libro);
+        txtBusqueda.textProperty().addListener((observable, oldValue, newValue) -> {
+            filteredData.setPredicate(libro -> {
+                if (newValue == null || newValue.isEmpty()) {
+                    return true;
                 }
-                break;
-            case "Título":
-                List<Libro> porTitulo = libroDAO.buscarPorTitulo(criterio);
-                listaLibrosObservable.addAll(porTitulo);
-                break;
-            case "Autor":
-                List<Libro> porAutor = libroDAO.buscarPorAutor(criterio);
-                listaLibrosObservable.addAll(porAutor);
-                break;
-        }
+                
+                String lowerCaseFilter = newValue.toLowerCase();
+                String filtroSeleccionado = cmbFiltro.getValue();
 
-        tblLibros.setItems(listaLibrosObservable);
-    }
+                if ("ISBN".equals(filtroSeleccionado)) {
+                    return libro.getIsbn() != null && libro.getIsbn().toLowerCase().contains(lowerCaseFilter);
+                } else if ("Título".equals(filtroSeleccionado)) {
+                    return libro.getTitulo() != null && libro.getTitulo().toLowerCase().contains(lowerCaseFilter);
+                }
+                
+                return false;
+            });
+        });
 
-    private void cargarTodosLosLibros() {
-        List<Libro> todos = libroDAO.listarTodos();
-        listaLibrosObservable = FXCollections.observableArrayList(todos);
-        tblLibros.setItems(listaLibrosObservable);
+        SortedList<Libro> sortedData = new SortedList<>(filteredData);
+        sortedData.comparatorProperty().bind(tblLibros.comparatorProperty());
+        tblLibros.setItems(sortedData);
+        
+        LOGGER.info("Buscador inicializado correctamente con FilteredList.");
     }
 }
