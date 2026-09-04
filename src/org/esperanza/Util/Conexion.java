@@ -23,27 +23,18 @@ public class Conexion {
         }
 
         Properties config = new Properties();
-
         try (InputStream in = getClass().getResourceAsStream(CONFIG_FILE)) {
             if (in == null) {
-                throw new IllegalStateException(
-                        "No se encontró " + CONFIG_FILE + " en el classpath. "
-                        + "Asegúrate de crearlo en la carpeta Source Packages.");
+                throw new IllegalStateException("No se encontró " + CONFIG_FILE + " en el classpath.");
             }
             config.load(in);
         } catch (IOException e) {
             throw new IllegalStateException("Error al leer " + CONFIG_FILE, e);
         }
 
- 
         this.url = config.getProperty("db.url");
         this.user = config.getProperty("db.user");
         this.password = config.getProperty("db.password");
-
-        if (url == null || user == null || password == null) {
-            throw new IllegalStateException(
-                    "Faltan propiedades (db.url, db.user, db.password) en " + CONFIG_FILE);
-        }
     }
 
     public static synchronized Conexion getInstancia() {

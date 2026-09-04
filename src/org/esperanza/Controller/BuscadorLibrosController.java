@@ -7,6 +7,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -21,6 +22,7 @@ public class BuscadorLibrosController implements Initializable {
 
     @FXML private ComboBox<String> cmbFiltro;
     @FXML private TextField txtBusqueda;
+    @FXML private Button btnBuscar;
     @FXML private TableView<Libro> tblLibros;
     @FXML private TableColumn<Libro, String> colIsbn;
     @FXML private TableColumn<Libro, String> colTitulo;
@@ -42,10 +44,8 @@ public class BuscadorLibrosController implements Initializable {
         colPrecio.setCellValueFactory(new PropertyValueFactory<>("precio"));
         colStock.setCellValueFactory(new PropertyValueFactory<>("stockActual"));
 
-        // Cargar datos originales
         listaLibrosMaster.addAll(libroDAO.listarTodos());
 
-        // Configuración de FilteredList para búsqueda dinámica
         FilteredList<Libro> filteredData = new FilteredList<>(listaLibrosMaster, b -> true);
 
         txtBusqueda.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -71,6 +71,12 @@ public class BuscadorLibrosController implements Initializable {
         sortedData.comparatorProperty().bind(tblLibros.comparatorProperty());
         tblLibros.setItems(sortedData);
         
-        LOGGER.info("Buscador inicializado correctamente con FilteredList.");
+        LOGGER.info("Controlador del buscador inicializado correctamente.");
+    }
+
+
+    @FXML
+    private void buscarLibro(ActionEvent event) {
+       
     }
 }
