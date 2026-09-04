@@ -7,16 +7,36 @@ import java.security.NoSuchAlgorithmException;
 public class PasswordUtil {
 
     public static String hashSHA256(String textoPlano) {
+
         try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hashBytes = digest.digest(textoPlano.getBytes(StandardCharsets.UTF_8));
-            StringBuilder sb = new StringBuilder();
+
+            MessageDigest digest =
+                    MessageDigest.getInstance("SHA-256");
+
+            byte[] hashBytes =
+                    digest.digest(
+                            textoPlano.getBytes(
+                                    StandardCharsets.UTF_8
+                            )
+                    );
+
+            StringBuilder sb =
+                    new StringBuilder();
+
             for (byte b : hashBytes) {
-                sb.append(String.format("%02x", b));
+                sb.append(
+                        String.format("%02x", b)
+                );
             }
+
             return sb.toString();
+
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Error al generar hash de contraseña", e);
+
+            throw new RuntimeException(
+                    "Error al generar hash de contraseña",
+                    e
+            );
         }
     }
 }

@@ -8,39 +8,89 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public final class Conexion {
-    private static final Conexion INSTANCIA = new Conexion();
 
-    public static Object getInstance() {
-        throw new UnsupportedOperationException("Not supported yet."); 
-    }
-    private final Properties propiedades = new Properties();
+    private static Conexion instancia;
+
+    private static final String CONFIG_FILE =
+            "/db.properties";
+
+    private final String url;
+    private final String user;
+    private final String password;
 
     private Conexion() {
-        cargarPropiedades();
-    }
 
-    public static Conexion getInstancia() {
-        return INSTANCIA;
-    }
+        try {
 
-    private void cargarPropiedades() {
-        try (InputStream entrada = Conexion.class.getResourceAsStream("/db.properties")) {
-            if (entrada != null) {
-                propiedades.load(entrada);
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+        } catch (ClassNotFoundException e) {
+
+            System.err.println(
+                    "Error al cargar Driver MySQL: "
+                    + e.getMessage()
+            );
+        }
+
+        Properties config = new Properties();
+
+        try (
+            InputStream in =
+                    Conexion.class.getResourceAsStream(
+                            CONFIG_FILE
+                    )
+        ) {
+
+            if (in == null) {
+
+                throw new IllegalStateException(
+                        "No se encontró "
+                        + CONFIG_FILE
+                        + " en el proyecto."
+                );
             }
+
+            config.load(in);
+
         } catch (IOException e) {
-            System.err.println("No se pudo leer db.properties: " + e.getMessage());
+
+            throw new IllegalStateException(
+                    "Error al leer "
+                    + CONFIG_FILE,
+                    e
+            );
+        }
+
+        url = config.getProperty("db.url");
+        user = config.getProperty("db.user");
+        password = config.getProperty("db.password");
+
+        if (url == null
+                || user == null
+                || password == null) {
+
+            throw new IllegalStateException(
+                    "Faltan datos en db.properties"
+            );
         }
     }
 
-    public Connection conectar() throws SQLException {
-        String url = System.getProperty("db.url", propiedades.getProperty("db.url"));
-        String user = System.getProperty("db.user", propiedades.getProperty("db.user"));
-        String password = System.getProperty("db.password", propiedades.getProperty("db.password", ""));
+    public static synchronized Conexion getInstancia() {
 
-        if (url == null || user == null) {
-            throw new SQLException("Falta configurar db.properties (db.url y db.user).");
+        if (instancia == null) {
+            instancia = new Conexion();
         }
-        return DriverManager.getConnection(url, user, password);
+
+        return instancia;
+    }
+
+    public Connection conectar()
+            throws SQLException {
+
+        return DriverManager.getConnection(
+                url,
+                user,
+                password
+        );
     }
 }

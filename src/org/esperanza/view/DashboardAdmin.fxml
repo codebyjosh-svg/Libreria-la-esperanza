@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
@@ -8,57 +9,182 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-            fx:controller="org.esperanza.Controller.DashboardAdminController"
-            prefWidth="900" prefHeight="600">
+<BorderPane
+        xmlns="http://javafx.com/javafx"
+        xmlns:fx="http://javafx.com/fxml"
+        fx:controller="org.esperanza.Controller.DashboardAdminController"
+        prefWidth="900"
+        prefHeight="600">
 
     <left>
-        <ScrollPane fitToWidth="true" prefWidth="200">
+
+        <ScrollPane
+                fitToWidth="true"
+                prefWidth="200">
+
             <VBox spacing="8">
+
                 <padding>
-                    <Insets top="15" right="10" bottom="15" left="10"/>
+                    <Insets
+                            top="15"
+                            right="10"
+                            bottom="15"
+                            left="10"/>
                 </padding>
-                <Label text="Librería La Esperanza"/>
+
+                <Label
+                        text="Librería La Esperanza"
+                        style="-fx-font-size: 15px; -fx-font-weight: bold;"/>
+
                 <Separator/>
-                <Button text="Usuarios" onAction="#onUsuariosClick" maxWidth="Infinity"/>
-                <Button text="Libros" onAction="#onLibrosClick" maxWidth="Infinity"/>
-                <Button text="Autores" onAction="#onAutoresClick" maxWidth="Infinity"/>
-                <Button text="Categorías" onAction="#onCategoriasClick" maxWidth="Infinity"/>
-                <Button text="Editoriales" onAction="#onEditorialesClick" maxWidth="Infinity"/>
-                <Button text="Ventas" onAction="#onVentasClick" maxWidth="Infinity"/>
-                <Button text="Autores-Libro" onAction="#onAutoresLibroClick" maxWidth="Infinity"/>
-                <Button text="Detalle Ventas" onAction="#onDetalleVentasClick" maxWidth="Infinity"/>
-                <Button text="Clientes" onAction="#onClientesClick" maxWidth="Infinity"/>
+
+                <Button
+                        text="Usuarios"
+                        onAction="#onUsuariosClick"
+                        maxWidth="Infinity"/>
+
+                <Button
+                        text="Cambiar contraseña"
+                        onAction="#onCambiarContrasenaClick"
+                        maxWidth="Infinity"/>
+
+                <Button
+                        text="Libros"
+                        onAction="#onLibrosClick"
+                        maxWidth="Infinity"/>
+
+                <Button
+                        text="Autores"
+                        onAction="#onAutoresClick"
+                        maxWidth="Infinity"/>
+
+                <Button
+                        text="Categorías"
+                        onAction="#onCategoriasClick"
+                        maxWidth="Infinity"/>
+
+                <Button
+                        text="Editoriales"
+                        onAction="#onEditorialesClick"
+                        maxWidth="Infinity"/>
+
+                <Button
+                        text="Ventas"
+                        onAction="#onVentasClick"
+                        maxWidth="Infinity"/>
+
+                <Button
+                        text="Autores-Libro"
+                        onAction="#onAutoresLibroClick"
+                        maxWidth="Infinity"/>
+
+                <Button
+                        text="Detalle Ventas"
+                        onAction="#onDetalleVentasClick"
+                        maxWidth="Infinity"/>
+
+                <Button
+                        text="Clientes"
+                        onAction="#onClientesClick"
+                        maxWidth="Infinity"/>
+
             </VBox>
+
         </ScrollPane>
+
     </left>
 
     <top>
-        <HBox alignment="CENTER_LEFT" spacing="10">
+
+        <HBox
+                alignment="CENTER_LEFT"
+                spacing="10">
+
             <padding>
-                <Insets top="10" right="15" bottom="10" left="15"/>
+                <Insets
+                        top="10"
+                        right="15"
+                        bottom="10"
+                        left="15"/>
             </padding>
-            <Label text="Panel de Control" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+            <Label
+                    text="Panel de Control"
+                    style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+
             <HBox HBox.hgrow="ALWAYS"/>
-            <Label fx:id="lblUsuario" text="Admin"/>
-            <Button text="Cerrar Sesión" onAction="#onCerrarSesionClick"/>
+
+            <Label
+                    fx:id="lblUsuario"
+                    text="Admin"/>
+
+            <Button
+                    text="Cerrar Sesión"
+                    onAction="#onCerrarSesionClick"/>
+
         </HBox>
+
     </top>
 
     <center>
-        <VBox spacing="10">
+
+        <VBox spacing="15">
+
             <padding>
-                <Insets top="20" right="20" bottom="20" left="20"/>
+                <Insets
+                        top="20"
+                        right="20"
+                        bottom="20"
+                        left="20"/>
             </padding>
-            <Label text="Bienvenido" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
-            <Label text="Accesos rápidos a las funciones principales del sistema"/>
+
+            <Label
+                    text="Bienvenido"
+                    style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+
+            <Label
+                    text="Accesos rápidos a las funciones principales del sistema"/>
 
             <HBox spacing="10">
-                <Button text="Nuevo Libro" onAction="#onLibrosClick" prefWidth="150" prefHeight="60"/>
-                <Button text="Agregar Venta" onAction="#onVentasClick" prefWidth="150" prefHeight="60"/>
-                <Button text="Gestionar Usuarios" onAction="#onUsuariosClick" prefWidth="150" prefHeight="60"/>
-                <Button text="Reportes" onAction="#onClientesClick" prefWidth="150" prefHeight="60"/>
+
+                <Button
+                        text="Nuevo Libro"
+                        onAction="#onLibrosClick"
+                        prefWidth="150"
+                        prefHeight="60"/>
+
+                <Button
+                        text="Agregar Venta"
+                        onAction="#onVentasClick"
+                        prefWidth="150"
+                        prefHeight="60"/>
+
+                <Button
+                        text="Gestionar Usuarios"
+                        onAction="#onUsuariosClick"
+                        prefWidth="150"
+                        prefHeight="60"/>
+
+                <Button
+                        text="Reportes"
+                        onAction="#onClientesClick"
+                        prefWidth="150"
+                        prefHeight="60"/>
+
             </HBox>
+
+            <HBox spacing="10">
+
+                <Button
+                        text="Cambiar contraseña"
+                        onAction="#onCambiarContrasenaClick"
+                        prefWidth="150"
+                        prefHeight="60"/>
+
+            </HBox>
+
         </VBox>
+
     </center>
+
 </BorderPane>
