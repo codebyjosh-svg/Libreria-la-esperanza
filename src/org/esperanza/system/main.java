@@ -2,7 +2,7 @@ package org.esperanza.system;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
+import org.esperanza.view.CarritoVentaVista;
 import javafx.stage.Stage;
 
 /**
@@ -19,12 +19,16 @@ public class main {
 
         @Override
         public void start(Stage stage) {
-            Pane root = new Pane();
-            Scene scene = new Scene(root, 800, 600);
+            CarritoVentaVista root = new CarritoVentaVista();
+            Scene scene = new Scene(root, 950, 620);
 
             stage.setTitle("Libreria La Esperanza");
             stage.setScene(scene);
+            stage.setMinWidth(760);
+            stage.setMinHeight(560);
             stage.show();
         }
     }
 }
+
+

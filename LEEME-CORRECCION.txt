@@ -1,0 +1,18 @@
+REVISION DEL ZIP
+
+Se corrigio CarritoVenta.java, que contenia por error public class DetalleVenta.
+Se restauro la logica del carrito y se unificaron paquetes e imports:
+- org.esperanza.model: Venta, DetalleVenta, CarritoVenta.
+- org.esperanza.view: CarritoVentaVista.
+- org.esperanza.util: Conexion.
+- org.esperanza.Dao: DAO de ventas y detalles.
+Las carpetas ahora coinciden exactamente con sus paquetes, incluidas mayusculas.
+
+Abrir esta copia descomprimida en una carpeta nueva con NetBeans, cerrar la
+copia anterior y ejecutar Limpiar y construir. Mantener configuradas las
+bibliotecas JavaFX21 y Mysql_Connector_8 del proyecto.
+
+Verificacion: modelos, carrito, DAO y conexion compilan con Java 21.
+PruebaVentas pasa: calculos, cantidades, eliminacion, copias, vaciado,
+commit y rollback con JDBC simulado. No se verifico MySQL real.
+La pantalla JavaFX no se compilo ni ejecuto porque falta el SDK en este equipo.
