@@ -2,6 +2,7 @@ package org.esperanza.Controller;
 
 import java.io.IOException;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -11,7 +12,10 @@ import javafx.scene.control.Label;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import org.esperanza.Model.Rol;
 import org.esperanza.Model.Usuario;
+import org.esperanza.Service.NavegacionRol;
+import org.esperanza.Service.SesionUsuario;
 
 public class DashboardAdminController {
 
@@ -20,15 +24,31 @@ public class DashboardAdminController {
 
     private Usuario usuarioActual;
 
-    // =====================================================
-    // RECIBIR USUARIO DESDE LOGIN
-    // =====================================================
+    @FXML
+    private void initialize() {
 
-    public void setUsuarioActual(Usuario usuarioActual) {
+        if (!NavegacionRol.validarRol(
+                Rol.ADMIN)) {
 
-        this.usuarioActual = usuarioActual;
+            Platform.runLater(
+                    this::redirigirDashboardCorrecto
+            );
 
-        if (usuarioActual != null && lblUsuario != null) {
+            return;
+        }
+
+        usuarioActual =
+                SesionUsuario
+                        .getInstancia()
+                        .getUsuarioActual();
+
+        actualizarUsuario();
+    }
+
+    private void actualizarUsuario() {
+
+        if (usuarioActual != null
+                && lblUsuario != null) {
 
             lblUsuario.setText(
                     usuarioActual.getUsrname()
@@ -36,20 +56,32 @@ public class DashboardAdminController {
         }
     }
 
-    // =====================================================
-    // ABRIR GESTIÓN DE USUARIOS
-    // =====================================================
+    public void setUsuarioActual(
+            Usuario usuarioActual) {
+
+        this.usuarioActual =
+                usuarioActual;
+
+        actualizarUsuario();
+    }
 
     @FXML
     private void onUsuariosClick() {
+
+        if (!NavegacionRol.validarPermiso(
+                "GESTION_USUARIOS")) {
+
+            return;
+        }
 
         try {
 
             FXMLLoader loader =
                     new FXMLLoader(
-                            getClass().getResource(
-                                    "/org/esperanza/view/Usuarios.fxml"
-                            )
+                            getClass()
+                                    .getResource(
+                                            "/org/esperanza/view/Usuarios.fxml"
+                                    )
                     );
 
             Parent root =
@@ -81,17 +113,14 @@ public class DashboardAdminController {
         }
     }
 
-    // =====================================================
-    // US-1.4 - CAMBIO DE CONTRASEÑA
-    // =====================================================
-
     @FXML
     private void onCambiarContrasenaClick() {
 
         if (usuarioActual == null) {
 
             mostrarError(
-                    "No se pudo identificar al usuario que inició sesión."
+                    "No se pudo identificar al usuario "
+                    + "que inició sesión."
             );
 
             return;
@@ -101,9 +130,10 @@ public class DashboardAdminController {
 
             FXMLLoader loader =
                     new FXMLLoader(
-                            getClass().getResource(
-                                    "/org/esperanza/view/CambioContrasenaDashboard.fxml"
-                            )
+                            getClass()
+                                    .getResource(
+                                            "/org/esperanza/view/CambioContrasenaDashboard.fxml"
+                                    )
                     );
 
             Parent root =
@@ -112,7 +142,6 @@ public class DashboardAdminController {
             CambioContrasenaController controller =
                     loader.getController();
 
-            // Mandamos el ID REAL del usuario logueado
             controller.setIdUsuarioActual(
                     usuarioActual.getId()
             );
@@ -128,7 +157,6 @@ public class DashboardAdminController {
                     new Scene(root)
             );
 
-            // Hace que esta ventana dependa del dashboard
             ventana.initOwner(
                     lblUsuario
                             .getScene()
@@ -139,7 +167,9 @@ public class DashboardAdminController {
                     Modality.WINDOW_MODAL
             );
 
-            ventana.setResizable(false);
+            ventana.setResizable(
+                    false
+            );
 
             ventana.centerOnScreen();
 
@@ -150,15 +180,12 @@ public class DashboardAdminController {
             e.printStackTrace();
 
             mostrarError(
-                    "No se pudo abrir la pantalla de Cambio de Contraseña.\n"
+                    "No se pudo abrir la pantalla "
+                    + "de Cambio de Contraseña.\n"
                     + e.getMessage()
             );
         }
     }
-
-    // =====================================================
-    // LIBROS
-    // =====================================================
 
     @FXML
     private void onLibrosClick() {
@@ -168,10 +195,6 @@ public class DashboardAdminController {
         );
     }
 
-    // =====================================================
-    // AUTORES
-    // =====================================================
-
     @FXML
     private void onAutoresClick() {
 
@@ -179,10 +202,6 @@ public class DashboardAdminController {
                 "Autores"
         );
     }
-
-    // =====================================================
-    // CATEGORÍAS
-    // =====================================================
 
     @FXML
     private void onCategoriasClick() {
@@ -192,10 +211,6 @@ public class DashboardAdminController {
         );
     }
 
-    // =====================================================
-    // EDITORIALES
-    // =====================================================
-
     @FXML
     private void onEditorialesClick() {
 
@@ -204,21 +219,19 @@ public class DashboardAdminController {
         );
     }
 
-    // =====================================================
-    // VENTAS
-    // =====================================================
-
     @FXML
     private void onVentasClick() {
+
+        if (!NavegacionRol.validarPermiso(
+                "VENTAS")) {
+
+            return;
+        }
 
         mostrarEnConstruccion(
                 "Ventas"
         );
     }
-
-    // =====================================================
-    // AUTORES-LIBRO
-    // =====================================================
 
     @FXML
     private void onAutoresLibroClick() {
@@ -228,10 +241,6 @@ public class DashboardAdminController {
         );
     }
 
-    // =====================================================
-    // DETALLE VENTAS
-    // =====================================================
-
     @FXML
     private void onDetalleVentasClick() {
 
@@ -239,10 +248,6 @@ public class DashboardAdminController {
                 "Detalle Ventas"
         );
     }
-
-    // =====================================================
-    // CLIENTES
-    // =====================================================
 
     @FXML
     private void onClientesClick() {
@@ -252,20 +257,24 @@ public class DashboardAdminController {
         );
     }
 
-    // =====================================================
-    // CERRAR SESIÓN
-    // =====================================================
-
     @FXML
     private void onCerrarSesionClick() {
+
+        SesionUsuario
+                .getInstancia()
+                .cerrarSesion();
+
+        usuarioActual =
+                null;
 
         try {
 
             FXMLLoader loader =
                     new FXMLLoader(
-                            getClass().getResource(
-                                    "/org/esperanza/view/Login.fxml"
-                            )
+                            getClass()
+                                    .getResource(
+                                            "/org/esperanza/view/Login.fxml"
+                                    )
                     );
 
             Parent root =
@@ -297,9 +306,36 @@ public class DashboardAdminController {
         }
     }
 
-    // =====================================================
-    // MENSAJE MÓDULO EN CONSTRUCCIÓN
-    // =====================================================
+    private void redirigirDashboardCorrecto() {
+
+        if (lblUsuario == null
+                || lblUsuario.getScene() == null
+                || lblUsuario
+                        .getScene()
+                        .getWindow() == null) {
+
+            return;
+        }
+
+        Stage stage =
+                (Stage) lblUsuario
+                        .getScene()
+                        .getWindow();
+
+        if (SesionUsuario
+                .getInstancia()
+                .haySesionActiva()) {
+
+            NavegacionRol
+                    .abrirDashboardSegunRol(
+                            stage
+                    );
+
+        } else {
+
+            stage.close();
+        }
+    }
 
     private void mostrarEnConstruccion(
             String modulo) {
@@ -318,17 +354,13 @@ public class DashboardAdminController {
         );
 
         alert.setContentText(
-                "Módulo de "
+                "El módulo "
                 + modulo
-                + " en construcción."
+                + " se encuentra en construcción."
         );
 
         alert.showAndWait();
     }
-
-    // =====================================================
-    // MOSTRAR ERROR
-    // =====================================================
 
     private void mostrarError(
             String mensaje) {

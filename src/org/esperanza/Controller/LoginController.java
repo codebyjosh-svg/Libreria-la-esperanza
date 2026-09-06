@@ -1,12 +1,7 @@
 package org.esperanza.Controller;
 
-import java.io.IOException;
-
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -16,7 +11,9 @@ import javafx.stage.Stage;
 
 import org.esperanza.Model.Usuario;
 import org.esperanza.Service.AutenticacionService;
+import org.esperanza.Service.NavegacionRol;
 import org.esperanza.Service.ResultadoLogin;
+import org.esperanza.Service.SesionUsuario;
 
 public class LoginController {
 
@@ -35,6 +32,14 @@ public class LoginController {
     private final AutenticacionService autenticacionService =
             new AutenticacionService();
 
+    @FXML
+    private void initialize() {
+
+        if (lblMensaje != null) {
+            lblMensaje.setText("");
+        }
+    }
+
     // =====================================================
     // BOTÓN INGRESAR
     // =====================================================
@@ -42,8 +47,11 @@ public class LoginController {
     @FXML
     private void onIngresarClick(ActionEvent event) {
 
-        String username = txtUsername.getText();
-        String password = txtPassword.getText();
+        String username =
+                txtUsername.getText();
+
+        String password =
+                txtPassword.getText();
 
         ResultadoLogin resultado =
                 autenticacionService.autenticar(
@@ -53,10 +61,40 @@ public class LoginController {
 
         switch (resultado.getEstado()) {
 
-            case EXITO:
+            case EXITO -> {
 
                 Usuario usuario =
                         resultado.getUsuario();
+
+                if (usuario == null) {
+
+                    mostrarAdvertencia(
+                            "Error",
+                            "No se pudo obtener la información del usuario."
+                    );
+
+                    return;
+                }
+
+                /*
+                 * T1.16
+                 * Guardar usuario autenticado en sesión.
+                 */
+                boolean sesionCorrecta =
+                        SesionUsuario
+                                .getInstancia()
+                                .iniciarSesion(usuario);
+
+                if (!sesionCorrecta) {
+
+                    mostrarAdvertencia(
+                            "Acceso denegado",
+                            "El usuario no tiene un rol válido "
+                            + "o se encuentra inactivo."
+                    );
+
+                    return;
+                }
 
                 mostrarExito(
                         "Bienvenido, "
@@ -66,173 +104,90 @@ public class LoginController {
                         + ")"
                 );
 
-                abrirDashboard(
-                        usuario,
-                        event
-                );
+                Stage stage =
+                        (Stage) btnIngresar
+                                .getScene()
+                                .getWindow();
 
-                break;
+                /*
+                 * T1.21
+                 * Ya NO abrimos DashboardAdmin
+                 * directamente.
+                 *
+                 * NavegacionRol decide cuál abrir:
+                 *
+                 * ADMIN  -> DashboardAdmin
+                 * CAJERO -> DashboardCajero
+                 * BODEGA -> DashboardBodega
+                 */
+                boolean abierto =
+                        NavegacionRol
+                                .abrirDashboardSegunRol(
+                                        stage
+                                );
 
-            case CAMPOS_VACIOS:
+                if (!abierto) {
+
+                    SesionUsuario
+                            .getInstancia()
+                            .cerrarSesion();
+                }
+            }
+
+            case CAMPOS_VACIOS -> {
 
                 mostrarAdvertencia(
                         "Campos incompletos",
                         "Completa usuario y contraseña."
                 );
+            }
 
-                break;
-
-            case USUARIO_NO_ENCONTRADO:
+            case USUARIO_NO_ENCONTRADO -> {
 
                 mostrarAdvertencia(
                         "Usuario no encontrado",
                         "El usuario no existe."
                 );
+            }
 
-                break;
-
-            case CONTRASENA_INCORRECTA:
+            case CONTRASENA_INCORRECTA -> {
 
                 mostrarAdvertencia(
                         "Credenciales incorrectas",
                         "Usuario o contraseña incorrectos."
                 );
+            }
 
-                break;
-
-            case USUARIO_INACTIVO:
+            case USUARIO_INACTIVO -> {
 
                 mostrarAdvertencia(
                         "Usuario inactivo",
-                        "Este usuario está inactivo. Contacta al administrador."
+                        "Este usuario está inactivo. "
+                        + "Contacta al administrador."
                 );
+            }
 
-                break;
-
-            default:
+            default -> {
 
                 mostrarAdvertencia(
                         "Error",
                         "No fue posible iniciar sesión."
                 );
-
-                break;
+            }
         }
     }
 
     // =====================================================
-    // ABRIR DASHBOARD
-    // =====================================================
-
-    private void abrirDashboard(
-            Usuario usuario,
-            ActionEvent event) {
-
-        if (usuario == null) {
-
-            mostrarAdvertencia(
-                    "Error",
-                    "No se pudo obtener la información del usuario."
-            );
-
-            return;
-        }
-
-        if (usuario.getRol() == null) {
-
-            mostrarAdvertencia(
-                    "Error",
-                    "El usuario no tiene un rol asignado."
-            );
-
-            return;
-        }
-
-        String rol =
-                usuario.getRol()
-                        .trim()
-                        .toUpperCase();
-
-        // Por ahora solamente existe el dashboard de ADMIN
-        if (!rol.equals("ADMIN")) {
-
-            mostrarAdvertencia(
-                    "Acceso",
-                    "El dashboard para el rol "
-                    + usuario.getRol()
-                    + " todavía no está disponible."
-            );
-
-            return;
-        }
-
-        try {
-
-            FXMLLoader loader =
-                    new FXMLLoader(
-                            getClass().getResource(
-                                    "/org/esperanza/view/DashboardAdmin.fxml"
-                            )
-                    );
-
-            Parent root =
-                    loader.load();
-
-            // =================================================
-            // OBTENER EL CONTROLADOR DEL DASHBOARD
-            // =================================================
-
-            DashboardAdminController dashboardController =
-                    loader.getController();
-
-            // =================================================
-            // ENVIAR EL USUARIO QUE INICIÓ SESIÓN
-            // Esto permite obtener posteriormente su ID
-            // para cambiar la contraseña.
-            // =================================================
-
-            dashboardController.setUsuarioActual(
-                    usuario
-            );
-
-            // =================================================
-            // CAMBIAR DE PANTALLA
-            // =================================================
-
-            Stage stage =
-                    (Stage) ((Button) event.getSource())
-                            .getScene()
-                            .getWindow();
-
-            stage.setScene(
-                    new Scene(root)
-            );
-
-            stage.setTitle(
-                    "Librería La Esperanza - Panel Administrador"
-            );
-
-            stage.centerOnScreen();
-
-        } catch (IOException e) {
-
-            e.printStackTrace();
-
-            mostrarAdvertencia(
-                    "Error",
-                    "No se pudo cargar el dashboard: "
-                    + e.getMessage()
-            );
-        }
-    }
-
-    // =====================================================
-    // MOSTRAR ADVERTENCIAS
+    // ADVERTENCIAS
     // =====================================================
 
     private void mostrarAdvertencia(
             String titulo,
             String mensaje) {
+
+        if (lblMensaje != null) {
+            lblMensaje.setText(mensaje);
+        }
 
         Alert alert =
                 new Alert(
@@ -244,37 +199,36 @@ public class LoginController {
         alert.setContentText(mensaje);
 
         alert.showAndWait();
-
-        if (lblMensaje != null) {
-
-            lblMensaje.getStyleClass()
-                    .setAll("lbl-mensaje");
-
-            lblMensaje.setStyle(
-                    "-fx-text-fill: #ff6b6b;"
-            );
-
-            lblMensaje.setText(mensaje);
-        }
     }
 
     // =====================================================
-    // MOSTRAR MENSAJE DE ÉXITO
+    // MENSAJE DE ÉXITO
     // =====================================================
 
     private void mostrarExito(
             String mensaje) {
 
         if (lblMensaje != null) {
-
-            lblMensaje.getStyleClass()
-                    .setAll("lbl-mensaje");
-
-            lblMensaje.setStyle(
-                    "-fx-text-fill: #4ade80;"
-            );
-
-            lblMensaje.setText(mensaje);
+            lblMensaje.setText("");
         }
+
+        Alert alert =
+                new Alert(
+                        Alert.AlertType.INFORMATION
+                );
+
+        alert.setTitle(
+                "Inicio de sesión"
+        );
+
+        alert.setHeaderText(
+                null
+        );
+
+        alert.setContentText(
+                mensaje
+        );
+
+        alert.showAndWait();
     }
 }
