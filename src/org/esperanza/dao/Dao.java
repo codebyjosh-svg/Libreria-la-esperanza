@@ -1,5 +1,5 @@
 
-package org.esperanza.Dao;
+package org.esperanza.dao;
 
 public interface Dao {
 
