@@ -1,37 +1,125 @@
 package org.esperanza.system;
 
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.stage.Stage;
-import org.esperanza.dao.UsuarioDao;
+
 import org.esperanza.Model.Usuario;
+import org.esperanza.Service.NavegacionRol;
 import org.esperanza.Service.SesionUsuario;
+import org.esperanza.dao.UsuarioDao;
 
 /**
- * Punto de entrada. La aplicación inicia directamente, sin pantalla de login.
+ * Punto de entrada para probar US-1.3.
+ *
+ * Esta rama todavía no contiene el login de develop,
+ * por eso utiliza temporalmente el primer usuario activo.
  */
 public class main {
-    public static class Ventana extends Application {
-        @Override
-        public void start(Stage stage) throws Exception {
-            UsuarioDao dao = new UsuarioDao();
-            Usuario usuarioInicial = dao.listarUsuariosActivos().stream().findFirst().orElse(null);
-            if (usuarioInicial != null) SesionUsuario.getInstancia().iniciarSesion(usuarioInicial);
 
-            Parent root = FXMLLoader.load(getClass().getResource("/org/esperanza/view/DashboardAdmin.fxml"));
-            Scene scene = new Scene(root, 1050, 700);
-            stage.setTitle("Librería La Esperanza");
-            stage.setScene(scene);
-            stage.setResizable(true);
-            stage.setOnCloseRequest(e -> SesionUsuario.getInstancia().cerrarSesion());
-            stage.centerOnScreen();
-            stage.show();
+    public static class Ventana
+            extends Application {
+
+        @Override
+        public void start(
+                Stage stage) {
+
+            UsuarioDao usuarioDao =
+                    new UsuarioDao();
+
+           Usuario usuarioInicial =
+        usuarioDao
+                .listarUsuariosActivos()
+                .stream()
+                .filter(usuario ->
+                        "cajero1".equalsIgnoreCase(
+                                usuario.getUsrname()
+                        )
+                )
+                .findFirst()
+                .orElse(null);
+
+            if (usuarioInicial == null) {
+
+                mostrarError(
+                        "No existen usuarios activos "
+                        + "para iniciar la aplicación."
+                );
+
+                return;
+            }
+
+            // T1.16
+            boolean sesionCorrecta =
+                    SesionUsuario
+                            .getInstancia()
+                            .iniciarSesion(
+                                    usuarioInicial
+                            );
+
+            if (!sesionCorrecta) {
+
+                mostrarError(
+                        "El usuario está inactivo "
+                        + "o tiene un rol no válido."
+                );
+
+                return;
+            }
+
+            // T1.21
+            boolean dashboardAbierto =
+                    NavegacionRol
+                            .abrirDashboardSegunRol(
+                                    stage
+                            );
+
+            if (!dashboardAbierto) {
+
+                SesionUsuario
+                        .getInstancia()
+                        .cerrarSesion();
+
+                return;
+            }
+
+            stage.setOnCloseRequest(
+                    e -> SesionUsuario
+                            .getInstancia()
+                            .cerrarSesion()
+            );
+        }
+
+        private void mostrarError(
+                String mensaje) {
+
+            Alert alert =
+                    new Alert(
+                            Alert.AlertType.ERROR
+                    );
+
+            alert.setTitle(
+                    "Error"
+            );
+
+            alert.setHeaderText(
+                    null
+            );
+
+            alert.setContentText(
+                    mensaje
+            );
+
+            alert.showAndWait();
         }
     }
 
-    public static void main(String[] args) {
-        Application.launch(Ventana.class, args);
+    public static void main(
+            String[] args) {
+
+        Application.launch(
+                Ventana.class,
+                args
+        );
     }
 }

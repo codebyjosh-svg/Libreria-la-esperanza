@@ -1,11 +1,12 @@
 package org.esperanza.Model;
 
 /**
- * Roles del sistema y sus permisos asociados.
- * Autor: mi nombre
+ * Roles del sistema y permisos asociados.
  */
 public enum Rol {
-    ADMIN("Administrador",
+
+    ADMIN(
+            "Administrador",
             new String[]{
                 "GESTION_USUARIOS",
                 "VER_REPORTES",
@@ -13,20 +14,27 @@ public enum Rol {
                 "VENTAS",
                 "CONFIGURACION",
                 "DASHBOARD_ADMIN"
-            }),
-    CAJERO("Cajero",
+            }
+    ),
+
+    CAJERO(
+            "Cajero",
             new String[]{
                 "VENTAS",
                 "CONSULTAR_PRODUCTOS",
                 "DASHBOARD_CAJERO"
-            }),
-    BODEGA("Bodega",
+            }
+    ),
+
+    BODEGA(
+            "Bodega",
             new String[]{
                 "GESTION_INVENTARIO",
                 "CONSULTAR_PRODUCTOS",
                 "ENTRADAS_SALIDAS",
                 "DASHBOARD_BODEGA"
-            });
+            }
+    );
 
     private final String nombreVisible;
     private final String[] permisos;
@@ -45,40 +53,47 @@ public enum Rol {
     }
 
     public boolean tienePermiso(String permiso) {
-        if (permiso == null) return false;
-        for (String p : permisos) {
-            if (p.equalsIgnoreCase(permiso)) {
+
+        if (permiso == null) {
+            return false;
+        }
+
+        for (String permisoRol : permisos) {
+
+            if (permisoRol.equalsIgnoreCase(permiso)) {
                 return true;
             }
         }
+
         return false;
     }
 
     /**
-     * Convierte el texto del rol guardado en BD al enum.
-     * Acepta: ADMIN, Administrador, CAJERO, Cajero, BODEGA, Bodega, etc.
+     * Convierte el rol almacenado en la base de datos
+     * al enum correspondiente.
      */
     public static Rol fromString(String valor) {
+
         if (valor == null || valor.trim().isEmpty()) {
             return null;
         }
-        String v = valor.trim().toUpperCase();
-        switch (v) {
+
+        String rol = valor.trim().toUpperCase();
+
+        switch (rol) {
+
             case "ADMIN":
             case "ADMINISTRADOR":
                 return ADMIN;
+
             case "CAJERO":
                 return CAJERO;
+
             case "BODEGA":
             case "BODEGUERO":
                 return BODEGA;
+
             default:
-                // Intento por coincidencia parcial
-                for (Rol r : values()) {
-                    if (r.name().equalsIgnoreCase(v) || r.nombreVisible.equalsIgnoreCase(valor.trim())) {
-                        return r;
-                    }
-                }
                 return null;
         }
     }
