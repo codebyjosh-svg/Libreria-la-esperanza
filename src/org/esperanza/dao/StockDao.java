@@ -5,35 +5,56 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Objects;
+
 import org.esperanza.util.Conexion;
 
 /**
- * DAO encargado de consultar y validar el stock de los libros.
+ * DAO encargado de consultar, validar
+ * y actualizar el stock de los libros.
  *
  * T2.17 - Validar stock.
+ * T2.19 - Actualizar stock.
  */
 public class StockDao {
 
     private final ProveedorConexion conexiones;
 
-    public StockDao() {
-        this(() -> Conexion.getInstancia().conectar());
-    }
+    // =====================================================
+    // CONSTRUCTORES
+    // =====================================================
 
-    public StockDao(ProveedorConexion conexiones) {
-        this.conexiones = Objects.requireNonNull(
-                conexiones,
-                "El proveedor de conexion es obligatorio"
+    public StockDao() {
+
+        this(
+                () -> Conexion
+                        .getInstancia()
+                        .conectar()
         );
     }
+
+    public StockDao(
+            ProveedorConexion conexiones) {
+
+        this.conexiones =
+                Objects.requireNonNull(
+                        conexiones,
+                        "El proveedor de conexion es obligatorio"
+                );
+    }
+
+    // =====================================================
+    // T2.17 - OBTENER STOCK ACTUAL
+    // =====================================================
 
     /**
      * Obtiene el stock actual de un libro activo.
      *
      * @param isbn ISBN del libro.
-     * @return stock disponible, o -1 si no existe o esta inactivo.
+     * @return stock disponible,
+     * o -1 si no existe o esta inactivo.
      */
-    public int obtenerStockActual(String isbn) throws SQLException {
+    public int obtenerStockActual(
+            String isbn) throws SQLException {
 
         validarIsbn(isbn);
 
@@ -44,21 +65,37 @@ public class StockDao {
                   AND activo = 1
                 """;
 
-        try (Connection conexion = conexiones.conectar();
-             PreparedStatement ps = conexion.prepareStatement(sql)) {
+        try (
+                Connection conexion =
+                        conexiones.conectar();
 
-            ps.setString(1, isbn.trim());
+                PreparedStatement ps =
+                        conexion.prepareStatement(sql)
+        ) {
 
-            try (ResultSet rs = ps.executeQuery()) {
+            ps.setString(
+                    1,
+                    isbn.trim()
+            );
+
+            try (ResultSet rs =
+                    ps.executeQuery()) {
 
                 if (rs.next()) {
-                    return rs.getInt("stock_actual");
+
+                    return rs.getInt(
+                            "stock_actual"
+                    );
                 }
 
                 return -1;
             }
         }
     }
+
+    // =====================================================
+    // T2.17 - COMPROBAR STOCK
+    // =====================================================
 
     /**
      * Comprueba si existe suficiente stock.
@@ -67,18 +104,22 @@ public class StockDao {
             String isbn,
             int cantidad) throws SQLException {
 
+        validarIsbn(isbn);
         validarCantidad(cantidad);
 
-        int stockActual = obtenerStockActual(isbn);
+        int stockActual =
+                obtenerStockActual(isbn);
 
         return stockActual >= cantidad;
     }
 
+    // =====================================================
+    // T2.17 - COMPROBAR STOCK EN TRANSACCION
+    // =====================================================
+
     /**
-     * Version que utiliza una conexion existente.
-     *
-     * Se usara en T2.18 para que la validacion
-     * forme parte de la misma transaccion JDBC.
+     * Comprueba el stock utilizando una conexion
+     * que ya pertenece a una transaccion.
      */
     public boolean hayStockSuficiente(
             Connection conexion,
@@ -104,25 +145,36 @@ public class StockDao {
         try (PreparedStatement ps =
                 conexion.prepareStatement(sql)) {
 
-            ps.setString(1, isbn.trim());
+            ps.setString(
+                    1,
+                    isbn.trim()
+            );
 
-            try (ResultSet rs = ps.executeQuery()) {
+            try (ResultSet rs =
+                    ps.executeQuery()) {
 
                 if (!rs.next()) {
+
                     return false;
                 }
 
                 int stockActual =
-                        rs.getInt("stock_actual");
+                        rs.getInt(
+                                "stock_actual"
+                        );
 
                 return stockActual >= cantidad;
             }
         }
     }
 
+    // =====================================================
+    // T2.17 - VALIDAR STOCK
+    // =====================================================
+
     /**
-     * Valida stock y genera mensajes entendibles
-     * para la interfaz.
+     * Valida que el libro exista,
+     * este activo y tenga stock suficiente.
      */
     public void validarStock(
             Connection conexion,
@@ -148,9 +200,13 @@ public class StockDao {
         try (PreparedStatement ps =
                 conexion.prepareStatement(sql)) {
 
-            ps.setString(1, isbn.trim());
+            ps.setString(
+                    1,
+                    isbn.trim()
+            );
 
-            try (ResultSet rs = ps.executeQuery()) {
+            try (ResultSet rs =
+                    ps.executeQuery()) {
 
                 if (!rs.next()) {
 
@@ -160,10 +216,14 @@ public class StockDao {
                 }
 
                 String titulo =
-                        rs.getString("titulo");
+                        rs.getString(
+                                "titulo"
+                        );
 
                 int stockActual =
-                        rs.getInt("stock_actual");
+                        rs.getInt(
+                                "stock_actual"
+                        );
 
                 if (stockActual < cantidad) {
 
@@ -180,9 +240,89 @@ public class StockDao {
         }
     }
 
-    private void validarIsbn(String isbn) {
+    // =====================================================
+    // T2.19 - DESCONTAR STOCK
+    // =====================================================
 
-        if (isbn == null || isbn.trim().isEmpty()) {
+public void descontarStock(
+        Connection conexion,
+        String isbn,
+        int cantidad) throws SQLException {
+
+    Objects.requireNonNull(
+            conexion,
+            "La conexion es obligatoria"
+    );
+
+    validarIsbn(isbn);
+    validarCantidad(cantidad);
+
+    String sql = """
+            UPDATE libros
+            SET stock_actual = stock_actual - ?
+            WHERE isbn = ?
+              AND activo = 1
+              AND stock_actual >= ?
+            """;
+
+    try (PreparedStatement ps =
+            conexion.prepareStatement(sql)) {
+
+        ps.setInt(
+                1,
+                cantidad
+        );
+
+        ps.setString(
+                2,
+                isbn.trim()
+        );
+
+        ps.setInt(
+                3,
+                cantidad
+        );
+
+        System.out.println(
+                "[T2.19] Entrando a descontarStock"
+        );
+
+        System.out.println(
+                "[T2.19] ISBN: " + isbn
+        );
+
+        System.out.println(
+                "[T2.19] Cantidad a descontar: "
+                + cantidad
+        );
+
+        int filasAfectadas =
+                ps.executeUpdate();
+
+        System.out.println(
+                "[T2.19] Filas actualizadas: "
+                + filasAfectadas
+        );
+
+        if (filasAfectadas != 1) {
+
+            throw new SQLException(
+                    "No se pudo descontar el stock "
+                    + "del libro con ISBN: "
+                    + isbn
+            );
+        }
+    }
+}
+    // =====================================================
+    // VALIDAR ISBN
+    // =====================================================
+
+    private void validarIsbn(
+            String isbn) {
+
+        if (isbn == null
+                || isbn.trim().isEmpty()) {
 
             throw new IllegalArgumentException(
                     "El ISBN es obligatorio."
@@ -190,7 +330,12 @@ public class StockDao {
         }
     }
 
-    private void validarCantidad(int cantidad) {
+    // =====================================================
+    // VALIDAR CANTIDAD
+    // =====================================================
+
+    private void validarCantidad(
+            int cantidad) {
 
         if (cantidad <= 0) {
 

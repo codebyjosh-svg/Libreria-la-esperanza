@@ -26,6 +26,10 @@ public class VentaDao {
     private final DetalleVentaDao detalleVentaDao;
     private final StockDao stockDao;
 
+    // =====================================================
+    // CONSTRUCTOR NORMAL
+    // =====================================================
+
     public VentaDao() {
 
         this(
@@ -35,11 +39,18 @@ public class VentaDao {
         );
     }
 
+    // =====================================================
+    // CONSTRUCTOR PARA PRUEBAS
+    // =====================================================
+
     public VentaDao(
             ProveedorConexion conexiones) {
 
         this.conexiones =
-                Objects.requireNonNull(conexiones);
+                Objects.requireNonNull(
+                        conexiones,
+                        "El proveedor de conexion es obligatorio"
+                );
 
         this.detalleVentaDao =
                 new DetalleVentaDao(conexiones);
@@ -48,17 +59,20 @@ public class VentaDao {
                 new StockDao(conexiones);
     }
 
-    /**
-     * T2.18
-     *
-     * Registra cabecera y detalles utilizando
-     * una sola transaccion JDBC.
-     */
+    // =====================================================
+    // REGISTRAR VENTA
+    // T2.17 + T2.18 + T2.19
+    // =====================================================
+
     public Venta registrar(
             long cuiCliente,
             int idUsuario,
             List<DetalleVenta> detalles)
             throws SQLException {
+
+        // =================================================
+        // VALIDACIONES
+        // =================================================
 
         if (cuiCliente <= 0) {
 
@@ -85,6 +99,10 @@ public class VentaDao {
                     "La venta debe tener productos"
             );
         }
+
+        // =================================================
+        // COPIA DE DETALLES
+        // =================================================
 
         List<DetalleVenta> copia =
                 new ArrayList<>();
@@ -124,11 +142,17 @@ public class VentaDao {
                     );
         }
 
+        // =================================================
+        // CALCULAR TOTAL
+        // =================================================
+
         BigDecimal descuento =
                 BigDecimal.ZERO;
 
         BigDecimal total =
-                subtotal.subtract(descuento);
+                subtotal.subtract(
+                        descuento
+                );
 
         Venta venta =
                 new Venta(
@@ -142,20 +166,21 @@ public class VentaDao {
                         idUsuario
                 );
 
+        // =================================================
+        // CONEXION
+        // =================================================
+
         try (Connection conexion =
                 conexiones.conectar()) {
 
-            /*
-             * MUY IMPORTANTE:
-             * desde aqui comienza la transaccion.
-             */
+            // Iniciar transaccion
             conexion.setAutoCommit(false);
 
             try {
 
-                // ==========================================
+                // =========================================
                 // T2.17 - VALIDAR STOCK
-                // ==========================================
+                // =========================================
 
                 for (DetalleVenta detalle : copia) {
 
@@ -166,9 +191,9 @@ public class VentaDao {
                     );
                 }
 
-                // ==========================================
-                // INSERTAR CABECERA DE VENTA
-                // ==========================================
+                // =========================================
+                // T2.18 - INSERTAR VENTA
+                // =========================================
 
                 String sqlVenta = """
                         INSERT INTO ventas
@@ -224,6 +249,10 @@ public class VentaDao {
                         );
                     }
 
+                    // =====================================
+                    // OBTENER ID DE LA VENTA
+                    // =====================================
+
                     try (ResultSet claves =
                             ps.getGeneratedKeys()) {
 
@@ -240,31 +269,50 @@ public class VentaDao {
                     }
                 }
 
-                // ==========================================
-                // INSERTAR TODOS LOS DETALLES
-                // ==========================================
+                // =========================================
+                // T2.18 - INSERTAR DETALLES
+                // T2.19 - DESCONTAR STOCK
+                // =========================================
 
                 for (DetalleVenta detalle : copia) {
 
+                    // Insertar detalle
                     detalleVentaDao.insertar(
                             conexion,
                             venta.getIdVenta(),
                             detalle
                     );
+
+                    // IMPORTANTE:
+                    // descontar stock del libro
+                    System.out.println(
+                            "[T2.19] Descontando stock del ISBN: "
+                    );
+
+                    stockDao.descontarStock(
+                            conexion,
+                            detalle.getIsbn(),
+                            detalle.getCantidad()
+                    );
                 }
 
-                /*
-                 * Todos los INSERT funcionaron.
-                 */
+                // =========================================
+                // TODO FUNCIONO
+                // =========================================
+
                 conexion.commit();
+
+                System.out.println(
+                        "[T2.19] Venta confirmada y stock actualizado."
+                );
 
             } catch (SQLException
                     | RuntimeException e) {
 
-                /*
-                 * Esto será parte de T2.20.
-                 * Ya lo dejamos preparado.
-                 */
+                // =========================================
+                // ERROR -> ROLLBACK
+                // =========================================
+
                 try {
 
                     conexion.rollback();
@@ -285,6 +333,7 @@ public class VentaDao {
                     conexion.setAutoCommit(true);
 
                 } catch (SQLException ignored) {
+
                 }
             }
         }
@@ -292,8 +341,13 @@ public class VentaDao {
         return venta;
     }
 
+    // =====================================================
+    // BUSCAR POR ID
+    // =====================================================
+
     public Optional<Venta> buscarPorId(
-            int idVenta) throws SQLException {
+            int idVenta)
+            throws SQLException {
 
         String sql = """
                 SELECT
@@ -308,11 +362,13 @@ public class VentaDao {
                 WHERE id_venta = ?
                 """;
 
-        try (Connection conexion =
-                    conexiones.conectar();
+        try (
+                Connection conexion =
+                        conexiones.conectar();
 
-             PreparedStatement ps =
-                    conexion.prepareStatement(sql)) {
+                PreparedStatement ps =
+                        conexion.prepareStatement(sql)
+        ) {
 
             ps.setInt(
                     1,
@@ -334,6 +390,10 @@ public class VentaDao {
         }
     }
 
+    // =====================================================
+    // LISTAR
+    // =====================================================
+
     public List<Venta> listar()
             throws SQLException {
 
@@ -353,14 +413,16 @@ public class VentaDao {
                 ORDER BY id_venta DESC
                 """;
 
-        try (Connection conexion =
-                    conexiones.conectar();
+        try (
+                Connection conexion =
+                        conexiones.conectar();
 
-             PreparedStatement ps =
-                    conexion.prepareStatement(sql);
+                PreparedStatement ps =
+                        conexion.prepareStatement(sql);
 
-             ResultSet rs =
-                    ps.executeQuery()) {
+                ResultSet rs =
+                        ps.executeQuery()
+        ) {
 
             while (rs.next()) {
 
@@ -373,8 +435,13 @@ public class VentaDao {
         return ventas;
     }
 
+    // =====================================================
+    // CONVERTIR RESULTSET
+    // =====================================================
+
     private Venta leer(
-            ResultSet rs) throws SQLException {
+            ResultSet rs)
+            throws SQLException {
 
         return new Venta(
                 rs.getInt(

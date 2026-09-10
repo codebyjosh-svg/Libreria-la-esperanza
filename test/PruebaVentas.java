@@ -66,7 +66,7 @@ public class PruebaVentas {
                         switch (metodo.getName()) {
 
                             case "setAutoCommit":
-                                return null;
+                                return true;
 
                             case "commit":
                                 commit = true;
