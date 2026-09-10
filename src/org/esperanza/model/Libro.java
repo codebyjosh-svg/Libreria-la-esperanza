@@ -1,4 +1,4 @@
-package org.esperanza.Model;
+package org.esperanza.model;
 
 public class Libro {
     private String isbn;
@@ -11,23 +11,9 @@ public class Libro {
     private int stockActual;
     private int stockMinimo;
     private boolean activo;
-    private String nombreAutor; 
+    private String nombreAutor;
 
     public Libro() {}
-
-    public Libro(String isbn, String titulo, String fechaPublicacion, double precio, int idCategoria, String nitEditorial, int idProveedor, int stockActual, int stockMinimo, boolean activo, String nombreAutor) {
-        this.isbn = isbn;
-        this.titulo = titulo;
-        this.fechaPublicacion = fechaPublicacion;
-        this.precio = precio;
-        this.idCategoria = idCategoria;
-        this.nitEditorial = nitEditorial;
-        this.idProveedor = idProveedor;
-        this.stockActual = stockActual;
-        this.stockMinimo = stockMinimo;
-        this.activo = activo;
-        this.nombreAutor = nombreAutor;
-    }
 
     public String getIsbn() { return isbn; }
     public void setIsbn(String isbn) { this.isbn = isbn; }

@@ -1,12 +1,10 @@
-package org.esperanza.Controller;
+package org.esperanza.controller;
 
-import org.esperanza.Dao.LibroDAO;
-import org.esperanza.Dao.Impl.LibroDAOImpl;
-import org.esperanza.Model.Libro;
+import org.esperanza.dao.LibroDAO;
+import org.esperanza.dao.impl.LibroDAOImpl;
+import org.esperanza.model  .Libro;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -27,18 +25,17 @@ public class BuscadorLibrosController implements Initializable {
     @FXML private TableView<Libro> tblLibros;
     @FXML private TableColumn<Libro, String> colIsbn;
     @FXML private TableColumn<Libro, String> colTitulo;
-    @FXML private TableColumn<Libro, String> colAutor; // <--- Referencia al Autor
+    @FXML private TableColumn<Libro, String> colAutor;
     @FXML private TableColumn<Libro, Double> colPrecio;
     @FXML private TableColumn<Libro, Integer> colStock;
 
     private LibroDAO libroDAO;
     private ObservableList<Libro> listaLibrosMaster = FXCollections.observableArrayList();
-    private FilteredList<Libro> filteredData;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         libroDAO = new LibroDAOImpl();
-        
+
         cmbFiltro.getItems().addAll("ISBN", "Título", "Autor");
         cmbFiltro.getSelectionModel().selectFirst();
 
@@ -49,57 +46,49 @@ public class BuscadorLibrosController implements Initializable {
         colStock.setCellValueFactory(new PropertyValueFactory<>("stockActual"));
 
         listaLibrosMaster.addAll(libroDAO.listarTodos());
+        tblLibros.setItems(listaLibrosMaster);
 
-        filteredData = new FilteredList<>(listaLibrosMaster, b -> true);
-
-        txtBusqueda.textProperty().addListener((observable, oldValue, newValue) -> {
-            String filtroSeleccionado = cmbFiltro.getValue();
-            
-            if ("Autor".equals(filtroSeleccionado)) {
-                return; 
-            }
-
-            filteredData.setPredicate(libro -> {
-                if (newValue == null || newValue.isEmpty()) {
-                    return true;
-                }
-                
-                String lowerCaseFilter = newValue.toLowerCase();
-
-                if ("ISBN".equals(filtroSeleccionado)) {
-                    return libro.getIsbn() != null && libro.getIsbn().toLowerCase().contains(lowerCaseFilter);
-                } else if ("Título".equals(filtroSeleccionado)) {
-                    return libro.getTitulo() != null && libro.getTitulo().toLowerCase().contains(lowerCaseFilter);
-                }
-                
-                return false;
-            });
-        });
-
-        SortedList<Libro> sortedData = new SortedList<>(filteredData);
-        sortedData.comparatorProperty().bind(tblLibros.comparatorProperty());
-        tblLibros.setItems(sortedData);
-        
-      
+        LOGGER.info("Vista BuscadorLibros cargada correctamente.");
     }
 
     @FXML
     private void buscarLibro(ActionEvent event) {
         String criterio = txtBusqueda.getText().trim();
-        String filtro = cmbFiltro.getValue();
+        String filtroSeleccionado = cmbFiltro.getValue();
 
         if (criterio.isEmpty()) {
             listaLibrosMaster.clear();
             listaLibrosMaster.addAll(libroDAO.listarTodos());
-            filteredData.setPredicate(b -> true);
+            LOGGER.info("Campo de búsqueda vacío, mostrando todos los libros.");
             return;
         }
 
-        if ("Autor".equals(filtro)) {
-            List<Libro> resultadosAutor = libroDAO.buscarPorAutor(criterio);
-            listaLibrosMaster.clear();
-            listaLibrosMaster.addAll(resultadosAutor);
-            filteredData.setPredicate(b -> true);
+        listaLibrosMaster.clear();
+
+        switch (filtroSeleccionado) {
+            case "ISBN":
+                Libro libroEncontrado = libroDAO.buscarPorIsbn(criterio);
+                if (libroEncontrado != null) {
+                    listaLibrosMaster.add(libroEncontrado);
+                }
+                break;
+            case "Título":
+                List<Libro> resultadosTitulo = libroDAO.buscarPorTitulo(criterio);
+                if (resultadosTitulo != null) {
+                    listaLibrosMaster.addAll(resultadosTitulo);
+                }
+                break;
+            case "Autor":
+                List<Libro> resultadosAutor = libroDAO.buscarPorAutor(criterio);
+                if (resultadosAutor != null) {
+                    listaLibrosMaster.addAll(resultadosAutor);
+                }
+                break;
+            default:
+                LOGGER.warning("Filtro de búsqueda no reconocido.");
+                break;
         }
+
+        LOGGER.info("Búsqueda ejecutada mediante DAO usando el filtro: " + filtroSeleccionado);
     }
 }

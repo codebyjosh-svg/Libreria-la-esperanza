@@ -1,8 +1,8 @@
-package org.esperanza.Dao.Impl;
+package org.esperanza.dao.impl;
 
-import org.esperanza.Dao.LibroDAO;
-import org.esperanza.Util.Conexion;
-import org.esperanza.Model.Libro;
+import org.esperanza.dao.LibroDAO;
+import org.esperanza.system.Conexion;
+import org.esperanza.model.Libro;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
