@@ -15,6 +15,7 @@ import javafx.stage.Stage;
 import org.esperanza.Model.Rol;
 import org.esperanza.Service.NavegacionRol;
 import org.esperanza.Service.SesionUsuario;
+import org.esperanza.controller.CarritoVentaController;
 
 public class DashboardCajeroController {
 
@@ -48,8 +49,8 @@ public class DashboardCajeroController {
 
     private void actualizarEncabezado() {
 
-        SesionUsuario sesion =
-                SesionUsuario
+        SesionUsuario sesion
+                = SesionUsuario
                         .getInstancia();
 
         lblBienvenida.setText(
@@ -72,16 +73,56 @@ public class DashboardCajeroController {
     @FXML
     private void onNuevaVenta() {
 
-        if (!NavegacionRol.validarPermiso(
-                "VENTAS")) {
-
+        if (!NavegacionRol.validarPermiso("VENTAS")) {
             return;
         }
 
-        mostrarInfo(
-                "Ventas",
-                "Acceso al módulo de ventas autorizado."
-        );
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource(
+                            "/org/esperanza/view/CarritoVenta.fxml"
+                    )
+            );
+
+            Parent root = loader.load();
+
+            CarritoVentaController controller
+                    = loader.getController();
+
+            controller.setIdUsuario(
+                    SesionUsuario
+                            .getInstancia()
+                            .getUsuarioActual()
+                            .getId()
+            );
+
+            Stage ventana = new Stage();
+
+            ventana.setTitle(
+                    "Registrar Venta - Librería La Esperanza"
+            );
+
+            ventana.setScene(
+                    new Scene(root)
+            );
+
+            ventana.initOwner(
+                    lblBienvenida
+                            .getScene()
+                            .getWindow()
+            );
+
+            ventana.centerOnScreen();
+            ventana.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+
+            mostrarError(
+                    "No se pudo abrir el carrito de venta.\n"
+                    + e.getMessage()
+            );
+        }
     }
 
     @FXML
@@ -113,19 +154,19 @@ public class DashboardCajeroController {
 
         try {
 
-            FXMLLoader loader =
-                    new FXMLLoader(
+            FXMLLoader loader
+                    = new FXMLLoader(
                             getClass()
                                     .getResource(
                                             "/org/esperanza/view/Login.fxml"
                                     )
                     );
 
-            Parent root =
-                    loader.load();
+            Parent root
+                    = loader.load();
 
-            Stage stage =
-                    (Stage) btnCerrarSesion
+            Stage stage
+                    = (Stage) btnCerrarSesion
                             .getScene()
                             .getWindow();
 
@@ -161,8 +202,8 @@ public class DashboardCajeroController {
             return;
         }
 
-        Stage stage =
-                (Stage) lblBienvenida
+        Stage stage
+                = (Stage) lblBienvenida
                         .getScene()
                         .getWindow();
 
@@ -185,8 +226,8 @@ public class DashboardCajeroController {
             String titulo,
             String mensaje) {
 
-        Alert alert =
-                new Alert(
+        Alert alert
+                = new Alert(
                         Alert.AlertType.INFORMATION
                 );
 
@@ -200,8 +241,8 @@ public class DashboardCajeroController {
     private void mostrarError(
             String mensaje) {
 
-        Alert alert =
-                new Alert(
+        Alert alert
+                = new Alert(
                         Alert.AlertType.ERROR
                 );
 
