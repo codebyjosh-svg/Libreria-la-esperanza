@@ -1,0 +1,14 @@
+.fondo { -fx-background-color: #f4f7fb; }
+.encabezado { -fx-background-color: #26384d; }
+.titulo { -fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white; }
+.subtitulo { -fx-text-fill: #d7e1ec; -fx-font-size: 13px; }
+.table-view { -fx-background-color: white; -fx-border-color: #dbe3ec; -fx-border-radius: 6; }
+.table-view .column-header-background { -fx-background-color: #eaf0f6; }
+.table-view .column-header .label { -fx-text-fill: #26384d; -fx-font-weight: bold; }
+.btn-principal { -fx-background-color: #2f6fed; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 9 16; -fx-background-radius: 5; }
+.btn-principal:hover { -fx-background-color: #245bc4; }
+.btn-secundario { -fx-background-color: #e5ebf2; -fx-text-fill: #26384d; -fx-padding: 9 16; -fx-background-radius: 5; }
+.btn-desactivar { -fx-background-color: #d9534f; -fx-text-fill: white; -fx-background-radius: 4; -fx-padding: 6 9; }
+.estado-activo { -fx-text-fill: #16803c; -fx-font-weight: bold; }
+.estado-inactivo { -fx-text-fill: #b42318; -fx-font-weight: bold; }
+.text-field, .password-field, .combo-box { -fx-background-color: white; -fx-border-color: #cbd5e1; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 8; }
