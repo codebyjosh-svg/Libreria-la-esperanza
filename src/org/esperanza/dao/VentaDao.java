@@ -2,102 +2,402 @@ package org.esperanza.dao;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.sql.*;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 import java.time.LocalDateTime;
-import java.util.*;
-import org.esperanza.model.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
+import org.esperanza.model.DetalleVenta;
+import org.esperanza.model.Venta;
 import org.esperanza.util.Conexion;
 
 public class VentaDao {
+
     private final ProveedorConexion conexiones;
-    private final DetalleVentaDao detalleDao;
+    private final DetalleVentaDao detalleVentaDao;
+    private final StockDao stockDao;
 
     public VentaDao() {
-        this(() -> Conexion.getInstancia().conectar());
+
+        this(
+                () -> Conexion
+                        .getInstancia()
+                        .conectar()
+        );
     }
 
-    public VentaDao(ProveedorConexion conexiones) {
-        this.conexiones = Objects.requireNonNull(conexiones);
-        this.detalleDao = new DetalleVentaDao(conexiones);
+    public VentaDao(
+            ProveedorConexion conexiones) {
+
+        this.conexiones =
+                Objects.requireNonNull(conexiones);
+
+        this.detalleVentaDao =
+                new DetalleVentaDao(conexiones);
+
+        this.stockDao =
+                new StockDao(conexiones);
     }
 
-    /** Registra cabecera y detalles de forma atomica. No modifica los objetos recibidos. */
-    public Venta registrar(int idCliente, int idEmpleado, List<DetalleVenta> detalles) throws SQLException {
-        if (idCliente <= 0 || idEmpleado <= 0) {
-            throw new IllegalArgumentException("Cliente y empleado deben tener identificadores positivos");
+    /**
+     * T2.18
+     *
+     * Registra cabecera y detalles utilizando
+     * una sola transaccion JDBC.
+     */
+    public Venta registrar(
+            long cuiCliente,
+            int idUsuario,
+            List<DetalleVenta> detalles)
+            throws SQLException {
+
+        if (cuiCliente <= 0) {
+
+            throw new IllegalArgumentException(
+                    "El CUI del cliente es obligatorio"
+            );
         }
-        Objects.requireNonNull(detalles, "Los detalles son obligatorios");
-        if (detalles.isEmpty()) throw new IllegalArgumentException("La venta debe tener productos");
-        List<DetalleVenta> copia = new ArrayList<>();
-        BigDecimal total = BigDecimal.ZERO;
-        for (DetalleVenta d : detalles) {
-            Objects.requireNonNull(d, "No se permiten detalles nulos");
-            if (d.getIdProducto() <= 0) throw new IllegalArgumentException("Producto invalido");
-            BigDecimal precio = d.getPrecioUnitario().setScale(2, RoundingMode.UNNECESSARY);
-            if (precio.precision() > 19) throw new IllegalArgumentException("Precio fuera de rango");
-            DetalleVenta item = new DetalleVenta(0, 0, d.getIdProducto(), d.getCantidad(), precio);
+
+        if (idUsuario <= 0) {
+
+            throw new IllegalArgumentException(
+                    "El usuario debe ser valido"
+            );
+        }
+
+        Objects.requireNonNull(
+                detalles,
+                "Los detalles son obligatorios"
+        );
+
+        if (detalles.isEmpty()) {
+
+            throw new IllegalArgumentException(
+                    "La venta debe tener productos"
+            );
+        }
+
+        List<DetalleVenta> copia =
+                new ArrayList<>();
+
+        BigDecimal subtotal =
+                BigDecimal.ZERO;
+
+        for (DetalleVenta detalle : detalles) {
+
+            Objects.requireNonNull(
+                    detalle,
+                    "No se permiten detalles nulos"
+            );
+
+            BigDecimal precio =
+                    detalle
+                            .getPrecioUnitario()
+                            .setScale(
+                                    2,
+                                    RoundingMode.UNNECESSARY
+                            );
+
+            DetalleVenta item =
+                    new DetalleVenta(
+                            0,
+                            0,
+                            detalle.getIsbn(),
+                            detalle.getCantidad(),
+                            precio
+                    );
+
             copia.add(item);
-            total = total.add(item.getSubtotal());
+
+            subtotal =
+                    subtotal.add(
+                            item.getSubtotal()
+                    );
         }
-        if (total.precision() > 19) throw new IllegalArgumentException("Total fuera de rango");
-        Venta venta = new Venta(0, LocalDateTime.now().withNano(0), idCliente, idEmpleado, total);
-        try (Connection c = conexiones.conectar()) {
-            c.setAutoCommit(false);
+
+        BigDecimal descuento =
+                BigDecimal.ZERO;
+
+        BigDecimal total =
+                subtotal.subtract(descuento);
+
+        Venta venta =
+                new Venta(
+                        0,
+                        LocalDateTime.now()
+                                .withNano(0),
+                        subtotal,
+                        descuento,
+                        total,
+                        cuiCliente,
+                        idUsuario
+                );
+
+        try (Connection conexion =
+                conexiones.conectar()) {
+
+            /*
+             * MUY IMPORTANTE:
+             * desde aqui comienza la transaccion.
+             */
+            conexion.setAutoCommit(false);
+
             try {
-                String sql = "INSERT INTO venta (fecha, id_cliente, id_empleado, total) VALUES (?, ?, ?, ?)";
-                try (PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-                    ps.setTimestamp(1, Timestamp.valueOf(venta.getFecha()));
-                    ps.setInt(2, idCliente);
-                    ps.setInt(3, idEmpleado);
-                    ps.setBigDecimal(4, total);
-                    if (ps.executeUpdate() != 1) throw new SQLException("No se inserto la venta");
-                    try (ResultSet claves = ps.getGeneratedKeys()) {
-                        if (!claves.next()) throw new SQLException("No se obtuvo el ID de la venta");
-                        venta.setIdVenta(claves.getInt(1));
+
+                // ==========================================
+                // T2.17 - VALIDAR STOCK
+                // ==========================================
+
+                for (DetalleVenta detalle : copia) {
+
+                    stockDao.validarStock(
+                            conexion,
+                            detalle.getIsbn(),
+                            detalle.getCantidad()
+                    );
+                }
+
+                // ==========================================
+                // INSERTAR CABECERA DE VENTA
+                // ==========================================
+
+                String sqlVenta = """
+                        INSERT INTO ventas
+                        (
+                            subtotal,
+                            descuento,
+                            total,
+                            estado,
+                            cui_cliente,
+                            id_usuario
+                        )
+                        VALUES (?, ?, ?, 'COMPLETADA', ?, ?)
+                        """;
+
+                try (PreparedStatement ps =
+                        conexion.prepareStatement(
+                                sqlVenta,
+                                Statement.RETURN_GENERATED_KEYS
+                        )) {
+
+                    ps.setBigDecimal(
+                            1,
+                            subtotal
+                    );
+
+                    ps.setBigDecimal(
+                            2,
+                            descuento
+                    );
+
+                    ps.setBigDecimal(
+                            3,
+                            total
+                    );
+
+                    ps.setLong(
+                            4,
+                            cuiCliente
+                    );
+
+                    ps.setInt(
+                            5,
+                            idUsuario
+                    );
+
+                    int filas =
+                            ps.executeUpdate();
+
+                    if (filas != 1) {
+
+                        throw new SQLException(
+                                "No se pudo registrar la venta"
+                        );
+                    }
+
+                    try (ResultSet claves =
+                            ps.getGeneratedKeys()) {
+
+                        if (!claves.next()) {
+
+                            throw new SQLException(
+                                    "No se obtuvo el ID de la venta"
+                            );
+                        }
+
+                        venta.setIdVenta(
+                                claves.getInt(1)
+                        );
                     }
                 }
-                for (DetalleVenta d : copia) detalleDao.insertar(c, venta.getIdVenta(), d);
-                c.commit();
-            } catch (SQLException | RuntimeException e) {
-                try { c.rollback(); } catch (SQLException rollback) { e.addSuppressed(rollback); }
+
+                // ==========================================
+                // INSERTAR TODOS LOS DETALLES
+                // ==========================================
+
+                for (DetalleVenta detalle : copia) {
+
+                    detalleVentaDao.insertar(
+                            conexion,
+                            venta.getIdVenta(),
+                            detalle
+                    );
+                }
+
+                /*
+                 * Todos los INSERT funcionaron.
+                 */
+                conexion.commit();
+
+            } catch (SQLException
+                    | RuntimeException e) {
+
+                /*
+                 * Esto será parte de T2.20.
+                 * Ya lo dejamos preparado.
+                 */
+                try {
+
+                    conexion.rollback();
+
+                } catch (SQLException rollbackError) {
+
+                    e.addSuppressed(
+                            rollbackError
+                    );
+                }
+
                 throw e;
+
+            } finally {
+
+                try {
+
+                    conexion.setAutoCommit(true);
+
+                } catch (SQLException ignored) {
+                }
             }
         }
+
         return venta;
     }
 
-    public Optional<Venta> buscarPorId(int idVenta) throws SQLException {
-        try (Connection c = conexiones.conectar();
-                PreparedStatement ps = c.prepareStatement("SELECT * FROM venta WHERE id_venta = ?")) {
-            ps.setInt(1, idVenta);
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next() ? Optional.of(leer(rs)) : Optional.empty();
+    public Optional<Venta> buscarPorId(
+            int idVenta) throws SQLException {
+
+        String sql = """
+                SELECT
+                    id_venta,
+                    fecha_venta,
+                    subtotal,
+                    descuento,
+                    total,
+                    cui_cliente,
+                    id_usuario
+                FROM ventas
+                WHERE id_venta = ?
+                """;
+
+        try (Connection conexion =
+                    conexiones.conectar();
+
+             PreparedStatement ps =
+                    conexion.prepareStatement(sql)) {
+
+            ps.setInt(
+                    1,
+                    idVenta
+            );
+
+            try (ResultSet rs =
+                    ps.executeQuery()) {
+
+                if (rs.next()) {
+
+                    return Optional.of(
+                            leer(rs)
+                    );
+                }
+
+                return Optional.empty();
             }
         }
     }
 
-    public List<Venta> listar() throws SQLException {
-        List<Venta> ventas = new ArrayList<>();
-        try (Connection c = conexiones.conectar();
-                PreparedStatement ps = c.prepareStatement("SELECT * FROM venta ORDER BY id_venta DESC");
-                ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) ventas.add(leer(rs));
+    public List<Venta> listar()
+            throws SQLException {
+
+        List<Venta> ventas =
+                new ArrayList<>();
+
+        String sql = """
+                SELECT
+                    id_venta,
+                    fecha_venta,
+                    subtotal,
+                    descuento,
+                    total,
+                    cui_cliente,
+                    id_usuario
+                FROM ventas
+                ORDER BY id_venta DESC
+                """;
+
+        try (Connection conexion =
+                    conexiones.conectar();
+
+             PreparedStatement ps =
+                    conexion.prepareStatement(sql);
+
+             ResultSet rs =
+                    ps.executeQuery()) {
+
+            while (rs.next()) {
+
+                ventas.add(
+                        leer(rs)
+                );
+            }
         }
+
         return ventas;
     }
 
-    /** El esquema elimina los detalles asociados mediante ON DELETE CASCADE. */
-    public boolean eliminar(int idVenta) throws SQLException {
-        try (Connection c = conexiones.conectar();
-                PreparedStatement ps = c.prepareStatement("DELETE FROM venta WHERE id_venta = ?")) {
-            ps.setInt(1, idVenta);
-            return ps.executeUpdate() == 1;
-        }
-    }
+    private Venta leer(
+            ResultSet rs) throws SQLException {
 
-    private Venta leer(ResultSet rs) throws SQLException {
-        return new Venta(rs.getInt("id_venta"), rs.getTimestamp("fecha").toLocalDateTime(),
-                rs.getInt("id_cliente"), rs.getInt("id_empleado"), rs.getBigDecimal("total"));
+        return new Venta(
+                rs.getInt(
+                        "id_venta"
+                ),
+                rs.getTimestamp(
+                        "fecha_venta"
+                ).toLocalDateTime(),
+                rs.getBigDecimal(
+                        "subtotal"
+                ),
+                rs.getBigDecimal(
+                        "descuento"
+                ),
+                rs.getBigDecimal(
+                        "total"
+                ),
+                rs.getLong(
+                        "cui_cliente"
+                ),
+                rs.getInt(
+                        "id_usuario"
+                )
+        );
     }
 }
-

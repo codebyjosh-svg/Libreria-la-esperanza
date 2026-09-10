@@ -3,59 +3,176 @@ package org.esperanza.model;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.SQLException;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 import org.esperanza.dao.VentaDao;
 
-
-/** Carrito en memoria para conectar a un controlador JavaFX. */
 public class CarritoVenta {
-    private final Map<Integer, DetalleVenta> productos = new LinkedHashMap<>();
 
-    public void agregarProducto(int idProducto, int cantidad, BigDecimal precioUnitario) {
-        if (idProducto <= 0) throw new IllegalArgumentException("Producto invalido");
-        BigDecimal precio = Objects.requireNonNull(precioUnitario).setScale(2, RoundingMode.UNNECESSARY);
-        if (precio.precision() > 19) throw new IllegalArgumentException("Precio fuera de rango");
-        DetalleVenta nuevo = new DetalleVenta(0, 0, idProducto, cantidad, precio);
-        DetalleVenta actual = productos.get(idProducto);
-        if (actual != null) {
-            if (actual.getPrecioUnitario().compareTo(precio) != 0) {
-                throw new IllegalArgumentException("El producto ya tiene otro precio; retiralo antes de cambiarlo");
-            }
-            nuevo.setCantidad(Math.addExact(actual.getCantidad(), cantidad));
+    private final Map<String, DetalleVenta> productos =
+            new LinkedHashMap<>();
+
+    public void agregarProducto(
+            String isbn,
+            int cantidad,
+            BigDecimal precioUnitario) {
+
+        if (isbn == null || isbn.trim().isEmpty()) {
+
+            throw new IllegalArgumentException(
+                    "El ISBN es obligatorio"
+            );
         }
-        productos.put(idProducto, nuevo);
+
+        BigDecimal precio =
+                Objects.requireNonNull(
+                        precioUnitario
+                ).setScale(
+                        2,
+                        RoundingMode.UNNECESSARY
+                );
+
+        if (precio.signum() < 0) {
+
+            throw new IllegalArgumentException(
+                    "El precio no puede ser negativo"
+            );
+        }
+
+        String isbnLimpio =
+                isbn.trim();
+
+        DetalleVenta nuevo =
+                new DetalleVenta(
+                        0,
+                        0,
+                        isbnLimpio,
+                        cantidad,
+                        precio
+                );
+
+        DetalleVenta actual =
+                productos.get(isbnLimpio);
+
+        if (actual != null) {
+
+            if (actual
+                    .getPrecioUnitario()
+                    .compareTo(precio) != 0) {
+
+                throw new IllegalArgumentException(
+                        "El libro ya tiene otro precio"
+                );
+            }
+
+            nuevo.setCantidad(
+                    Math.addExact(
+                            actual.getCantidad(),
+                            cantidad
+                    )
+            );
+        }
+
+        productos.put(
+                isbnLimpio,
+                nuevo
+        );
     }
 
-    public void cambiarCantidad(int idProducto, int cantidad) {
-        DetalleVenta detalle = productos.get(idProducto);
-        if (detalle == null) throw new IllegalArgumentException("El producto no esta en el carrito");
+    public void cambiarCantidad(
+            String isbn,
+            int cantidad) {
+
+        DetalleVenta detalle =
+                productos.get(isbn);
+
+        if (detalle == null) {
+
+            throw new IllegalArgumentException(
+                    "El libro no esta en el carrito"
+            );
+        }
+
         detalle.setCantidad(cantidad);
     }
 
-    public boolean quitarProducto(int idProducto) { return productos.remove(idProducto) != null; }
-    public boolean estaVacio() { return productos.isEmpty(); }
-    public void vaciar() { productos.clear(); }
+    public boolean quitarProducto(
+            String isbn) {
 
-    /** Devuelve copias para proteger el estado interno del carrito. */
+        return productos.remove(isbn) != null;
+    }
+
+    public boolean estaVacio() {
+
+        return productos.isEmpty();
+    }
+
+    public void vaciar() {
+
+        productos.clear();
+    }
+
     public List<DetalleVenta> getDetalles() {
-        List<DetalleVenta> copia = new ArrayList<>();
-        for (DetalleVenta d : productos.values()) {
-            copia.add(new DetalleVenta(0, 0, d.getIdProducto(), d.getCantidad(), d.getPrecioUnitario()));
+
+        List<DetalleVenta> copia =
+                new ArrayList<>();
+
+        for (DetalleVenta detalle
+                : productos.values()) {
+
+            copia.add(
+                    new DetalleVenta(
+                            0,
+                            0,
+                            detalle.getIsbn(),
+                            detalle.getCantidad(),
+                            detalle.getPrecioUnitario()
+                    )
+            );
         }
-        return Collections.unmodifiableList(copia);
+
+        return Collections.unmodifiableList(
+                copia
+        );
     }
 
     public BigDecimal getTotal() {
-        return productos.values().stream().map(DetalleVenta::getSubtotal)
-                .reduce(new BigDecimal("0.00"), BigDecimal::add);
+
+        return productos
+                .values()
+                .stream()
+                .map(
+                        DetalleVenta::getSubtotal
+                )
+                .reduce(
+                        new BigDecimal("0.00"),
+                        BigDecimal::add
+                );
     }
 
-    /** Solo vacia el carrito despues de un registro exitoso. */
-    public Venta confirmarVenta(int idCliente, int idEmpleado, VentaDao ventaDao) throws SQLException {
-        Venta venta = Objects.requireNonNull(ventaDao).registrar(idCliente, idEmpleado, getDetalles());
+    public Venta confirmarVenta(
+            long cuiCliente,
+            int idUsuario,
+            VentaDao ventaDao)
+            throws SQLException {
+
+        Venta venta =
+                Objects.requireNonNull(
+                        ventaDao
+                ).registrar(
+                        cuiCliente,
+                        idUsuario,
+                        getDetalles()
+                );
+
         vaciar();
+
         return venta;
     }
 }
-
-
