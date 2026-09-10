@@ -9,14 +9,19 @@ import javafx.stage.Stage;
 public class Main extends Application {
 
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage stage) {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/org/esperanza/view/CambioContrasenaDashboard.fxml"));
+            Parent root = FXMLLoader.load(
+                    getClass().getResource("/org/esperanza/view/Login.fxml")
+            );
+
             Scene scene = new Scene(root);
-            primaryStage.setTitle("Librería La Esperanza");
-            primaryStage.setScene(scene);
-            primaryStage.centerOnScreen();
-            primaryStage.show();
+            stage.setTitle("Librería La Esperanza");
+            stage.setScene(scene);
+            stage.setResizable(false);
+            stage.centerOnScreen();
+            stage.show();
+
         } catch (Exception e) {
             e.printStackTrace();
         }

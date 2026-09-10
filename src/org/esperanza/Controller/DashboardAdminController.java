@@ -16,6 +16,7 @@ import org.esperanza.Model.Rol;
 import org.esperanza.Model.Usuario;
 import org.esperanza.Service.NavegacionRol;
 import org.esperanza.Service.SesionUsuario;
+import org.esperanza.controller.CarritoVentaController;        
 
 public class DashboardAdminController {
 
@@ -219,19 +220,60 @@ public class DashboardAdminController {
         );
     }
 
-    @FXML
-    private void onVentasClick() {
+@FXML
+private void onVentasClick() {
 
-        if (!NavegacionRol.validarPermiso(
-                "VENTAS")) {
+    if (!NavegacionRol.validarPermiso("VENTAS")) {
+        return;
+    }
 
-            return;
-        }
+    if (usuarioActual == null) {
+        mostrarError("No se pudo identificar al usuario actual.");
+        return;
+    }
 
-        mostrarEnConstruccion(
-                "Ventas"
+    try {
+        FXMLLoader loader = new FXMLLoader(
+                getClass().getResource(
+                        "/org/esperanza/view/CarritoVenta.fxml"
+                )
+        );
+
+        Parent root = loader.load();
+
+        CarritoVentaController controller =
+                loader.getController();
+
+        controller.setIdUsuario(
+                usuarioActual.getId()
+        );
+
+        Stage ventana = new Stage();
+
+        ventana.setTitle(
+                "Registrar Venta - Librería La Esperanza"
+        );
+
+        ventana.setScene(
+                new Scene(root)
+        );
+
+        ventana.initOwner(
+                lblUsuario.getScene().getWindow()
+        );
+
+        ventana.centerOnScreen();
+        ventana.show();
+
+    } catch (IOException e) {
+        e.printStackTrace();
+
+        mostrarError(
+                "No se pudo abrir el carrito de venta.\n"
+                + e.getMessage()
         );
     }
+}
 
     @FXML
     private void onAutoresLibroClick() {

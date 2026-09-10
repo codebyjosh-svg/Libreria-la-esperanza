@@ -10,13 +10,10 @@ import java.util.Map;
 
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.print.PageLayout;
-import javafx.print.PrinterJob;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.transform.Scale;
 
 import org.esperanza.model.DetalleVenta;
 
@@ -100,59 +97,13 @@ public class TicketVentaController {
         return new HBox(5, libro, cant, precioLabel, subtotalLabel);
     }
 
-    @FXML
-    private void imprimir() {
-        PrinterJob job = PrinterJob.createPrinterJob();
-
-        if (job == null) {
-            mostrarMensaje(
-                    Alert.AlertType.ERROR,
-                    "No se encontró una impresora disponible."
-            );
-            return;
-        }
-
-        boolean continuar = job.showPrintDialog(
-                contenidoTicket.getScene().getWindow()
-        );
-
-        if (!continuar) return;
-
-        PageLayout pagina = job.getJobSettings().getPageLayout();
-
-        double ancho = contenidoTicket.getBoundsInParent().getWidth();
-        double alto = contenidoTicket.getBoundsInParent().getHeight();
-
-        double escalaX = pagina.getPrintableWidth() / ancho;
-        double escalaY = pagina.getPrintableHeight() / alto;
-        double escala = Math.min(1, Math.min(escalaX, escalaY));
-
-        Scale scale = new Scale(escala, escala);
-        contenidoTicket.getTransforms().add(scale);
-
-        boolean impreso = job.printPage(
-                pagina,
-                contenidoTicket
-        );
-
-        contenidoTicket.getTransforms().remove(scale);
-
-        if (impreso) {
-            job.endJob();
-
-            mostrarMensaje(
-                    Alert.AlertType.INFORMATION,
-                    "Comprobante enviado a impresión."
-            );
-        } else {
-            job.cancelJob();
-
-            mostrarMensaje(
-                    Alert.AlertType.ERROR,
-                    "No se pudo imprimir el comprobante."
-            );
-        }
-    }
+  @FXML
+private void imprimir() {
+    mostrarMensaje(
+            Alert.AlertType.INFORMATION,
+            "Comprobante generado correctamente."
+    );
+}
 
     private void mostrarMensaje(Alert.AlertType tipo, String mensaje) {
         Alert alert = new Alert(tipo);
