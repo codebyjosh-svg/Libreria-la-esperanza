@@ -1,6 +1,10 @@
 package org.esperanza.controller;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.sql.SQLException;
+import java.util.List;
+
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.fxml.FXML;
@@ -9,8 +13,12 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+
+import org.esperanza.dao.VentaDao;
 import org.esperanza.model.CarritoVenta;
 import org.esperanza.model.DetalleVenta;
+import org.esperanza.model.Venta;
+import org.esperanza.view.ComprobanteVenta;
 
 public class CarritoVentaController {
 
@@ -18,6 +26,7 @@ public class CarritoVentaController {
     @FXML private TextField txtPrecio;
     @FXML private TextField txtCantidad;
     @FXML private TextField txtNuevaCantidad;
+    @FXML private TextField txtCuiCliente;
 
     @FXML private TableView<DetalleVenta> tabla;
     @FXML private TableColumn<DetalleVenta, String> colIsbn;
@@ -28,11 +37,15 @@ public class CarritoVentaController {
     @FXML private Button btnActualizar;
     @FXML private Button btnEliminar;
     @FXML private Button btnVaciar;
+    @FXML private Button btnConfirmar;
 
     @FXML private Label lblTotal;
     @FXML private Label lblMensaje;
 
     private final CarritoVenta carrito = new CarritoVenta();
+    private final VentaDao ventaDao = new VentaDao();
+
+    private int idUsuario = 5;
 
     @FXML
     public void initialize() {
@@ -52,7 +65,9 @@ public class CarritoVentaController {
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
         );
 
-        tabla.setPlaceholder(new Label("Agrega libros para iniciar la venta."));
+        tabla.setPlaceholder(
+                new Label("Agrega libros para iniciar la venta.")
+        );
 
         btnActualizar.disableProperty().bind(
                 tabla.getSelectionModel().selectedItemProperty().isNull()
@@ -63,6 +78,10 @@ public class CarritoVentaController {
         );
 
         btnVaciar.disableProperty().bind(
+                Bindings.isEmpty(tabla.getItems())
+        );
+
+        btnConfirmar.disableProperty().bind(
                 Bindings.isEmpty(tabla.getItems())
         );
 
@@ -102,7 +121,9 @@ public class CarritoVentaController {
             }
 
             if (precio.compareTo(BigDecimal.ZERO) <= 0) {
-                throw new IllegalArgumentException("El precio debe ser mayor que cero");
+                throw new IllegalArgumentException(
+                        "El precio debe ser mayor que cero"
+                );
             }
 
             carrito.agregarProducto(isbn, cantidad, precio);
@@ -112,16 +133,20 @@ public class CarritoVentaController {
             txtPrecio.clear();
             txtCantidad.setText("1");
             txtIsbn.requestFocus();
+
         }, "Libro agregado al carrito.");
     }
 
     @FXML
     private void actualizarCantidad() {
         ejecutar(() -> {
-            DetalleVenta detalle = tabla.getSelectionModel().getSelectedItem();
+            DetalleVenta detalle =
+                    tabla.getSelectionModel().getSelectedItem();
 
             if (detalle == null) {
-                throw new IllegalArgumentException("Selecciona un libro");
+                throw new IllegalArgumentException(
+                        "Selecciona un libro"
+                );
             }
 
             int cantidad = enteroPositivo(
@@ -129,22 +154,31 @@ public class CarritoVentaController {
                     "La cantidad"
             );
 
-            carrito.cambiarCantidad(detalle.getIsbn(), cantidad);
+            carrito.cambiarCantidad(
+                    detalle.getIsbn(),
+                    cantidad
+            );
+
             refrescar(detalle.getIsbn());
+
         }, "Cantidad actualizada.");
     }
 
     @FXML
     private void eliminarProducto() {
         ejecutar(() -> {
-            DetalleVenta detalle = tabla.getSelectionModel().getSelectedItem();
+            DetalleVenta detalle =
+                    tabla.getSelectionModel().getSelectedItem();
 
             if (detalle == null) {
-                throw new IllegalArgumentException("Selecciona un libro");
+                throw new IllegalArgumentException(
+                        "Selecciona un libro"
+                );
             }
 
             carrito.quitarProducto(detalle.getIsbn());
             refrescar(null);
+
         }, "Libro eliminado.");
     }
 
@@ -156,14 +190,70 @@ public class CarritoVentaController {
         }, "Carrito vacío.");
     }
 
-    private void refrescar(String isbn) {
-        tabla.getItems().setAll(carrito.getDetalles());
-        lblTotal.setText("Total: Q" + carrito.getTotal().toPlainString());
+    @FXML
+    private void confirmarVenta() {
+        try {
+            String cuiTexto = txtCuiCliente.getText().trim();
 
-        if (isbn == null) return;
+            if (cuiTexto.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Ingresa el CUI del cliente"
+                );
+            }
+
+            long cuiCliente = Long.parseLong(cuiTexto);
+
+            if (cuiCliente <= 0) {
+                throw new IllegalArgumentException(
+                        "El CUI del cliente no es válido"
+                );
+            }
+
+            List<DetalleVenta> detalles =
+                    carrito.getDetalles();
+
+            Venta venta = carrito.confirmarVenta(
+                    cuiCliente,
+                    idUsuario,
+                    ventaDao
+            );
+
+            refrescar(null);
+            txtCuiCliente.clear();
+
+            lblMensaje.setStyle(
+                    "-fx-text-fill: #166534;"
+            );
+
+            lblMensaje.setText(
+                    "Venta registrada correctamente."
+            );
+
+            ComprobanteVenta.mostrar(
+                    venta,
+                    detalles
+            );
+
+        } catch (NumberFormatException e) {
+            mostrarError("Ingresa un CUI válido.");
+        } catch (IllegalArgumentException | SQLException | IOException e) {
+            mostrarError(e.getMessage());
+        }
+    }
+
+    private void refrescar(String isbnSeleccionado) {
+        tabla.getItems().setAll(
+                carrito.getDetalles()
+        );
+
+        lblTotal.setText(
+                "Total: Q" + carrito.getTotal().toPlainString()
+        );
+
+        if (isbnSeleccionado == null) return;
 
         for (DetalleVenta detalle : tabla.getItems()) {
-            if (detalle.getIsbn().equals(isbn)) {
+            if (detalle.getIsbn().equals(isbnSeleccionado)) {
                 tabla.getSelectionModel().select(detalle);
                 break;
             }
@@ -173,7 +263,9 @@ public class CarritoVentaController {
     private int enteroPositivo(String texto, String nombre) {
         try {
             int valor = Integer.parseInt(texto.trim());
+
             if (valor > 0) return valor;
+
         } catch (NumberFormatException ignored) {
         }
 
@@ -182,18 +274,40 @@ public class CarritoVentaController {
         );
     }
 
-    private void ejecutar(Runnable accion, String confirmacion) {
+    private void ejecutar(Runnable accion, String mensaje) {
         try {
             accion.run();
-            lblMensaje.setStyle("-fx-text-fill: #166534;");
-            lblMensaje.setText(confirmacion);
+
+            lblMensaje.setStyle(
+                    "-fx-text-fill: #166534;"
+            );
+
+            lblMensaje.setText(mensaje);
+
         } catch (IllegalArgumentException | ArithmeticException e) {
-            lblMensaje.setStyle("-fx-text-fill: #b91c1c;");
-            lblMensaje.setText(
+            mostrarError(
                     e instanceof ArithmeticException
                             ? "Usa precios de hasta dos decimales."
                             : e.getMessage()
             );
         }
+    }
+
+    private void mostrarError(String mensaje) {
+        lblMensaje.setStyle(
+                "-fx-text-fill: #b91c1c;"
+        );
+
+        lblMensaje.setText(mensaje);
+    }
+
+    public void setIdUsuario(int idUsuario) {
+        if (idUsuario <= 0) {
+            throw new IllegalArgumentException(
+                    "El usuario no es válido"
+            );
+        }
+
+        this.idUsuario = idUsuario;
     }
 }

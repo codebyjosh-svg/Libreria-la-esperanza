@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane prefHeight="600.0" prefWidth="900.0"
-            style="-fx-background-color: white; -fx-padding: 20;"
+<BorderPane prefHeight="600.0" prefWidth="950.0"
+            style="-fx-background-color: white;"
             xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.esperanza.controller.CarritoVentaController">
+
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
 
     <top>
         <VBox spacing="12">
@@ -17,17 +22,23 @@
             <HBox spacing="10">
                 <VBox spacing="5">
                     <Label text="ISBN"/>
-                    <TextField fx:id="txtIsbn" promptText="Ej. 978-0-124" prefWidth="170"/>
+                    <TextField fx:id="txtIsbn"
+                               promptText="Ej. 978-0-124"
+                               prefWidth="170"/>
                 </VBox>
 
                 <VBox spacing="5">
                     <Label text="Precio unitario"/>
-                    <TextField fx:id="txtPrecio" promptText="Ej. 135.50" prefWidth="120"/>
+                    <TextField fx:id="txtPrecio"
+                               promptText="Ej. 135.50"
+                               prefWidth="120"/>
                 </VBox>
 
                 <VBox spacing="5">
                     <Label text="Cantidad"/>
-                    <TextField fx:id="txtCantidad" text="1" prefWidth="80"/>
+                    <TextField fx:id="txtCantidad"
+                               text="1"
+                               prefWidth="80"/>
                 </VBox>
 
                 <VBox alignment="BOTTOM_LEFT">
@@ -45,20 +56,41 @@
     <center>
         <TableView fx:id="tabla" prefHeight="380">
             <columns>
-                <TableColumn fx:id="colIsbn" text="ISBN" prefWidth="220"/>
-                <TableColumn fx:id="colCantidad" text="Cantidad" prefWidth="120"/>
-                <TableColumn fx:id="colPrecio" text="Precio unitario" prefWidth="170"/>
-                <TableColumn fx:id="colSubtotal" text="Subtotal" prefWidth="170"/>
+                <TableColumn fx:id="colIsbn"
+                             text="ISBN"
+                             prefWidth="220"/>
+
+                <TableColumn fx:id="colCantidad"
+                             text="Cantidad"
+                             prefWidth="120"/>
+
+                <TableColumn fx:id="colPrecio"
+                             text="Precio unitario"
+                             prefWidth="170"/>
+
+                <TableColumn fx:id="colSubtotal"
+                             text="Subtotal"
+                             prefWidth="170"/>
             </columns>
         </TableView>
     </center>
 
     <bottom>
         <VBox spacing="12">
+
             <HBox spacing="10">
                 <VBox spacing="5">
                     <Label text="Nueva cantidad"/>
-                    <TextField fx:id="txtNuevaCantidad" text="1" prefWidth="100"/>
+                    <TextField fx:id="txtNuevaCantidad"
+                               text="1"
+                               prefWidth="100"/>
+                </VBox>
+
+                <VBox spacing="5">
+                    <Label text="CUI del cliente"/>
+                    <TextField fx:id="txtCuiCliente"
+                               promptText="Ej. 2000100010101"
+                               prefWidth="170"/>
                 </VBox>
 
                 <VBox alignment="BOTTOM_LEFT">
@@ -78,13 +110,20 @@
                             text="Vaciar carrito"
                             onAction="#vaciarCarrito"/>
                 </VBox>
+
+                <VBox alignment="BOTTOM_LEFT">
+                    <Button fx:id="btnConfirmar"
+                            text="Confirmar venta"
+                            onAction="#confirmarVenta"/>
+                </VBox>
             </HBox>
 
             <Label fx:id="lblTotal"
                    text="Total: Q0.00"
                    style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
 
-            <Label fx:id="lblMensaje" wrapText="true"/>
+            <Label fx:id="lblMensaje"
+                   wrapText="true"/>
         </VBox>
     </bottom>
 
