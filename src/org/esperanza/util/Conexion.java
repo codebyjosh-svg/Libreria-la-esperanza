@@ -7,90 +7,62 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
-public final class Conexion {
+public class Conexion {
 
     private static Conexion instancia;
 
-    private static final String CONFIG_FILE =
-            "/db.properties";
+    private static final String CONFIG_FILE = "/db.properties";
 
     private final String url;
     private final String user;
     private final String password;
 
+    //Constructor privado para evitar que hagan "new Conexion()" fuera de esta clase
     private Conexion() {
-
         try {
-
             Class.forName("com.mysql.cj.jdbc.Driver");
-
         } catch (ClassNotFoundException e) {
-
-            System.err.println(
-                    "Error al cargar Driver MySQL: "
-                    + e.getMessage()
-            );
+            System.err.println("Error Driver: " + e.getMessage());
         }
 
+        //consumo o uso del properties empezamos creando una clase Properties
         Properties config = new Properties();
-
-        try (
-            InputStream in =
-                    Conexion.class.getResourceAsStream(
-                            CONFIG_FILE
-                    )
-        ) {
-
+        //cargar archivo db.properties
+        try (InputStream in = getClass().getResourceAsStream(CONFIG_FILE)) {
             if (in == null) {
-
+                //excepcion si no encuentra el archivo o no existe
                 throw new IllegalStateException(
-                        "No se encontró "
-                        + CONFIG_FILE
-                        + " en el proyecto."
-                );
+                        "No se encontro " + CONFIG_FILE + " en el classpath. "
+                        + "Copia db.properties.example como src/db.properties y ajusta los valores.");
             }
-
+            //cargamos el archivo dentro de la clase propertis
             config.load(in);
-
         } catch (IOException e) {
-
-            throw new IllegalStateException(
-                    "Error al leer "
-                    + CONFIG_FILE,
-                    e
-            );
+            throw new IllegalStateException("Error al leer " + CONFIG_FILE, e);
         }
+        //llenamos nuestras varibles finales con los datos de db.properties.
+        this.url = config.getProperty("db.url");
+        this.user = config.getProperty("db.user");
+        this.password = config.getProperty("db.password");
 
-        url = config.getProperty("db.url");
-        user = config.getProperty("db.user");
-        password = config.getProperty("db.password");
-
-        if (url == null
-                || user == null
-                || password == null) {
-
+        //comprobación de datos del properties nulos para cada atributo o datos nulos.
+        if (url == null || user == null || password == null) {
             throw new IllegalStateException(
-                    "Faltan datos en db.properties"
-            );
+                    "Faltan propiedades (db.url, db.user, db.password) en " + CONFIG_FILE);
         }
     }
 
+    //Método público estático para obtener la única instancia del Gestor
     public static synchronized Conexion getInstancia() {
-
         if (instancia == null) {
             instancia = new Conexion();
         }
-
         return instancia;
     }
 
-    public Connection conectar()
-            throws SQLException {
-
-        return DriverManager.getConnection(
-                url,
-                user,
-                password
-        );
+    //Método para entregar una conexión fresca cada vez que se pida
+    public Connection conectar() throws SQLException {
+        return DriverManager.getConnection(url, user, password);
     }
+
 }
