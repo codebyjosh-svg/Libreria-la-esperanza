@@ -1,33 +1,33 @@
 package org.esperanza.view;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
-
+import java.util.Map;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-
 import org.esperanza.controller.TicketVentaController;
+import org.esperanza.dao.DatosVentaDao;
 import org.esperanza.model.DetalleVenta;
 import org.esperanza.model.Venta;
 
 public class ComprobanteVenta {
 
-    public static void mostrar(
-            Venta venta,
-            List<DetalleVenta> detalles) throws IOException {
+    public static void mostrar(Venta venta, List<DetalleVenta> detalles)
+            throws IOException, SQLException {
+
+        DatosVentaDao datosDao = new DatosVentaDao();
+        String cliente = datosDao.obtenerNombreCliente(venta.getCuiCliente());
+        Map<String, String> titulos = datosDao.obtenerTitulos(detalles);
 
         FXMLLoader loader = new FXMLLoader(
-                ComprobanteVenta.class.getResource(
-                        "/org/esperanza/view/TicketVenta.fxml"
-                )
+                ComprobanteVenta.class.getResource("/org/esperanza/view/TicketVenta.fxml")
         );
 
         Parent root = loader.load();
-
-        TicketVentaController controller =
-                loader.getController();
+        TicketVentaController controller = loader.getController();
 
         controller.setDatosVenta(
                 venta.getIdVenta(),
@@ -39,18 +39,12 @@ public class ComprobanteVenta {
                 venta.getTotal()
         );
 
-        controller.setDetalles(detalles);
+        controller.setNombreCliente(cliente, venta.getCuiCliente());
+        controller.setDetalles(detalles, titulos);
 
         Stage stage = new Stage();
-
-        stage.setTitle(
-                "Comprobante de venta #" + venta.getIdVenta()
-        );
-
-        stage.setScene(
-                new Scene(root)
-        );
-
+        stage.setTitle("Comprobante de venta #" + venta.getIdVenta());
+        stage.setScene(new Scene(root));
         stage.setResizable(false);
         stage.show();
     }

@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 
 <VBox alignment="TOP_CENTER"
-      prefWidth="470.0"
+      prefWidth="500.0"
       spacing="10.0"
       style="-fx-background-color: white;"
       xmlns="http://javafx.com/javafx/21"
@@ -24,7 +24,7 @@
 
     <Separator/>
 
-    <VBox spacing="5" prefWidth="430">
+    <VBox spacing="5" prefWidth="460">
         <Label fx:id="lblVenta"/>
         <Label fx:id="lblFecha"/>
         <Label fx:id="lblCliente"/>
@@ -33,23 +33,22 @@
 
     <Separator/>
 
-    <HBox spacing="5" prefWidth="430"
-          style="-fx-font-weight: bold;">
-        <Label text="ISBN" prefWidth="160"/>
-        <Label text="Cant." prefWidth="55"/>
-        <Label text="Precio" prefWidth="90"/>
-        <Label text="Subtotal" prefWidth="105"/>
+    <HBox spacing="5" prefWidth="460" style="-fx-font-weight: bold;">
+        <Label text="Libro / ISBN" prefWidth="180"/>
+        <Label text="Cant." prefWidth="50"/>
+        <Label text="Precio" prefWidth="80"/>
+        <Label text="Subtotal" prefWidth="100"/>
     </HBox>
 
     <VBox fx:id="boxProductos"
-          spacing="6"
-          prefWidth="430"/>
+          spacing="8"
+          prefWidth="460"/>
 
     <Separator/>
 
     <VBox alignment="CENTER_RIGHT"
           spacing="6"
-          prefWidth="430">
+          prefWidth="460">
 
         <Label fx:id="lblSubtotal"/>
         <Label fx:id="lblDescuento"/>

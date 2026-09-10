@@ -1,9 +1,12 @@
 package org.esperanza.controller;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -36,12 +39,23 @@ public class TicketVentaController {
         lblTotal.setText("TOTAL: Q" + dinero(total));
     }
 
+    public void setNombreCliente(String nombre, long cui) {
+        lblCliente.setText("Cliente: " + nombre + " (" + cui + ")");
+    }
+
     public void setDetalles(List<DetalleVenta> detalles) {
+        setDetalles(detalles, Collections.emptyMap());
+    }
+
+    public void setDetalles(List<DetalleVenta> detalles, Map<String, String> titulos) {
         boxProductos.getChildren().clear();
 
         for (DetalleVenta detalle : detalles) {
+            String titulo = titulos.getOrDefault(detalle.getIsbn(), detalle.getIsbn());
+
             boxProductos.getChildren().add(
                     crearFila(
+                            titulo,
                             detalle.getIsbn(),
                             detalle.getCantidad(),
                             detalle.getPrecioUnitario(),
@@ -51,27 +65,28 @@ public class TicketVentaController {
         }
     }
 
-    private HBox crearFila(String isbn, int cantidad,
+    private HBox crearFila(String titulo, String isbn, int cantidad,
                            BigDecimal precio, BigDecimal subtotal) {
 
-        Label lblIsbn = new Label(isbn);
-        Label lblCantidad = new Label(String.valueOf(cantidad));
-        Label lblPrecio = new Label("Q" + dinero(precio));
-        Label lblSub = new Label("Q" + dinero(subtotal));
+        Label libro = new Label(titulo + "\n" + isbn);
+        Label cant = new Label(String.valueOf(cantidad));
+        Label precioLabel = new Label("Q" + dinero(precio));
+        Label subtotalLabel = new Label("Q" + dinero(subtotal));
 
-        lblIsbn.setPrefWidth(160);
-        lblCantidad.setPrefWidth(55);
-        lblPrecio.setPrefWidth(90);
-        lblSub.setPrefWidth(105);
+        libro.setPrefWidth(180);
+        libro.setWrapText(true);
+        cant.setPrefWidth(50);
+        precioLabel.setPrefWidth(80);
+        subtotalLabel.setPrefWidth(100);
 
-        lblCantidad.setAlignment(Pos.CENTER);
-        lblPrecio.setAlignment(Pos.CENTER_RIGHT);
-        lblSub.setAlignment(Pos.CENTER_RIGHT);
+        cant.setAlignment(Pos.CENTER);
+        precioLabel.setAlignment(Pos.CENTER_RIGHT);
+        subtotalLabel.setAlignment(Pos.CENTER_RIGHT);
 
-        return new HBox(5, lblIsbn, lblCantidad, lblPrecio, lblSub);
+        return new HBox(5, libro, cant, precioLabel, subtotalLabel);
     }
 
     private String dinero(BigDecimal valor) {
-        return valor.setScale(2).toPlainString();
+        return valor.setScale(2, RoundingMode.HALF_UP).toPlainString();
     }
 }
