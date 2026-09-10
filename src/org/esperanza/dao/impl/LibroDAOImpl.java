@@ -1,7 +1,7 @@
 package org.esperanza.dao.impl;
 
 import org.esperanza.dao.LibroDAO;
-import org.esperanza.system.Conexion;
+import org.esperanza.util.Conexion;
 import org.esperanza.model.Libro;
 
 import java.sql.Connection;
@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 public class LibroDAOImpl implements LibroDAO {
     private static final Logger LOGGER = Logger.getLogger(LibroDAOImpl.class.getName());
 
-    // Consulta base uniendo la tabla de libros con autores mediante JOIN
+
     private static final String SELECT_BASE = 
         "SELECT l.*, GROUP_CONCAT(CONCAT(a.nombre_autor, ' ', a.apellido_autor) SEPARATOR ', ') AS nombre_autor " +
         "FROM libros l " +
