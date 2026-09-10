@@ -8,13 +8,6 @@ import java.util.Objects;
 
 import org.esperanza.util.Conexion;
 
-/**
- * DAO encargado de consultar, validar
- * y actualizar el stock de los libros.
- *
- * T2.17 - Validar stock.
- * T2.19 - Actualizar stock.
- */
 public class StockDao {
 
     private final ProveedorConexion conexiones;
@@ -37,10 +30,6 @@ public class StockDao {
                         "El proveedor de conexion es obligatorio"
                 );
     }
-
-    // =====================================================
-    // T2.17 - OBTENER STOCK ACTUAL
-    // =====================================================
 
     public int obtenerStockActual(
             String isbn) throws SQLException {
@@ -82,10 +71,6 @@ public class StockDao {
         }
     }
 
-    // =====================================================
-    // T2.17 - COMPROBAR STOCK
-    // =====================================================
-
     public boolean hayStockSuficiente(
             String isbn,
             int cantidad) throws SQLException {
@@ -98,10 +83,6 @@ public class StockDao {
 
         return stockActual >= cantidad;
     }
-
-    // =====================================================
-    // T2.17 - COMPROBAR STOCK EN TRANSACCION
-    // =====================================================
 
     public boolean hayStockSuficiente(
             Connection conexion,
@@ -149,10 +130,6 @@ public class StockDao {
             }
         }
     }
-
-    // =====================================================
-    // T2.17 - VALIDAR STOCK
-    // =====================================================
 
     public void validarStock(
             Connection conexion,
@@ -218,10 +195,6 @@ public class StockDao {
         }
     }
 
-    // =====================================================
-    // T2.19 - DESCONTAR STOCK
-    // =====================================================
-
     public void descontarStock(
             Connection conexion,
             String isbn,
@@ -274,10 +247,6 @@ public class StockDao {
             }
         }
     }
-
-    // =====================================================
-    // VALIDACIONES
-    // =====================================================
 
     private void validarIsbn(
             String isbn) {
