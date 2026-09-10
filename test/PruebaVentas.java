@@ -10,24 +10,18 @@ import org.esperanza.dao.VentaDao;
 import org.esperanza.model.CarritoVenta;
 import org.esperanza.model.Venta;
 
-/**
- * Pruebas sin dependencias externas.
- * JDBC simulado, sin necesidad de MySQL.
- */
 public class PruebaVentas {
 
     static void verificar(boolean valor) {
 
         if (!valor) {
+
             throw new AssertionError(
-                    "Una de las pruebas no obtuvo el resultado esperado."
+                    "Una de las pruebas no obtuvo "
+                    + "el resultado esperado."
             );
         }
     }
-
-    // =====================================================
-    // BASE DE DATOS SIMULADA
-    // =====================================================
 
     static class BaseSimulada {
 
@@ -36,8 +30,10 @@ public class PruebaVentas {
         boolean cerrada;
 
         int insertados;
+        int actualizacionesStock;
 
         boolean fallarDetalle;
+        boolean fallarStock;
 
         int stockDisponible = 100;
 
@@ -53,10 +49,6 @@ public class PruebaVentas {
             );
         }
 
-        // =================================================
-        // CONEXION SIMULADA
-        // =================================================
-
         Connection conectar() {
 
             return proxy(
@@ -66,21 +58,28 @@ public class PruebaVentas {
                         switch (metodo.getName()) {
 
                             case "setAutoCommit":
-                                return true;
+                                return null;
 
                             case "commit":
+
                                 commit = true;
+
                                 return null;
 
                             case "rollback":
+
                                 rollback = true;
+
                                 return null;
 
                             case "close":
+
                                 cerrada = true;
+
                                 return null;
 
                             case "isClosed":
+
                                 return cerrada;
 
                             case "prepareStatement":
@@ -88,7 +87,9 @@ public class PruebaVentas {
                                 String sql =
                                         (String) argumentos[0];
 
-                                return crearPreparedStatement(sql);
+                                return crearPreparedStatement(
+                                        sql
+                                );
 
                             default:
 
@@ -101,10 +102,6 @@ public class PruebaVentas {
             );
         }
 
-        // =================================================
-        // PREPARED STATEMENT SIMULADO
-        // =================================================
-
         private PreparedStatement crearPreparedStatement(
                 String sql) {
 
@@ -116,28 +113,46 @@ public class PruebaVentas {
                                 metodo.getName();
 
                         if (nombreMetodo.startsWith("set")) {
+
                             return null;
                         }
 
                         if (nombreMetodo.equals("close")) {
+
                             return null;
                         }
 
-                        // Consulta de stock
                         if (nombreMetodo.equals("executeQuery")) {
 
                             return crearResultadoStock();
                         }
 
-                        // INSERTS
                         if (nombreMetodo.equals("executeUpdate")) {
 
                             if (fallarDetalle
-                                    && sql.contains("detalle_venta")) {
+                                    && sql.contains(
+                                            "detalle_venta"
+                                    )) {
 
                                 throw new SQLException(
-                                        "Fallo simulado al insertar detalle"
+                                        "Fallo simulado "
+                                        + "al insertar detalle"
                                 );
+                            }
+
+                            if (sql.contains("UPDATE libros")) {
+
+                                if (fallarStock) {
+
+                                    throw new SQLException(
+                                            "Fallo simulado "
+                                            + "al actualizar stock"
+                                    );
+                                }
+
+                                actualizacionesStock++;
+
+                                return 1;
                             }
 
                             insertados++;
@@ -145,23 +160,21 @@ public class PruebaVentas {
                             return 1;
                         }
 
-                        // IDs generados
-                        if (nombreMetodo.equals("getGeneratedKeys")) {
+                        if (nombreMetodo.equals(
+                                "getGeneratedKeys"
+                        )) {
 
                             return crearGeneratedKeys();
                         }
 
                         throw new UnsupportedOperationException(
-                                "Metodo PreparedStatement no simulado: "
+                                "Metodo PreparedStatement "
+                                + "no simulado: "
                                 + nombreMetodo
                         );
                     }
             );
         }
-
-        // =================================================
-        // RESULTADO SIMULADO DE STOCK
-        // =================================================
 
         private ResultSet crearResultadoStock() {
 
@@ -199,17 +212,14 @@ public class PruebaVentas {
                             default:
 
                                 throw new UnsupportedOperationException(
-                                        "Metodo ResultSet no simulado: "
+                                        "Metodo ResultSet "
+                                        + "no simulado: "
                                         + metodo.getName()
                                 );
                         }
                     }
             );
         }
-
-        // =================================================
-        // GENERATED KEYS SIMULADAS
-        // =================================================
 
         private ResultSet crearGeneratedKeys() {
 
@@ -243,7 +253,8 @@ public class PruebaVentas {
                             default:
 
                                 throw new UnsupportedOperationException(
-                                        "Metodo ResultSet no simulado: "
+                                        "Metodo ResultSet "
+                                        + "no simulado: "
                                         + metodo.getName()
                                 );
                         }
@@ -251,10 +262,6 @@ public class PruebaVentas {
             );
         }
     }
-
-    // =====================================================
-    // PRUEBAS
-    // =====================================================
 
     public static void main(
             String[] args) throws Exception {
@@ -270,10 +277,6 @@ public class PruebaVentas {
         System.out.println(
                 "=================================="
         );
-
-        // =================================================
-        // PRUEBA 1 - AGREGAR MISMO LIBRO
-        // =================================================
 
         CarritoVenta carrito =
                 new CarritoVenta();
@@ -309,10 +312,6 @@ public class PruebaVentas {
                 "OK - Agregar y sumar productos"
         );
 
-        // =================================================
-        // PRUEBA 2 - COPIA PROTEGIDA
-        // =================================================
-
         carrito
                 .getDetalles()
                 .get(0)
@@ -328,10 +327,6 @@ public class PruebaVentas {
         System.out.println(
                 "OK - Copia protegida del carrito"
         );
-
-        // =================================================
-        // PRUEBA 3 - CAMBIAR CANTIDAD
-        // =================================================
 
         carrito.cambiarCantidad(
                 "978-0-124",
@@ -356,10 +351,6 @@ public class PruebaVentas {
                 "OK - Cambio de cantidad"
         );
 
-        // =================================================
-        // PRUEBA 4 - CANTIDAD INVALIDA
-        // =================================================
-
         try {
 
             carrito.cambiarCantidad(
@@ -377,10 +368,6 @@ public class PruebaVentas {
                     "OK - Cantidad invalida rechazada"
             );
         }
-
-        // =================================================
-        // PRUEBA 5 - PRECIO DIFERENTE
-        // =================================================
 
         try {
 
@@ -401,10 +388,6 @@ public class PruebaVentas {
             );
         }
 
-        // =================================================
-        // PRUEBA 6 - ELIMINAR PRODUCTO
-        // =================================================
-
         verificar(
                 carrito.quitarProducto(
                         "978-0-126"
@@ -423,18 +406,15 @@ public class PruebaVentas {
                 "OK - Eliminar producto"
         );
 
-        // =================================================
-        // PRUEBA 7 - ROLLBACK SIMULADO
-        // =================================================
-
-        BaseSimulada fallo =
+        BaseSimulada falloDetalle =
                 new BaseSimulada();
 
-        fallo.fallarDetalle = true;
+        falloDetalle.fallarDetalle =
+                true;
 
-        VentaDao ventaDaoFallo =
+        VentaDao ventaDaoFalloDetalle =
                 new VentaDao(
-                        () -> fallo.conectar()
+                        () -> falloDetalle.conectar()
                 );
 
         try {
@@ -442,7 +422,7 @@ public class PruebaVentas {
             carrito.confirmarVenta(
                     1L,
                     1,
-                    ventaDaoFallo
+                    ventaDaoFalloDetalle
             );
 
             throw new AssertionError(
@@ -452,15 +432,15 @@ public class PruebaVentas {
         } catch (SQLException esperado) {
 
             verificar(
-                    fallo.rollback
+                    falloDetalle.rollback
             );
 
             verificar(
-                    !fallo.commit
+                    !falloDetalle.commit
             );
 
             verificar(
-                    fallo.cerrada
+                    falloDetalle.cerrada
             );
 
             verificar(
@@ -468,13 +448,69 @@ public class PruebaVentas {
             );
 
             System.out.println(
-                    "OK - Rollback ejecutado"
+                    "OK - Rollback por fallo de detalle"
             );
         }
 
-        // =================================================
-        // PRUEBA 8 - VENTA EXITOSA
-        // =================================================
+        CarritoVenta carritoRollbackStock =
+                new CarritoVenta();
+
+        carritoRollbackStock.agregarProducto(
+                "978-0-127",
+                1,
+                new BigDecimal("165.00")
+        );
+
+        BaseSimulada falloStock =
+                new BaseSimulada();
+
+        falloStock.fallarStock =
+                true;
+
+        VentaDao ventaDaoFalloStock =
+                new VentaDao(
+                        () -> falloStock.conectar()
+                );
+
+        try {
+
+            carritoRollbackStock.confirmarVenta(
+                    1L,
+                    1,
+                    ventaDaoFalloStock
+            );
+
+            throw new AssertionError(
+                    "La venta debio hacer rollback"
+            );
+
+        } catch (SQLException esperado) {
+
+            verificar(
+                    falloStock.rollback
+            );
+
+            verificar(
+                    !falloStock.commit
+            );
+
+            verificar(
+                    falloStock.cerrada
+            );
+
+            verificar(
+                    falloStock.insertados == 2
+            );
+
+            verificar(
+                    !carritoRollbackStock.estaVacio()
+            );
+
+            System.out.println(
+                    "OK - T2.20 rollback "
+                    + "por fallo al actualizar stock"
+            );
+        }
 
         carrito.agregarProducto(
                 "978-0-126",
@@ -509,15 +545,12 @@ public class PruebaVentas {
                 exito.cerrada
         );
 
-        /*
-         * 1 INSERT en ventas
-         * +
-         * 2 INSERT en detalle_venta
-         * =
-         * 3 INSERTS
-         */
         verificar(
                 exito.insertados == 3
+        );
+
+        verificar(
+                exito.actualizacionesStock == 2
         );
 
         verificar(
@@ -545,12 +578,9 @@ public class PruebaVentas {
         );
 
         System.out.println(
-                "OK - Venta y detalles confirmados con commit"
+                "OK - Venta, detalles y stock "
+                + "confirmados con commit"
         );
-
-        // =================================================
-        // PRUEBA 9 - VACIAR CARRITO
-        // =================================================
 
         carrito.agregarProducto(
                 "978-0-127",
@@ -576,10 +606,6 @@ public class PruebaVentas {
                 "OK - Vaciar carrito"
         );
 
-        // =================================================
-        // PRUEBA 10 - VENTA VACIA
-        // =================================================
-
         try {
 
             carrito.confirmarVenta(
@@ -599,10 +625,6 @@ public class PruebaVentas {
             );
         }
 
-        // =================================================
-        // RESULTADO FINAL
-        // =================================================
-
         System.out.println(
                 "=================================="
         );
@@ -616,9 +638,8 @@ public class PruebaVentas {
         );
 
         System.out.println(
-                "OK: carrito, cantidades, total, "
-                + "stock simulado, venta, detalle, "
-                + "commit y rollback."
+                "OK: T2.17, T2.18, T2.19 "
+                + "y T2.20 funcionando."
         );
     }
 }

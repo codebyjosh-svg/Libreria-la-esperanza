@@ -19,10 +19,6 @@ public class StockDao {
 
     private final ProveedorConexion conexiones;
 
-    // =====================================================
-    // CONSTRUCTORES
-    // =====================================================
-
     public StockDao() {
 
         this(
@@ -46,13 +42,6 @@ public class StockDao {
     // T2.17 - OBTENER STOCK ACTUAL
     // =====================================================
 
-    /**
-     * Obtiene el stock actual de un libro activo.
-     *
-     * @param isbn ISBN del libro.
-     * @return stock disponible,
-     * o -1 si no existe o esta inactivo.
-     */
     public int obtenerStockActual(
             String isbn) throws SQLException {
 
@@ -97,9 +86,6 @@ public class StockDao {
     // T2.17 - COMPROBAR STOCK
     // =====================================================
 
-    /**
-     * Comprueba si existe suficiente stock.
-     */
     public boolean hayStockSuficiente(
             String isbn,
             int cantidad) throws SQLException {
@@ -117,10 +103,6 @@ public class StockDao {
     // T2.17 - COMPROBAR STOCK EN TRANSACCION
     // =====================================================
 
-    /**
-     * Comprueba el stock utilizando una conexion
-     * que ya pertenece a una transaccion.
-     */
     public boolean hayStockSuficiente(
             Connection conexion,
             String isbn,
@@ -172,10 +154,6 @@ public class StockDao {
     // T2.17 - VALIDAR STOCK
     // =====================================================
 
-    /**
-     * Valida que el libro exista,
-     * este activo y tenga stock suficiente.
-     */
     public void validarStock(
             Connection conexion,
             String isbn,
@@ -244,78 +222,61 @@ public class StockDao {
     // T2.19 - DESCONTAR STOCK
     // =====================================================
 
-public void descontarStock(
-        Connection conexion,
-        String isbn,
-        int cantidad) throws SQLException {
+    public void descontarStock(
+            Connection conexion,
+            String isbn,
+            int cantidad) throws SQLException {
 
-    Objects.requireNonNull(
-            conexion,
-            "La conexion es obligatoria"
-    );
-
-    validarIsbn(isbn);
-    validarCantidad(cantidad);
-
-    String sql = """
-            UPDATE libros
-            SET stock_actual = stock_actual - ?
-            WHERE isbn = ?
-              AND activo = 1
-              AND stock_actual >= ?
-            """;
-
-    try (PreparedStatement ps =
-            conexion.prepareStatement(sql)) {
-
-        ps.setInt(
-                1,
-                cantidad
+        Objects.requireNonNull(
+                conexion,
+                "La conexion es obligatoria"
         );
 
-        ps.setString(
-                2,
-                isbn.trim()
-        );
+        validarIsbn(isbn);
+        validarCantidad(cantidad);
 
-        ps.setInt(
-                3,
-                cantidad
-        );
+        String sql = """
+                UPDATE libros
+                SET stock_actual = stock_actual - ?
+                WHERE isbn = ?
+                  AND activo = 1
+                  AND stock_actual >= ?
+                """;
 
-        System.out.println(
-                "[T2.19] Entrando a descontarStock"
-        );
+        try (PreparedStatement ps =
+                conexion.prepareStatement(sql)) {
 
-        System.out.println(
-                "[T2.19] ISBN: " + isbn
-        );
-
-        System.out.println(
-                "[T2.19] Cantidad a descontar: "
-                + cantidad
-        );
-
-        int filasAfectadas =
-                ps.executeUpdate();
-
-        System.out.println(
-                "[T2.19] Filas actualizadas: "
-                + filasAfectadas
-        );
-
-        if (filasAfectadas != 1) {
-
-            throw new SQLException(
-                    "No se pudo descontar el stock "
-                    + "del libro con ISBN: "
-                    + isbn
+            ps.setInt(
+                    1,
+                    cantidad
             );
+
+            ps.setString(
+                    2,
+                    isbn.trim()
+            );
+
+            ps.setInt(
+                    3,
+                    cantidad
+            );
+
+            int filasAfectadas =
+                    ps.executeUpdate();
+
+            if (filasAfectadas != 1) {
+
+                throw new SQLException(
+                        "No se pudo descontar el stock "
+                        + "del libro con ISBN: "
+                        + isbn
+                );
+            }
         }
     }
-}
+
     // =====================================================
-    // VALIDAR ISBN
+    // VALIDACIONES
     // =====================================================
 
     private void validarIsbn(
@@ -329,10 +290,6 @@ public void descontarStock(
             );
         }
     }
-
-    // =====================================================
-    // VALIDAR CANTIDAD
-    // =====================================================
 
     private void validarCantidad(
             int cantidad) {

@@ -26,10 +26,6 @@ public class VentaDao {
     private final DetalleVentaDao detalleVentaDao;
     private final StockDao stockDao;
 
-    // =====================================================
-    // CONSTRUCTOR NORMAL
-    // =====================================================
-
     public VentaDao() {
 
         this(
@@ -38,10 +34,6 @@ public class VentaDao {
                         .conectar()
         );
     }
-
-    // =====================================================
-    // CONSTRUCTOR PARA PRUEBAS
-    // =====================================================
 
     public VentaDao(
             ProveedorConexion conexiones) {
@@ -59,20 +51,11 @@ public class VentaDao {
                 new StockDao(conexiones);
     }
 
-    // =====================================================
-    // REGISTRAR VENTA
-    // T2.17 + T2.18 + T2.19
-    // =====================================================
-
     public Venta registrar(
             long cuiCliente,
             int idUsuario,
             List<DetalleVenta> detalles)
             throws SQLException {
-
-        // =================================================
-        // VALIDACIONES
-        // =================================================
 
         if (cuiCliente <= 0) {
 
@@ -99,10 +82,6 @@ public class VentaDao {
                     "La venta debe tener productos"
             );
         }
-
-        // =================================================
-        // COPIA DE DETALLES
-        // =================================================
 
         List<DetalleVenta> copia =
                 new ArrayList<>();
@@ -142,10 +121,6 @@ public class VentaDao {
                     );
         }
 
-        // =================================================
-        // CALCULAR TOTAL
-        // =================================================
-
         BigDecimal descuento =
                 BigDecimal.ZERO;
 
@@ -166,21 +141,12 @@ public class VentaDao {
                         idUsuario
                 );
 
-        // =================================================
-        // CONEXION
-        // =================================================
-
         try (Connection conexion =
                 conexiones.conectar()) {
 
-            // Iniciar transaccion
             conexion.setAutoCommit(false);
 
             try {
-
-                // =========================================
-                // T2.17 - VALIDAR STOCK
-                // =========================================
 
                 for (DetalleVenta detalle : copia) {
 
@@ -190,10 +156,6 @@ public class VentaDao {
                             detalle.getCantidad()
                     );
                 }
-
-                // =========================================
-                // T2.18 - INSERTAR VENTA
-                // =========================================
 
                 String sqlVenta = """
                         INSERT INTO ventas
@@ -249,10 +211,6 @@ public class VentaDao {
                         );
                     }
 
-                    // =====================================
-                    // OBTENER ID DE LA VENTA
-                    // =====================================
-
                     try (ResultSet claves =
                             ps.getGeneratedKeys()) {
 
@@ -269,24 +227,12 @@ public class VentaDao {
                     }
                 }
 
-                // =========================================
-                // T2.18 - INSERTAR DETALLES
-                // T2.19 - DESCONTAR STOCK
-                // =========================================
-
                 for (DetalleVenta detalle : copia) {
 
-                    // Insertar detalle
                     detalleVentaDao.insertar(
                             conexion,
                             venta.getIdVenta(),
                             detalle
-                    );
-
-                    // IMPORTANTE:
-                    // descontar stock del libro
-                    System.out.println(
-                            "[T2.19] Descontando stock del ISBN: "
                     );
 
                     stockDao.descontarStock(
@@ -296,22 +242,10 @@ public class VentaDao {
                     );
                 }
 
-                // =========================================
-                // TODO FUNCIONO
-                // =========================================
-
                 conexion.commit();
-
-                System.out.println(
-                        "[T2.19] Venta confirmada y stock actualizado."
-                );
 
             } catch (SQLException
                     | RuntimeException e) {
-
-                // =========================================
-                // ERROR -> ROLLBACK
-                // =========================================
 
                 try {
 
@@ -340,10 +274,6 @@ public class VentaDao {
 
         return venta;
     }
-
-    // =====================================================
-    // BUSCAR POR ID
-    // =====================================================
 
     public Optional<Venta> buscarPorId(
             int idVenta)
@@ -390,10 +320,6 @@ public class VentaDao {
         }
     }
 
-    // =====================================================
-    // LISTAR
-    // =====================================================
-
     public List<Venta> listar()
             throws SQLException {
 
@@ -434,10 +360,6 @@ public class VentaDao {
 
         return ventas;
     }
-
-    // =====================================================
-    // CONVERTIR RESULTSET
-    // =====================================================
 
     private Venta leer(
             ResultSet rs)
