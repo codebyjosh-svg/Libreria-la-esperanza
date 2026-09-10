@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="TOP_CENTER"
+      prefWidth="500.0"
+      spacing="12.0"
+      style="-fx-background-color: white;"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.esperanza.controller.TicketVentaController">
+
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <VBox fx:id="contenidoTicket"
+          alignment="TOP_CENTER"
+          spacing="10"
+          prefWidth="460"
+          style="-fx-background-color: white;">
+
+        <Label text="LIBRERÍA LA ESPERANZA"
+               style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+
+        <Label text="Comprobante de venta"
+               style="-fx-font-size: 14px;"/>
+
+        <Separator/>
+
+        <VBox spacing="5" prefWidth="460">
+            <Label fx:id="lblVenta"/>
+            <Label fx:id="lblFecha"/>
+            <Label fx:id="lblCliente"/>
+            <Label fx:id="lblCajero"/>
+        </VBox>
+
+        <Separator/>
+
+        <HBox spacing="5" prefWidth="460"
+              style="-fx-font-weight: bold;">
+            <Label text="Libro / ISBN" prefWidth="180"/>
+            <Label text="Cant." prefWidth="50"/>
+            <Label text="Precio" prefWidth="80"/>
+            <Label text="Subtotal" prefWidth="100"/>
+        </HBox>
+
+        <VBox fx:id="boxProductos"
+              spacing="8"
+              prefWidth="460"/>
+
+        <Separator/>
+
+        <VBox alignment="CENTER_RIGHT"
+              spacing="6"
+              prefWidth="460">
+
+            <Label fx:id="lblSubtotal"/>
+            <Label fx:id="lblDescuento"/>
+
+            <Label fx:id="lblTotal"
+                   style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+        </VBox>
+
+        <Separator/>
+
+        <Label text="Gracias por su compra"
+               style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+
+    </VBox>
+
+    <Button text="Imprimir comprobante"
+            onAction="#imprimir"
+            prefWidth="180"/>
+
+</VBox>

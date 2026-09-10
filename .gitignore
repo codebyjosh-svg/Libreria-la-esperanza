@@ -1,19 +1,10 @@
-# NetBeans (privado/generado por IDE, no compartir)
 **/nbproject/private/
 **/nbproject/Makefile-*.mk
 **/nbproject/Package-*.bash
-
-# Compilados y artefactos de build
 build/
 nbbuild/
 dist/
 nbdist/
 .nb-gradle/
-*.class
-
-# Credenciales de base de datos (IMPORTANTE - la tuya)
+.atl/
 db.properties
-
-# Archivos de sistema operativo
-.DS_Store
-Thumbs.db
