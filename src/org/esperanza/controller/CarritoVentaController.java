@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.List;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.fxml.FXML;
@@ -13,7 +14,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 
+import org.esperanza.Service.NavegacionRol;
 import org.esperanza.dao.VentaDao;
 import org.esperanza.model.CarritoVenta;
 import org.esperanza.model.DetalleVenta;
@@ -85,14 +88,40 @@ public class CarritoVentaController {
                 Bindings.isEmpty(tabla.getItems())
         );
 
-        tabla.getSelectionModel().selectedItemProperty().addListener(
-                (obs, anterior, seleccionado) -> {
+        tabla.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((obs, anterior, seleccionado) -> {
                     if (seleccionado != null) {
                         txtNuevaCantidad.setText(
                                 String.valueOf(seleccionado.getCantidad())
                         );
                     }
-                }
+                });
+
+        txtCantidad.setText("1");
+        lblTotal.setText("Total: Q0.00");
+
+        configurarCierre();
+    }
+
+    private void configurarCierre() {
+        Platform.runLater(() -> {
+            Stage stage = (Stage) tabla
+                    .getScene()
+                    .getWindow();
+
+            stage.setOnCloseRequest(event -> {
+                event.consume();
+                regresarDashboard(stage);
+            });
+        });
+    }
+
+    private void regresarDashboard(Stage stage) {
+        stage.setOnCloseRequest(null);
+
+        NavegacionRol.abrirDashboardSegunRol(
+                stage
         );
     }
 
@@ -102,7 +131,9 @@ public class CarritoVentaController {
             String isbn = txtIsbn.getText().trim();
 
             if (isbn.isEmpty()) {
-                throw new IllegalArgumentException("El ISBN es obligatorio");
+                throw new IllegalArgumentException(
+                        "El ISBN es obligatorio"
+                );
             }
 
             int cantidad = enteroPositivo(
@@ -114,10 +145,14 @@ public class CarritoVentaController {
 
             try {
                 precio = new BigDecimal(
-                        txtPrecio.getText().trim().replace(',', '.')
+                        txtPrecio.getText()
+                                .trim()
+                                .replace(',', '.')
                 );
             } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("Escribe un precio válido");
+                throw new IllegalArgumentException(
+                        "Escribe un precio válido"
+                );
             }
 
             if (precio.compareTo(BigDecimal.ZERO) <= 0) {
@@ -126,7 +161,12 @@ public class CarritoVentaController {
                 );
             }
 
-            carrito.agregarProducto(isbn, cantidad, precio);
+            carrito.agregarProducto(
+                    isbn,
+                    cantidad,
+                    precio
+            );
+
             refrescar(isbn);
 
             txtIsbn.clear();
@@ -140,8 +180,9 @@ public class CarritoVentaController {
     @FXML
     private void actualizarCantidad() {
         ejecutar(() -> {
-            DetalleVenta detalle =
-                    tabla.getSelectionModel().getSelectedItem();
+            DetalleVenta detalle = tabla
+                    .getSelectionModel()
+                    .getSelectedItem();
 
             if (detalle == null) {
                 throw new IllegalArgumentException(
@@ -167,8 +208,9 @@ public class CarritoVentaController {
     @FXML
     private void eliminarProducto() {
         ejecutar(() -> {
-            DetalleVenta detalle =
-                    tabla.getSelectionModel().getSelectedItem();
+            DetalleVenta detalle = tabla
+                    .getSelectionModel()
+                    .getSelectedItem();
 
             if (detalle == null) {
                 throw new IllegalArgumentException(
@@ -176,7 +218,10 @@ public class CarritoVentaController {
                 );
             }
 
-            carrito.quitarProducto(detalle.getIsbn());
+            carrito.quitarProducto(
+                    detalle.getIsbn()
+            );
+
             refrescar(null);
 
         }, "Libro eliminado.");
@@ -187,13 +232,16 @@ public class CarritoVentaController {
         ejecutar(() -> {
             carrito.vaciar();
             refrescar(null);
+            txtNuevaCantidad.clear();
         }, "Carrito vacío.");
     }
 
     @FXML
     private void confirmarVenta() {
         try {
-            String cuiTexto = txtCuiCliente.getText().trim();
+            String cuiTexto = txtCuiCliente
+                    .getText()
+                    .trim();
 
             if (cuiTexto.isEmpty()) {
                 throw new IllegalArgumentException(
@@ -218,26 +266,28 @@ public class CarritoVentaController {
                     ventaDao
             );
 
-            refrescar(null);
-            txtCuiCliente.clear();
-
-            lblMensaje.setStyle(
-                    "-fx-text-fill: #166534;"
-            );
-
-            lblMensaje.setText(
-                    "Venta registrada correctamente."
-            );
+            Stage stage = (Stage) btnConfirmar
+                    .getScene()
+                    .getWindow();
 
             ComprobanteVenta.mostrar(
                     venta,
-                    detalles
+                    detalles,
+                    stage
             );
 
         } catch (NumberFormatException e) {
-            mostrarError("Ingresa un CUI válido.");
-        } catch (IllegalArgumentException | SQLException | IOException e) {
-            mostrarError(e.getMessage());
+            mostrarError(
+                    "Ingresa un CUI válido."
+            );
+
+        } catch (IllegalArgumentException
+                | SQLException
+                | IOException e) {
+
+            mostrarError(
+                    e.getMessage()
+            );
         }
     }
 
@@ -247,34 +297,52 @@ public class CarritoVentaController {
         );
 
         lblTotal.setText(
-                "Total: Q" + carrito.getTotal().toPlainString()
+                "Total: Q"
+                + carrito.getTotal().toPlainString()
         );
 
-        if (isbnSeleccionado == null) return;
+        if (isbnSeleccionado == null) {
+            return;
+        }
 
         for (DetalleVenta detalle : tabla.getItems()) {
-            if (detalle.getIsbn().equals(isbnSeleccionado)) {
-                tabla.getSelectionModel().select(detalle);
+            if (detalle.getIsbn()
+                    .equals(isbnSeleccionado)) {
+
+                tabla.getSelectionModel()
+                        .select(detalle);
+
                 break;
             }
         }
     }
 
-    private int enteroPositivo(String texto, String nombre) {
-        try {
-            int valor = Integer.parseInt(texto.trim());
+    private int enteroPositivo(
+            String texto,
+            String nombre) {
 
-            if (valor > 0) return valor;
+        try {
+            int valor = Integer.parseInt(
+                    texto.trim()
+            );
+
+            if (valor > 0) {
+                return valor;
+            }
 
         } catch (NumberFormatException ignored) {
         }
 
         throw new IllegalArgumentException(
-                nombre + " debe ser un entero mayor que cero"
+                nombre
+                + " debe ser un entero mayor que cero"
         );
     }
 
-    private void ejecutar(Runnable accion, String mensaje) {
+    private void ejecutar(
+            Runnable accion,
+            String mensaje) {
+
         try {
             accion.run();
 
@@ -282,9 +350,13 @@ public class CarritoVentaController {
                     "-fx-text-fill: #166534;"
             );
 
-            lblMensaje.setText(mensaje);
+            lblMensaje.setText(
+                    mensaje
+            );
 
-        } catch (IllegalArgumentException | ArithmeticException e) {
+        } catch (IllegalArgumentException
+                | ArithmeticException e) {
+
             mostrarError(
                     e instanceof ArithmeticException
                             ? "Usa precios de hasta dos decimales."
@@ -298,7 +370,11 @@ public class CarritoVentaController {
                 "-fx-text-fill: #b91c1c;"
         );
 
-        lblMensaje.setText(mensaje);
+        lblMensaje.setText(
+                mensaje == null
+                        ? "Ocurrió un error."
+                        : mensaje
+        );
     }
 
     public void setIdUsuario(int idUsuario) {

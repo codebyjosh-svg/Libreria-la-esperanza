@@ -1,4 +1,4 @@
-package org.esperanza.Controller;
+package org.esperanza.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;

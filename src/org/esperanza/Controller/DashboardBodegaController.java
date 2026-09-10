@@ -18,32 +18,23 @@ import org.esperanza.Service.SesionUsuario;
 
 public class DashboardBodegaController {
 
-    @FXML
-    private Label lblBienvenida;
-
-    @FXML
-    private Label lblRol;
-
-    @FXML
-    private Label lblPermisos;
-
-    @FXML
-    private Button btnCerrarSesion;
+    @FXML private Label lblBienvenida;
+    @FXML private Label lblRol;
+    @FXML private Label lblPermisos;
+    @FXML private Button btnCerrarSesion;
 
     @FXML
     private void initialize() {
 
-        if (!NavegacionRol.validarRol(
-                Rol.BODEGA)) {
-
+        if (!NavegacionRol.validarRol(Rol.BODEGA)) {
             Platform.runLater(
                     this::redirigirDashboardCorrecto
             );
-
             return;
         }
 
         actualizarEncabezado();
+        configurarCierre();
     }
 
     private void actualizarEncabezado() {
@@ -69,6 +60,27 @@ public class DashboardBodegaController {
                 + "CONSULTAR_PRODUCTOS | "
                 + "ENTRADAS_SALIDAS"
         );
+    }
+
+    private void configurarCierre() {
+
+        Platform.runLater(() -> {
+
+            Stage stage = (Stage) lblBienvenida
+                    .getScene()
+                    .getWindow();
+
+            stage.setOnCloseRequest(event -> {
+
+                event.consume();
+
+                SesionUsuario
+                        .getInstancia()
+                        .cerrarSesion();
+
+                volverLogin();
+            });
+        });
     }
 
     @FXML
@@ -97,8 +109,7 @@ public class DashboardBodegaController {
 
         mostrarInfo(
                 "Entradas / Salidas",
-                "Acceso al registro de entradas "
-                + "y salidas autorizado."
+                "Acceso al registro de entradas y salidas autorizado."
         );
     }
 
@@ -116,21 +127,19 @@ public class DashboardBodegaController {
 
         try {
 
-            FXMLLoader loader =
-                    new FXMLLoader(
-                            getClass()
-                                    .getResource(
-                                            "/org/esperanza/view/Login.fxml"
-                                    )
-                    );
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource(
+                            "/org/esperanza/view/Login.fxml"
+                    )
+            );
 
-            Parent root =
-                    loader.load();
+            Parent root = loader.load();
 
-            Stage stage =
-                    (Stage) btnCerrarSesion
-                            .getScene()
-                            .getWindow();
+            Stage stage = (Stage) lblBienvenida
+                    .getScene()
+                    .getWindow();
+
+            stage.setOnCloseRequest(null);
 
             stage.setScene(
                     new Scene(root)
@@ -164,10 +173,9 @@ public class DashboardBodegaController {
             return;
         }
 
-        Stage stage =
-                (Stage) lblBienvenida
-                        .getScene()
-                        .getWindow();
+        Stage stage = (Stage) lblBienvenida
+                .getScene()
+                .getWindow();
 
         if (SesionUsuario
                 .getInstancia()
@@ -188,30 +196,26 @@ public class DashboardBodegaController {
             String titulo,
             String mensaje) {
 
-        Alert alert =
-                new Alert(
-                        Alert.AlertType.INFORMATION
-                );
+        Alert alert = new Alert(
+                Alert.AlertType.INFORMATION
+        );
 
         alert.setTitle(titulo);
         alert.setHeaderText(null);
         alert.setContentText(mensaje);
-
         alert.showAndWait();
     }
 
     private void mostrarError(
             String mensaje) {
 
-        Alert alert =
-                new Alert(
-                        Alert.AlertType.ERROR
-                );
+        Alert alert = new Alert(
+                Alert.AlertType.ERROR
+        );
 
         alert.setTitle("Error");
         alert.setHeaderText(null);
         alert.setContentText(mensaje);
-
         alert.showAndWait();
     }
 }
