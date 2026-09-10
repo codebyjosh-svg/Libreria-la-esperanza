@@ -1,34 +1,28 @@
 package org.esperanza.system;
 
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import org.esperanza.view.CarritoVentaVista;
+import javafx.scene.Parent;
 import javafx.stage.Stage;
 
-/**
- * Punto de entrada del proyecto. Se mantiene como una clase normal
- * para poder trabajar con JavaFX desde el Classpath en NetBeans.
- */
-public class main {
+public class main extends Application {
+
+    @Override
+    public void start(Stage stage) throws Exception {
+        FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/org/esperanza/view/CarritoVenta.fxml")
+        );
+
+        Parent root = loader.load();
+        Scene scene = new Scene(root, 900, 600);
+
+        stage.setTitle("Librería La Esperanza");
+        stage.setScene(scene);
+        stage.show();
+    }
 
     public static void main(String[] args) {
-        Application.launch(Ventana.class, args);
-    }
-
-    public static class Ventana extends Application {
-
-        @Override
-        public void start(Stage stage) {
-            CarritoVentaVista root = new CarritoVentaVista();
-            Scene scene = new Scene(root, 950, 620);
-
-            stage.setTitle("Libreria La Esperanza");
-            stage.setScene(scene);
-            stage.setMinWidth(760);
-            stage.setMinHeight(560);
-            stage.show();
-        }
+        launch(args);
     }
 }
-
-

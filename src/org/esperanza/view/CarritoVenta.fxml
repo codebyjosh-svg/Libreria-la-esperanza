@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefHeight="600.0" prefWidth="900.0"
+            style="-fx-background-color: white; -fx-padding: 20;"
+            xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.esperanza.controller.CarritoVentaController">
+
+    <top>
+        <VBox spacing="12">
+            <Label text="Carrito de venta · Librería La Esperanza"
+                   style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
+
+            <HBox spacing="10">
+                <VBox spacing="5">
+                    <Label text="ISBN"/>
+                    <TextField fx:id="txtIsbn" promptText="Ej. 978-0-124" prefWidth="170"/>
+                </VBox>
+
+                <VBox spacing="5">
+                    <Label text="Precio unitario"/>
+                    <TextField fx:id="txtPrecio" promptText="Ej. 135.50" prefWidth="120"/>
+                </VBox>
+
+                <VBox spacing="5">
+                    <Label text="Cantidad"/>
+                    <TextField fx:id="txtCantidad" text="1" prefWidth="80"/>
+                </VBox>
+
+                <VBox alignment="BOTTOM_LEFT">
+                    <Button text="Agregar libro"
+                            defaultButton="true"
+                            onAction="#agregarProducto"/>
+                </VBox>
+            </HBox>
+
+            <Label text="El mismo ISBN suma cantidades. Selecciona una fila para modificarla."
+                   wrapText="true"/>
+        </VBox>
+    </top>
+
+    <center>
+        <TableView fx:id="tabla" prefHeight="380">
+            <columns>
+                <TableColumn fx:id="colIsbn" text="ISBN" prefWidth="220"/>
+                <TableColumn fx:id="colCantidad" text="Cantidad" prefWidth="120"/>
+                <TableColumn fx:id="colPrecio" text="Precio unitario" prefWidth="170"/>
+                <TableColumn fx:id="colSubtotal" text="Subtotal" prefWidth="170"/>
+            </columns>
+        </TableView>
+    </center>
+
+    <bottom>
+        <VBox spacing="12">
+            <HBox spacing="10">
+                <VBox spacing="5">
+                    <Label text="Nueva cantidad"/>
+                    <TextField fx:id="txtNuevaCantidad" text="1" prefWidth="100"/>
+                </VBox>
+
+                <VBox alignment="BOTTOM_LEFT">
+                    <Button fx:id="btnActualizar"
+                            text="Actualizar cantidad"
+                            onAction="#actualizarCantidad"/>
+                </VBox>
+
+                <VBox alignment="BOTTOM_LEFT">
+                    <Button fx:id="btnEliminar"
+                            text="Eliminar libro"
+                            onAction="#eliminarProducto"/>
+                </VBox>
+
+                <VBox alignment="BOTTOM_LEFT">
+                    <Button fx:id="btnVaciar"
+                            text="Vaciar carrito"
+                            onAction="#vaciarCarrito"/>
+                </VBox>
+            </HBox>
+
+            <Label fx:id="lblTotal"
+                   text="Total: Q0.00"
+                   style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+
+            <Label fx:id="lblMensaje" wrapText="true"/>
+        </VBox>
+    </bottom>
+
+</BorderPane>
