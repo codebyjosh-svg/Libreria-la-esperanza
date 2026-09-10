@@ -7,11 +7,17 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.print.PageLayout;
+import javafx.print.PrinterJob;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.transform.Scale;
+
 import org.esperanza.model.DetalleVenta;
 
 public class TicketVentaController {
@@ -23,7 +29,9 @@ public class TicketVentaController {
     @FXML private Label lblSubtotal;
     @FXML private Label lblDescuento;
     @FXML private Label lblTotal;
+
     @FXML private VBox boxProductos;
+    @FXML private VBox contenidoTicket;
 
     public void setDatosVenta(int idVenta, LocalDateTime fecha, long cuiCliente,
                               int idUsuario, BigDecimal subtotal,
@@ -32,6 +40,7 @@ public class TicketVentaController {
         lblVenta.setText("Venta No. " + idVenta);
         lblFecha.setText("Fecha: " + fecha.format(
                 DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+
         lblCliente.setText("Cliente: " + cuiCliente);
         lblCajero.setText("Cajero: " + idUsuario);
         lblSubtotal.setText("Subtotal: Q" + dinero(subtotal));
@@ -47,11 +56,16 @@ public class TicketVentaController {
         setDetalles(detalles, Collections.emptyMap());
     }
 
-    public void setDetalles(List<DetalleVenta> detalles, Map<String, String> titulos) {
+    public void setDetalles(List<DetalleVenta> detalles,
+                            Map<String, String> titulos) {
+
         boxProductos.getChildren().clear();
 
         for (DetalleVenta detalle : detalles) {
-            String titulo = titulos.getOrDefault(detalle.getIsbn(), detalle.getIsbn());
+            String titulo = titulos.getOrDefault(
+                    detalle.getIsbn(),
+                    detalle.getIsbn()
+            );
 
             boxProductos.getChildren().add(
                     crearFila(
@@ -84,6 +98,68 @@ public class TicketVentaController {
         subtotalLabel.setAlignment(Pos.CENTER_RIGHT);
 
         return new HBox(5, libro, cant, precioLabel, subtotalLabel);
+    }
+
+    @FXML
+    private void imprimir() {
+        PrinterJob job = PrinterJob.createPrinterJob();
+
+        if (job == null) {
+            mostrarMensaje(
+                    Alert.AlertType.ERROR,
+                    "No se encontró una impresora disponible."
+            );
+            return;
+        }
+
+        boolean continuar = job.showPrintDialog(
+                contenidoTicket.getScene().getWindow()
+        );
+
+        if (!continuar) return;
+
+        PageLayout pagina = job.getJobSettings().getPageLayout();
+
+        double ancho = contenidoTicket.getBoundsInParent().getWidth();
+        double alto = contenidoTicket.getBoundsInParent().getHeight();
+
+        double escalaX = pagina.getPrintableWidth() / ancho;
+        double escalaY = pagina.getPrintableHeight() / alto;
+        double escala = Math.min(1, Math.min(escalaX, escalaY));
+
+        Scale scale = new Scale(escala, escala);
+        contenidoTicket.getTransforms().add(scale);
+
+        boolean impreso = job.printPage(
+                pagina,
+                contenidoTicket
+        );
+
+        contenidoTicket.getTransforms().remove(scale);
+
+        if (impreso) {
+            job.endJob();
+
+            mostrarMensaje(
+                    Alert.AlertType.INFORMATION,
+                    "Comprobante enviado a impresión."
+            );
+        } else {
+            job.cancelJob();
+
+            mostrarMensaje(
+                    Alert.AlertType.ERROR,
+                    "No se pudo imprimir el comprobante."
+            );
+        }
+    }
+
+    private void mostrarMensaje(Alert.AlertType tipo, String mensaje) {
+        Alert alert = new Alert(tipo);
+        alert.setTitle("Impresión");
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
     }
 
     private String dinero(BigDecimal valor) {
