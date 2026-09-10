@@ -1,4 +1,4 @@
-package org.esperanza.Dao;
+package org.esperanza.dao;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

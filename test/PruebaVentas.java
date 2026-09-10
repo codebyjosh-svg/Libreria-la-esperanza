@@ -1,7 +1,7 @@
 import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.sql.*;
-import org.esperanza.Dao.*;
+import org.esperanza.dao.*;
 import org.esperanza.model.*;
 
 

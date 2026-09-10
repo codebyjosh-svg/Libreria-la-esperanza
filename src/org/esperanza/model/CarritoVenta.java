@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.SQLException;
 import java.util.*;
-import org.esperanza.Dao.VentaDao;
+import org.esperanza.dao.VentaDao;
 
 
 /** Carrito en memoria para conectar a un controlador JavaFX. */
