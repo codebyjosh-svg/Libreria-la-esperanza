@@ -4,10 +4,12 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+
 import org.esperanza.controller.TicketVentaController;
 import org.esperanza.dao.DatosVentaDao;
 import org.esperanza.model.DetalleVenta;
@@ -15,19 +17,31 @@ import org.esperanza.model.Venta;
 
 public class ComprobanteVenta {
 
-    public static void mostrar(Venta venta, List<DetalleVenta> detalles)
-            throws IOException, SQLException {
+    public static void mostrar(
+            Venta venta,
+            List<DetalleVenta> detalles,
+            Stage stage
+    ) throws IOException, SQLException {
 
         DatosVentaDao datosDao = new DatosVentaDao();
-        String cliente = datosDao.obtenerNombreCliente(venta.getCuiCliente());
-        Map<String, String> titulos = datosDao.obtenerTitulos(detalles);
+
+        String cliente = datosDao.obtenerNombreCliente(
+                venta.getCuiCliente()
+        );
+
+        Map<String, String> titulos =
+                datosDao.obtenerTitulos(detalles);
 
         FXMLLoader loader = new FXMLLoader(
-                ComprobanteVenta.class.getResource("/org/esperanza/view/TicketVenta.fxml")
+                ComprobanteVenta.class.getResource(
+                        "/org/esperanza/view/TicketVenta.fxml"
+                )
         );
 
         Parent root = loader.load();
-        TicketVentaController controller = loader.getController();
+
+        TicketVentaController controller =
+                loader.getController();
 
         controller.setDatosVenta(
                 venta.getIdVenta(),
@@ -39,14 +53,22 @@ public class ComprobanteVenta {
                 venta.getTotal()
         );
 
-        controller.setNombreCliente(cliente, venta.getCuiCliente());
-        controller.setDetalles(detalles, titulos);
+        controller.setNombreCliente(
+                cliente,
+                venta.getCuiCliente()
+        );
 
-        Stage stage = new Stage();
-        stage.setTitle("Comprobante de venta #" + venta.getIdVenta());
+        controller.setDetalles(
+                detalles,
+                titulos
+        );
+
         stage.setScene(new Scene(root));
-        stage.setResizable(false);
-        stage.show();
+        stage.setTitle(
+                "Comprobante de venta #" + venta.getIdVenta()
+        );
+
+        stage.centerOnScreen();
     }
 
     private ComprobanteVenta() {

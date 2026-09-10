@@ -1,4 +1,4 @@
-package org.esperanza.Controller;
+package org.esperanza.controller;
 
 import java.io.IOException;
 
@@ -16,7 +16,6 @@ import org.esperanza.Model.Rol;
 import org.esperanza.Model.Usuario;
 import org.esperanza.Service.NavegacionRol;
 import org.esperanza.Service.SesionUsuario;
-import org.esperanza.controller.CarritoVentaController;        
 
 public class DashboardAdminController {
 
@@ -27,84 +26,55 @@ public class DashboardAdminController {
 
     @FXML
     private void initialize() {
-
-        if (!NavegacionRol.validarRol(
-                Rol.ADMIN)) {
-
-            Platform.runLater(
-                    this::redirigirDashboardCorrecto
-            );
-
+        if (!NavegacionRol.validarRol(Rol.ADMIN)) {
+            Platform.runLater(this::redirigirDashboardCorrecto);
             return;
         }
 
-        usuarioActual =
-                SesionUsuario
-                        .getInstancia()
-                        .getUsuarioActual();
+        usuarioActual = SesionUsuario
+                .getInstancia()
+                .getUsuarioActual();
 
         actualizarUsuario();
     }
 
     private void actualizarUsuario() {
-
-        if (usuarioActual != null
-                && lblUsuario != null) {
-
-            lblUsuario.setText(
-                    usuarioActual.getUsrname()
-            );
+        if (usuarioActual != null && lblUsuario != null) {
+            lblUsuario.setText(usuarioActual.getUsrname());
         }
     }
 
-    public void setUsuarioActual(
-            Usuario usuarioActual) {
-
-        this.usuarioActual =
-                usuarioActual;
-
+    public void setUsuarioActual(Usuario usuarioActual) {
+        this.usuarioActual = usuarioActual;
         actualizarUsuario();
     }
 
     @FXML
     private void onUsuariosClick() {
-
-        if (!NavegacionRol.validarPermiso(
-                "GESTION_USUARIOS")) {
-
+        if (!NavegacionRol.validarPermiso("GESTION_USUARIOS")) {
             return;
         }
 
         try {
-
-            FXMLLoader loader =
-                    new FXMLLoader(
-                            getClass()
-                                    .getResource(
-                                            "/org/esperanza/view/Usuarios.fxml"
-                                    )
-                    );
-
-            Parent root =
-                    loader.load();
-
-            Stage stage =
-                    (Stage) lblUsuario
-                            .getScene()
-                            .getWindow();
-
-            stage.setScene(
-                    new Scene(root)
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource(
+                            "/org/esperanza/view/Usuarios.fxml"
+                    )
             );
 
+            Parent root = loader.load();
+
+            Stage stage = (Stage) lblUsuario
+                    .getScene()
+                    .getWindow();
+
+            stage.setScene(new Scene(root));
             stage.setTitle(
                     "Gestión de Usuarios - Librería La Esperanza"
             );
-
             stage.centerOnScreen();
 
         } catch (IOException e) {
-
             e.printStackTrace();
 
             mostrarError(
@@ -116,29 +86,21 @@ public class DashboardAdminController {
 
     @FXML
     private void onCambiarContrasenaClick() {
-
         if (usuarioActual == null) {
-
             mostrarError(
-                    "No se pudo identificar al usuario "
-                    + "que inició sesión."
+                    "No se pudo identificar al usuario que inició sesión."
             );
-
             return;
         }
 
         try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource(
+                            "/org/esperanza/view/CambioContrasenaDashboard.fxml"
+                    )
+            );
 
-            FXMLLoader loader =
-                    new FXMLLoader(
-                            getClass()
-                                    .getResource(
-                                            "/org/esperanza/view/CambioContrasenaDashboard.fxml"
-                                    )
-                    );
-
-            Parent root =
-                    loader.load();
+            Parent root = loader.load();
 
             CambioContrasenaController controller =
                     loader.getController();
@@ -147,16 +109,9 @@ public class DashboardAdminController {
                     usuarioActual.getId()
             );
 
-            Stage ventana =
-                    new Stage();
-
-            ventana.setTitle(
-                    "Cambiar Contraseña"
-            );
-
-            ventana.setScene(
-                    new Scene(root)
-            );
+            Stage ventana = new Stage();
+            ventana.setTitle("Cambiar Contraseña");
+            ventana.setScene(new Scene(root));
 
             ventana.initOwner(
                     lblUsuario
@@ -168,61 +123,66 @@ public class DashboardAdminController {
                     Modality.WINDOW_MODAL
             );
 
-            ventana.setResizable(
-                    false
-            );
-
+            ventana.setResizable(false);
             ventana.centerOnScreen();
-
             ventana.showAndWait();
 
         } catch (IOException e) {
-
             e.printStackTrace();
 
             mostrarError(
-                    "No se pudo abrir la pantalla "
-                    + "de Cambio de Contraseña.\n"
+                    "No se pudo abrir la pantalla de Cambio de Contraseña.\n"
                     + e.getMessage()
             );
         }
     }
 
-    @FXML
-    private void onLibrosClick() {
+   @FXML
+private void onLibrosClick() {
+    try {
+        FXMLLoader loader = new FXMLLoader(
+                getClass().getResource(
+                        "/org/esperanza/view/BuscadorLibros.fxml"
+                )
+        );
 
-        mostrarEnConstruccion(
-                "Libros"
+        Parent root = loader.load();
+
+        Stage stage = (Stage) lblUsuario
+                .getScene()
+                .getWindow();
+
+        stage.setScene(new Scene(root));
+        stage.setTitle("Buscar Libros - Librería La Esperanza");
+        stage.centerOnScreen();
+
+    } catch (IOException e) {
+        e.printStackTrace();
+
+        mostrarError(
+                "No se pudo abrir el buscador de libros.\n"
+                + e.getMessage()
         );
     }
+}
 
     @FXML
     private void onAutoresClick() {
-
-        mostrarEnConstruccion(
-                "Autores"
-        );
+        mostrarEnConstruccion("Autores");
     }
 
     @FXML
     private void onCategoriasClick() {
-
-        mostrarEnConstruccion(
-                "Categorías"
-        );
+        mostrarEnConstruccion("Categorías");
     }
 
     @FXML
     private void onEditorialesClick() {
-
-        mostrarEnConstruccion(
-                "Editoriales"
-        );
+        mostrarEnConstruccion("Editoriales");
     }
 
-@FXML
+    @FXML
 private void onVentasClick() {
-
     if (!NavegacionRol.validarPermiso("VENTAS")) {
         return;
     }
@@ -234,98 +194,65 @@ private void onVentasClick() {
 
     try {
         FXMLLoader loader = new FXMLLoader(
-                getClass().getResource(
-                        "/org/esperanza/view/CarritoVenta.fxml"
-                )
+                getClass().getResource("/org/esperanza/view/CarritoVenta.fxml")
         );
 
         Parent root = loader.load();
 
-        CarritoVentaController controller =
-                loader.getController();
+        CarritoVentaController controller = loader.getController();
+        controller.setIdUsuario(usuarioActual.getId());
 
-        controller.setIdUsuario(
-                usuarioActual.getId()
-        );
+        Stage stage = (Stage) lblUsuario
+                .getScene()
+                .getWindow();
 
-        Stage ventana = new Stage();
-
-        ventana.setTitle(
-                "Registrar Venta - Librería La Esperanza"
-        );
-
-        ventana.setScene(
-                new Scene(root)
-        );
-
-        ventana.initOwner(
-                lblUsuario.getScene().getWindow()
-        );
-
-        ventana.centerOnScreen();
-        ventana.show();
+        stage.setScene(new Scene(root));
+        stage.setTitle("Registrar Venta - Librería La Esperanza");
+        stage.centerOnScreen();
 
     } catch (IOException e) {
         e.printStackTrace();
-
         mostrarError(
                 "No se pudo abrir el carrito de venta.\n"
                 + e.getMessage()
         );
     }
 }
-
     @FXML
     private void onAutoresLibroClick() {
-
-        mostrarEnConstruccion(
-                "Autores-Libro"
-        );
+        mostrarEnConstruccion("Autores-Libro");
     }
 
     @FXML
     private void onDetalleVentasClick() {
-
-        mostrarEnConstruccion(
-                "Detalle Ventas"
-        );
+        mostrarEnConstruccion("Detalle Ventas");
     }
 
     @FXML
     private void onClientesClick() {
-
-        mostrarEnConstruccion(
-                "Clientes"
-        );
+        mostrarEnConstruccion("Clientes");
     }
 
     @FXML
     private void onCerrarSesionClick() {
-
         SesionUsuario
                 .getInstancia()
                 .cerrarSesion();
 
-        usuarioActual =
-                null;
+        usuarioActual = null;
 
         try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource(
+                            "/org/esperanza/view/Login.fxml"
+                    )
+            );
 
-            FXMLLoader loader =
-                    new FXMLLoader(
-                            getClass()
-                                    .getResource(
-                                            "/org/esperanza/view/Login.fxml"
-                                    )
-                    );
+            Parent root = loader.load();
 
-            Parent root =
-                    loader.load();
-
-            Stage stage =
-                    (Stage) lblUsuario
-                            .getScene()
-                            .getWindow();
+            Stage stage = (Stage) lblUsuario
+                    .getScene()
+                    .getWindow();
 
             stage.setScene(
                     new Scene(root)
@@ -338,7 +265,6 @@ private void onVentasClick() {
             stage.centerOnScreen();
 
         } catch (IOException e) {
-
             e.printStackTrace();
 
             mostrarError(
@@ -349,51 +275,35 @@ private void onVentasClick() {
     }
 
     private void redirigirDashboardCorrecto() {
-
         if (lblUsuario == null
                 || lblUsuario.getScene() == null
-                || lblUsuario
-                        .getScene()
-                        .getWindow() == null) {
-
+                || lblUsuario.getScene().getWindow() == null) {
             return;
         }
 
-        Stage stage =
-                (Stage) lblUsuario
-                        .getScene()
-                        .getWindow();
+        Stage stage = (Stage) lblUsuario
+                .getScene()
+                .getWindow();
 
         if (SesionUsuario
                 .getInstancia()
                 .haySesionActiva()) {
 
             NavegacionRol
-                    .abrirDashboardSegunRol(
-                            stage
-                    );
+                    .abrirDashboardSegunRol(stage);
 
         } else {
-
             stage.close();
         }
     }
 
-    private void mostrarEnConstruccion(
-            String modulo) {
-
-        Alert alert =
-                new Alert(
-                        Alert.AlertType.INFORMATION
-                );
-
-        alert.setTitle(
-                modulo
+    private void mostrarEnConstruccion(String modulo) {
+        Alert alert = new Alert(
+                Alert.AlertType.INFORMATION
         );
 
-        alert.setHeaderText(
-                null
-        );
+        alert.setTitle(modulo);
+        alert.setHeaderText(null);
 
         alert.setContentText(
                 "El módulo "
@@ -404,26 +314,14 @@ private void onVentasClick() {
         alert.showAndWait();
     }
 
-    private void mostrarError(
-            String mensaje) {
-
-        Alert alert =
-                new Alert(
-                        Alert.AlertType.ERROR
-                );
-
-        alert.setTitle(
-                "Error"
+    private void mostrarError(String mensaje) {
+        Alert alert = new Alert(
+                Alert.AlertType.ERROR
         );
 
-        alert.setHeaderText(
-                null
-        );
-
-        alert.setContentText(
-                mensaje
-        );
-
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
         alert.showAndWait();
     }
 }

@@ -19,23 +19,15 @@ import org.esperanza.controller.CarritoVentaController;
 
 public class DashboardCajeroController {
 
-    @FXML
-    private Label lblBienvenida;
-
-    @FXML
-    private Label lblRol;
-
-    @FXML
-    private Label lblPermisos;
-
-    @FXML
-    private Button btnCerrarSesion;
+    @FXML private Label lblBienvenida;
+    @FXML private Label lblRol;
+    @FXML private Label lblPermisos;
+    @FXML private Button btnCerrarSesion;
 
     @FXML
     private void initialize() {
 
-        if (!NavegacionRol.validarRol(
-                Rol.CAJERO)) {
+        if (!NavegacionRol.validarRol(Rol.CAJERO)) {
 
             Platform.runLater(
                     this::redirigirDashboardCorrecto
@@ -45,12 +37,13 @@ public class DashboardCajeroController {
         }
 
         actualizarEncabezado();
+        configurarCierre();
     }
 
     private void actualizarEncabezado() {
 
-        SesionUsuario sesion
-                = SesionUsuario
+        SesionUsuario sesion =
+                SesionUsuario
                         .getInstancia();
 
         lblBienvenida.setText(
@@ -70,14 +63,38 @@ public class DashboardCajeroController {
         );
     }
 
+    private void configurarCierre() {
+
+        Platform.runLater(() -> {
+
+            Stage stage = (Stage) lblBienvenida
+                    .getScene()
+                    .getWindow();
+
+            stage.setOnCloseRequest(event -> {
+
+                event.consume();
+
+                SesionUsuario
+                        .getInstancia()
+                        .cerrarSesion();
+
+                volverLogin();
+            });
+        });
+    }
+
     @FXML
     private void onNuevaVenta() {
 
-        if (!NavegacionRol.validarPermiso("VENTAS")) {
+        if (!NavegacionRol.validarPermiso(
+                "VENTAS")) {
+
             return;
         }
 
         try {
+
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource(
                             "/org/esperanza/view/CarritoVenta.fxml"
@@ -86,8 +103,8 @@ public class DashboardCajeroController {
 
             Parent root = loader.load();
 
-            CarritoVentaController controller
-                    = loader.getController();
+            CarritoVentaController controller =
+                    loader.getController();
 
             controller.setIdUsuario(
                     SesionUsuario
@@ -96,26 +113,24 @@ public class DashboardCajeroController {
                             .getId()
             );
 
-            Stage ventana = new Stage();
+            Stage stage = (Stage) lblBienvenida
+                    .getScene()
+                    .getWindow();
 
-            ventana.setTitle(
-                    "Registrar Venta - Librería La Esperanza"
-            );
+            stage.setOnCloseRequest(null);
 
-            ventana.setScene(
+            stage.setScene(
                     new Scene(root)
             );
 
-            ventana.initOwner(
-                    lblBienvenida
-                            .getScene()
-                            .getWindow()
+            stage.setTitle(
+                    "Registrar Venta - Librería La Esperanza"
             );
 
-            ventana.centerOnScreen();
-            ventana.show();
+            stage.centerOnScreen();
 
         } catch (IOException e) {
+
             e.printStackTrace();
 
             mostrarError(
@@ -154,21 +169,19 @@ public class DashboardCajeroController {
 
         try {
 
-            FXMLLoader loader
-                    = new FXMLLoader(
-                            getClass()
-                                    .getResource(
-                                            "/org/esperanza/view/Login.fxml"
-                                    )
-                    );
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource(
+                            "/org/esperanza/view/Login.fxml"
+                    )
+            );
 
-            Parent root
-                    = loader.load();
+            Parent root = loader.load();
 
-            Stage stage
-                    = (Stage) btnCerrarSesion
-                            .getScene()
-                            .getWindow();
+            Stage stage = (Stage) lblBienvenida
+                    .getScene()
+                    .getWindow();
+
+            stage.setOnCloseRequest(null);
 
             stage.setScene(
                     new Scene(root)
@@ -202,10 +215,9 @@ public class DashboardCajeroController {
             return;
         }
 
-        Stage stage
-                = (Stage) lblBienvenida
-                        .getScene()
-                        .getWindow();
+        Stage stage = (Stage) lblBienvenida
+                .getScene()
+                .getWindow();
 
         if (SesionUsuario
                 .getInstancia()
@@ -226,30 +238,26 @@ public class DashboardCajeroController {
             String titulo,
             String mensaje) {
 
-        Alert alert
-                = new Alert(
-                        Alert.AlertType.INFORMATION
-                );
+        Alert alert = new Alert(
+                Alert.AlertType.INFORMATION
+        );
 
         alert.setTitle(titulo);
         alert.setHeaderText(null);
         alert.setContentText(mensaje);
-
         alert.showAndWait();
     }
 
     private void mostrarError(
             String mensaje) {
 
-        Alert alert
-                = new Alert(
-                        Alert.AlertType.ERROR
-                );
+        Alert alert = new Alert(
+                Alert.AlertType.ERROR
+        );
 
         alert.setTitle("Error");
         alert.setHeaderText(null);
         alert.setContentText(mensaje);
-
         alert.showAndWait();
     }
 }
