@@ -1,19 +1,15 @@
 package org.esperanza.dao;
 
-import org.esperanza.model.Libro; 
 import java.util.List;
+import org.esperanza.model.Libro;
 
 public interface LibroDAO {
-
-    Libro buscarPorIsbn(String isbn);
-
-    List<Libro> buscarPorTitulo(String titulo);
-
-    List<Libro> buscarPorAutor(String autor);
-
     List<Libro> listarTodos();
+    Libro buscarLibro(String isbn);
+    boolean insertar(Libro libro);
+    boolean actualizar(Libro libro);
+    boolean eliminar(String isbn); 
 }
-
 
 
 
