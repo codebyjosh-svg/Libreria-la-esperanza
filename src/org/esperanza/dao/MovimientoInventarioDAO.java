@@ -17,6 +17,25 @@ public class MovimientoInventarioDAO {
         return Conexion.getInstancia().conectar();
     }
     
+    public boolean actualizarStock(String isbn, int cantidad)
+        throws SQLException {
+
+    String sql = """
+            UPDATE libros
+            SET stock_actual = stock_actual + ?
+            WHERE isbn = ?
+              AND activo = 1
+            """;
+
+    try (Connection conexion = obtenerConexion();
+         PreparedStatement ps = conexion.prepareStatement(sql)) {
+
+        ps.setInt(1, cantidad);
+        ps.setString(2, isbn);
+
+        return ps.executeUpdate() > 0;
+    }
+}
     
     public List<LibroDisponible> listarLibrosDisponibles()
             throws SQLException {
