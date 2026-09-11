@@ -31,7 +31,7 @@
             <Label fx:id="lblPermisos" styleClass="dash-permisos" wrapText="true"/>
             <HBox alignment="CENTER" spacing="20">
                 <Button text="Gestión de Inventario" onAction="#onInventario" styleClass="btn-accion" prefWidth="220" prefHeight="50"/>
-                <Button text="Entradas / Salidas" onAction="#onEntradasSalidas" styleClass="btn-accion" prefWidth="200" prefHeight="50"/>
+                <Button text="Registrar salida" onAction="#onEntradasSalidas" styleClass="btn-accion" prefWidth="200" prefHeight="50"/>
             </HBox>
             <Label text="Panel destinado al personal de bodega (rol BODEGA)." styleClass="dash-info"/>
         </VBox>

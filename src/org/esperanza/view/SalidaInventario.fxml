@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.esperanza.Controller.SalidaInventarioController"
+      prefWidth="600" spacing="16" style="-fx-background-color: #f5f7fa;">
+    <padding><Insets top="24" right="28" bottom="24" left="28"/></padding>
+    <Label text="Registrar salida de inventario" style="-fx-font-size: 23; -fx-font-weight: bold;"/>
+    <Label text="Registra mermas, traslados y devoluciones a proveedor." wrapText="true"/>
+    <VBox fx:id="formulario" spacing="10">
+        <Label text="ISBN del libro *"/>
+        <HBox spacing="10">
+            <TextField fx:id="txtIsbn" promptText="Ingresa el ISBN" HBox.hgrow="ALWAYS" onAction="#onConsultarStock"/>
+            <Button text="Consultar stock" onAction="#onConsultarStock"/>
+        </HBox>
+        <Label fx:id="lblStock" text="Stock: sin consultar"/>
+        <Label text="Tipo de salida *"/>
+        <ComboBox fx:id="cmbTipo" promptText="Selecciona un tipo" maxWidth="Infinity"/>
+        <Label text="Cantidad *"/>
+        <TextField fx:id="txtCantidad" promptText="Número entero mayor que cero"/>
+        <Label text="Observación / motivo * (máximo 500 caracteres)"/>
+        <TextArea fx:id="txtObservacion" promptText="Describe la merma, el destino del traslado o la devolución al proveedor." wrapText="true" prefRowCount="4"/>
+        <Label text="El stock se verifica de nuevo al guardar. La salida descuenta existencias de esta bodega." wrapText="true"/>
+        <HBox spacing="12" alignment="CENTER_RIGHT">
+            <Button text="Cerrar" onAction="#onCerrar"/>
+            <Button text="Registrar salida" onAction="#onRegistrar" defaultButton="true" style="-fx-background-color: #1d6654; -fx-text-fill: white;"/>
+        </HBox>
+    </VBox>
+    <Label fx:id="lblEstado" text="Completa los campos obligatorios (*)." wrapText="true"/>
+</VBox>
