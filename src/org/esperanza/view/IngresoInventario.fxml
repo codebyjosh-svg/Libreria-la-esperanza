@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1"
+            prefWidth="700"
+            prefHeight="500">
+
+    <top>
+        <VBox spacing="5">
+            <padding>
+                <Insets top="20" right="25" bottom="15" left="25"/>
+            </padding>
+
+            <Label text="Ingreso de Inventario"
+                   style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
+
+            <Label text="Registre la entrada de libros al inventario"/>
+        </VBox>
+    </top>
+
+    <center>
+        <VBox spacing="15">
+            <padding>
+                <Insets top="15" right="25" bottom="15" left="25"/>
+            </padding>
+
+            <Label text="Libro"/>
+
+            <ComboBox fx:id="cmbLibro"
+                      promptText="Seleccione un libro"
+                      maxWidth="Infinity"/>
+
+            <HBox spacing="30">
+
+                <VBox spacing="5">
+                    <Label text="ISBN"/>
+                    <Label fx:id="lblIsbn" text="-"/>
+                </VBox>
+
+                <VBox spacing="5">
+                    <Label text="Stock actual"/>
+                    <Label fx:id="lblStockActual" text="0"/>
+                </VBox>
+
+            </HBox>
+
+            <Label text="Cantidad a ingresar"/>
+
+            <TextField fx:id="txtCantidad"
+                       promptText="Ingrese la cantidad"/>
+
+            <Label text="Observación"/>
+
+            <TextArea fx:id="txtObservacion"
+                      promptText="Observación opcional"
+                      prefRowCount="4"
+                      wrapText="true"/>
+
+        </VBox>
+    </center>
+
+    <bottom>
+        <HBox spacing="10"
+              alignment="CENTER_RIGHT">
+
+            <padding>
+                <Insets top="15" right="25" bottom="20" left="25"/>
+            </padding>
+
+            <Button fx:id="btnCancelar"
+                    text="Cancelar"
+                    prefWidth="110"/>
+
+            <Button fx:id="btnRegistrar"
+                    text="Registrar Ingreso"
+                    prefWidth="150"/>
+
+        </HBox>
+    </bottom>
+
+</BorderPane>
