@@ -223,10 +223,54 @@ private void onVentasClick() {
         mostrarEnConstruccion("Autores-Libro");
     }
 
-    @FXML
-    private void onDetalleVentasClick() {
-        mostrarEnConstruccion("Detalle Ventas");
+  @FXML
+private void onDetalleVentasClick() {
+
+    if (!NavegacionRol.validarPermiso(
+            "VENTAS")) {
+
+        return;
     }
+
+    try {
+
+        FXMLLoader loader =
+                new FXMLLoader(
+                        getClass().getResource(
+                                "/org/esperanza/view/DashboardVentasDia.fxml"
+                        )
+                );
+
+        Parent root =
+                loader.load();
+
+        Stage stage =
+                (Stage) lblUsuario
+                        .getScene()
+                        .getWindow();
+
+        stage.setOnCloseRequest(null);
+
+        stage.setScene(
+                new Scene(root)
+        );
+
+        stage.setTitle(
+                "Ventas del Día - Librería La Esperanza"
+        );
+
+        stage.centerOnScreen();
+
+    } catch (IOException e) {
+
+        e.printStackTrace();
+
+        mostrarError(
+                "No se pudo abrir el resumen de ventas.\n"
+                + e.getMessage()
+        );
+    }
+}
 
     @FXML
     private void onClientesClick() {
