@@ -51,6 +51,20 @@ public class MovimientoInventarioDAO {
             String isbn,
             int cantidad) throws SQLException {
 
+        try (Connection conexion = obtenerConexion()) {
+            return actualizarStock(
+                    conexion,
+                    isbn,
+                    cantidad
+            );
+        }
+    }
+
+    private boolean actualizarStock(
+            Connection conexion,
+            String isbn,
+            int cantidad) throws SQLException {
+
         String sql = """
                 UPDATE libros
                 SET stock_actual = stock_actual + ?
@@ -58,8 +72,8 @@ public class MovimientoInventarioDAO {
                   AND activo = 1
                 """;
 
-        try (Connection conexion = obtenerConexion();
-             PreparedStatement ps = conexion.prepareStatement(sql)) {
+        try (PreparedStatement ps =
+                     conexion.prepareStatement(sql)) {
 
             ps.setInt(1, cantidad);
             ps.setString(2, isbn);
@@ -69,6 +83,24 @@ public class MovimientoInventarioDAO {
     }
 
     public boolean registrarMovimiento(
+            String isbn,
+            int idUsuario,
+            int cantidad,
+            String observacion) throws SQLException {
+
+        try (Connection conexion = obtenerConexion()) {
+            return registrarMovimiento(
+                    conexion,
+                    isbn,
+                    idUsuario,
+                    cantidad,
+                    observacion
+            );
+        }
+    }
+
+    private boolean registrarMovimiento(
+            Connection conexion,
             String isbn,
             int idUsuario,
             int cantidad,
@@ -86,8 +118,8 @@ public class MovimientoInventarioDAO {
                 VALUES (?, 'INGRESO', ?, ?, ?)
                 """;
 
-        try (Connection conexion = obtenerConexion();
-             PreparedStatement ps = conexion.prepareStatement(sql)) {
+        try (PreparedStatement ps =
+                     conexion.prepareStatement(sql)) {
 
             ps.setString(1, isbn);
             ps.setInt(2, cantidad);
@@ -95,6 +127,67 @@ public class MovimientoInventarioDAO {
             ps.setString(4, observacion);
 
             return ps.executeUpdate() > 0;
+        }
+    }
+
+    public boolean registrarIngresoInventario(
+            String isbn,
+            int idUsuario,
+            int cantidad,
+            String observacion) throws SQLException {
+
+        try (Connection conexion = obtenerConexion()) {
+
+            boolean autoCommitOriginal =
+                    conexion.getAutoCommit();
+
+            conexion.setAutoCommit(false);
+
+            try {
+
+                boolean stockActualizado =
+                        actualizarStock(
+                                conexion,
+                                isbn,
+                                cantidad
+                        );
+
+                if (!stockActualizado) {
+                    throw new SQLException(
+                            "No se pudo actualizar el stock del libro."
+                    );
+                }
+
+                boolean movimientoRegistrado =
+                        registrarMovimiento(
+                                conexion,
+                                isbn,
+                                idUsuario,
+                                cantidad,
+                                observacion
+                        );
+
+                if (!movimientoRegistrado) {
+                    throw new SQLException(
+                            "No se pudo registrar el movimiento."
+                    );
+                }
+
+                conexion.commit();
+
+                return true;
+
+            } catch (SQLException | RuntimeException e) {
+
+                conexion.rollback();
+                throw e;
+
+            } finally {
+
+                conexion.setAutoCommit(
+                        autoCommitOriginal
+                );
+            }
         }
     }
 
