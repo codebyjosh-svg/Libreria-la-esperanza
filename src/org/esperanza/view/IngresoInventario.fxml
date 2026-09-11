@@ -11,6 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.esperanza.controller.IngresoInventarioController"
             prefWidth="700"
             prefHeight="500">
 
