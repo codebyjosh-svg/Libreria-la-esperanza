@@ -67,19 +67,19 @@ public class VentaDao {
         if (idUsuario <= 0) {
 
             throw new IllegalArgumentException(
-                    "El usuario debe ser valido"
+                    "El usuario debe de ser aceptado "
             );
         }
 
         Objects.requireNonNull(
                 detalles,
-                "Los detalles son obligatorios"
+                "Los detalles son estrictamente obligatorios"
         );
 
         if (detalles.isEmpty()) {
 
             throw new IllegalArgumentException(
-                    "La venta debe tener productos"
+                    "La venta debe tener minimo 1 producto"
             );
         }
 

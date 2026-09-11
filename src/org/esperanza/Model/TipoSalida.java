@@ -3,7 +3,7 @@ package org.esperanza.Model;
 public enum TipoSalida {
     MERMA("Merma"),
     TRASLADO("Traslado"),
-    DEVOLUCION_PROVEEDOR("Devolución a proveedor");
+    DEVOLUCION_PROVEEDOR("Devolución");
 
     private final String nombre;
 
