@@ -9,84 +9,41 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane
-    xmlns="http://javafx.com/javafx"
-    xmlns:fx="http://javafx.com/fxml"
-    fx:controller="org.esperanza.controller.DashboardAdminController"
-    prefWidth="900"
-    prefHeight="600">
+<BorderPane prefHeight="600" prefWidth="900" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.esperanza.controller.DashboardAdminController">
 
     <left>
 
-        <ScrollPane
-            fitToWidth="true"
-            prefWidth="200">
+        <ScrollPane fitToWidth="true" prefWidth="200">
 
             <VBox spacing="8">
 
                 <padding>
-                    <Insets
-                        top="15"
-                        right="10"
-                        bottom="15"
-                        left="10"/>
+                    <Insets bottom="15" left="10" right="10" top="15" />
                 </padding>
 
-                <Label
-                    text="Librería La Esperanza"
-                    style="-fx-font-size: 15px; -fx-font-weight: bold;"/>
+                <Label style="-fx-font-size: 15px; -fx-font-weight: bold;" text="Librería La Esperanza" />
 
-                <Separator/>
+                <Separator />
 
-                <Button
-                    text="Usuarios"
-                    onAction="#onUsuariosClick"
-                    maxWidth="Infinity"/>
+                <Button maxWidth="Infinity" onAction="#onUsuariosClick" text="Usuarios" />
 
-                <Button
-                    text="Cambiar contraseña"
-                    onAction="#onCambiarContrasenaClick"
-                    maxWidth="Infinity"/>
+                <Button maxWidth="Infinity" onAction="#onCambiarContrasenaClick" text="Cambiar contraseña" />
 
-                <Button
-                    text="Libros"
-                    onAction="#onLibrosClick"
-                    maxWidth="Infinity"/>
+                <Button maxWidth="Infinity" onAction="#onLibrosClick" text="Libros" />
 
-                <Button
-                    text="Autores"
-                    onAction="#onAutoresClick"
-                    maxWidth="Infinity"/>
+                <Button maxWidth="Infinity" onAction="#onAutoresClick" text="Autores" />
 
-                <Button
-                    text="Categorías"
-                    onAction="#onCategoriasClick"
-                    maxWidth="Infinity"/>
+                <Button maxWidth="Infinity" onAction="#onCategoriasClick" text="Categorías" />
 
-                <Button
-                    text="Editoriales"
-                    onAction="#onEditorialesClick"
-                    maxWidth="Infinity"/>
+                <Button maxWidth="Infinity" onAction="#onEditorialesClick" text="Editoriales" />
 
-                <Button
-                    text="Ventas"
-                    onAction="#onVentasClick"
-                    maxWidth="Infinity"/>
+                <Button maxWidth="Infinity" onAction="#onVentasClick" text="Ventas" />
 
-                <Button
-                    text="Autores-Libro"
-                    onAction="#onAutoresLibroClick"
-                    maxWidth="Infinity"/>
+                <Button maxWidth="Infinity" onAction="#onAutoresLibroClick" text="Autores-Libro" />
 
-                <Button
-                    text="Detalle Ventas"
-                    onAction="#onDetalleVentasClick"
-                    maxWidth="Infinity"/>
+                <Button maxWidth="Infinity" onAction="#onDetalleVentasClick" text="Detalle Ventas" />
 
-                <Button
-                    text="Ventas del Día"
-                    onAction="#onDetalleVentasClick"
-                    maxWidth="Infinity"/>
+                <Button maxWidth="Infinity" onAction="#onDetalleVentasClick" text="Ventas del Día" />
 
             </VBox>
 
@@ -96,31 +53,19 @@
 
     <top>
 
-        <HBox
-            alignment="CENTER_LEFT"
-            spacing="10">
+        <HBox alignment="CENTER_LEFT" spacing="10">
 
             <padding>
-                <Insets
-                    top="10"
-                    right="15"
-                    bottom="10"
-                    left="15"/>
+                <Insets bottom="10" left="15" right="15" top="10" />
             </padding>
 
-            <Label
-                text="Panel de Control"
-                style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+            <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Panel de Control" />
 
-            <HBox HBox.hgrow="ALWAYS"/>
+            <HBox HBox.hgrow="ALWAYS" />
 
-            <Label
-                fx:id="lblUsuario"
-                text="Admin"/>
+            <Label fx:id="lblUsuario" text="Admin" />
 
-            <Button
-                text="Cerrar Sesión"
-                onAction="#onCerrarSesionClick"/>
+            <Button onAction="#onCerrarSesionClick" text="Cerrar Sesión" />
 
         </HBox>
 
@@ -131,55 +76,28 @@
         <VBox spacing="15">
 
             <padding>
-                <Insets
-                    top="20"
-                    right="20"
-                    bottom="20"
-                    left="20"/>
+                <Insets bottom="20" left="20" right="20" top="20" />
             </padding>
 
-            <Label
-                text="Bienvenido"
-                style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+            <Label style="-fx-font-size: 18px; -fx-font-weight: bold;" text="Bienvenido" />
 
-            <Label
-                text="Accesos rápidos a las funciones principales del sistema"/>
+            <Label text="Accesos rápidos a las funciones principales del sistema" />
 
             <HBox spacing="10">
 
-                <Button
-                    text="Nuevo Libro"
-                    onAction="#onLibrosClick"
-                    prefWidth="150"
-                    prefHeight="60"/>
+                <Button onAction="#onNuevoLibroClick" prefHeight="60" prefWidth="150" text="Nuevo Libro" />
 
-                <Button
-                    text="Agregar Venta"
-                    onAction="#onVentasClick"
-                    prefWidth="150"
-                    prefHeight="60"/>
+                <Button onAction="#onVentasClick" prefHeight="60" prefWidth="150" text="Agregar Venta" />
 
-                <Button
-                    text="Gestionar Usuarios"
-                    onAction="#onUsuariosClick"
-                    prefWidth="150"
-                    prefHeight="60"/>
+                <Button onAction="#onUsuariosClick" prefHeight="60" prefWidth="150" text="Gestionar Usuarios" />
 
-                <Button
-                    text="Reportes"
-                    onAction="#onClientesClick"
-                    prefWidth="150"
-                    prefHeight="60"/>
+                <Button onAction="#onClientesClick" prefHeight="60" prefWidth="150" text="Reportes" />
 
             </HBox>
 
             <HBox spacing="10">
 
-                <Button
-                    text="Cambiar contraseña"
-                    onAction="#onCambiarContrasenaClick"
-                    prefWidth="150"
-                    prefHeight="60"/>
+                <Button onAction="#onCambiarContrasenaClick" prefHeight="60" prefWidth="150" text="Cambiar contraseña" />
 
             </HBox>
 

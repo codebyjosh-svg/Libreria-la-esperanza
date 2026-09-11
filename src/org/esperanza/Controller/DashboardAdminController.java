@@ -102,8 +102,8 @@ public class DashboardAdminController {
 
             Parent root = loader.load();
 
-            CambioContrasenaController controller =
-                    loader.getController();
+            CambioContrasenaController controller
+                    = loader.getController();
 
             controller.setIdUsuarioActual(
                     usuarioActual.getId()
@@ -137,34 +137,39 @@ public class DashboardAdminController {
         }
     }
 
-   @FXML
-private void onLibrosClick() {
-    try {
-        FXMLLoader loader = new FXMLLoader(
-                getClass().getResource(
-                        "/org/esperanza/view/BuscadorLibros.fxml"
-                )
-        );
+    @FXML
+    private void onLibrosClick() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource(
+                            "/org/esperanza/view/BuscadorLibros.fxml"
+                    )
+            );
 
-        Parent root = loader.load();
+            Parent root = loader.load();
 
-        Stage stage = (Stage) lblUsuario
-                .getScene()
-                .getWindow();
+            Stage stage = (Stage) lblUsuario
+                    .getScene()
+                    .getWindow();
 
-        stage.setScene(new Scene(root));
-        stage.setTitle("Buscar Libros - Librería La Esperanza");
-        stage.centerOnScreen();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Buscar Libros - Librería La Esperanza");
+            stage.centerOnScreen();
 
-    } catch (IOException e) {
-        e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
 
-        mostrarError(
-                "No se pudo abrir el buscador de libros.\n"
-                + e.getMessage()
-        );
+            mostrarError(
+                    "No se pudo abrir el buscador de libros.\n"
+                    + e.getMessage()
+            );
+        }
     }
-}
+
+    @FXML
+    private void onNuevoLibroClick() {
+        mostrarEnConstruccion("Nuevo Libro");
+    }
 
     @FXML
     private void onAutoresClick() {
@@ -182,95 +187,96 @@ private void onLibrosClick() {
     }
 
     @FXML
-private void onVentasClick() {
-    if (!NavegacionRol.validarPermiso("VENTAS")) {
-        return;
+    private void onVentasClick() {
+        if (!NavegacionRol.validarPermiso("VENTAS")) {
+            return;
+        }
+
+        if (usuarioActual == null) {
+            mostrarError("No se pudo identificar al usuario actual.");
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/org/esperanza/view/CarritoVenta.fxml")
+            );
+
+            Parent root = loader.load();
+
+            CarritoVentaController controller = loader.getController();
+            controller.setIdUsuario(usuarioActual.getId());
+
+            Stage stage = (Stage) lblUsuario
+                    .getScene()
+                    .getWindow();
+
+            stage.setScene(new Scene(root));
+            stage.setTitle("Registrar Venta - Librería La Esperanza");
+            stage.centerOnScreen();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            mostrarError(
+                    "No se pudo abrir el carrito de venta.\n"
+                    + e.getMessage()
+            );
+        }
     }
 
-    if (usuarioActual == null) {
-        mostrarError("No se pudo identificar al usuario actual.");
-        return;
-    }
-
-    try {
-        FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/org/esperanza/view/CarritoVenta.fxml")
-        );
-
-        Parent root = loader.load();
-
-        CarritoVentaController controller = loader.getController();
-        controller.setIdUsuario(usuarioActual.getId());
-
-        Stage stage = (Stage) lblUsuario
-                .getScene()
-                .getWindow();
-
-        stage.setScene(new Scene(root));
-        stage.setTitle("Registrar Venta - Librería La Esperanza");
-        stage.centerOnScreen();
-
-    } catch (IOException e) {
-        e.printStackTrace();
-        mostrarError(
-                "No se pudo abrir el carrito de venta.\n"
-                + e.getMessage()
-        );
-    }
-}
     @FXML
     private void onAutoresLibroClick() {
         mostrarEnConstruccion("Autores-Libro");
     }
 
-  @FXML
-private void onDetalleVentasClick() {
+    @FXML
+    private void onDetalleVentasClick() {
 
-    if (!NavegacionRol.validarPermiso(
-            "VENTAS")) {
+        if (!NavegacionRol.validarPermiso(
+                "VENTAS")) {
 
-        return;
+            return;
+        }
+
+        try {
+
+            FXMLLoader loader
+                    = new FXMLLoader(
+                            getClass().getResource(
+                                    "/org/esperanza/view/DashboardVentasDia.fxml"
+                            )
+                    );
+
+            Parent root
+                    = loader.load();
+
+            Stage stage
+                    = (Stage) lblUsuario
+                            .getScene()
+                            .getWindow();
+
+            stage.setOnCloseRequest(null);
+
+            stage.setScene(
+                    new Scene(root)
+            );
+
+            stage.setTitle(
+                    "Ventas del Día - Librería La Esperanza"
+            );
+
+            stage.centerOnScreen();
+
+        } catch (IOException e) {
+
+            e.printStackTrace();
+
+            mostrarError(
+                    "No se pudo abrir el resumen de ventas.\n"
+                    + e.getMessage()
+            );
+        }
     }
-
-    try {
-
-        FXMLLoader loader =
-                new FXMLLoader(
-                        getClass().getResource(
-                                "/org/esperanza/view/DashboardVentasDia.fxml"
-                        )
-                );
-
-        Parent root =
-                loader.load();
-
-        Stage stage =
-                (Stage) lblUsuario
-                        .getScene()
-                        .getWindow();
-
-        stage.setOnCloseRequest(null);
-
-        stage.setScene(
-                new Scene(root)
-        );
-
-        stage.setTitle(
-                "Ventas del Día - Librería La Esperanza"
-        );
-
-        stage.centerOnScreen();
-
-    } catch (IOException e) {
-
-        e.printStackTrace();
-
-        mostrarError(
-                "No se pudo abrir el resumen de ventas.\n"
-                + e.getMessage()
-        );
-    }
-}
 
     @FXML
     private void onClientesClick() {
