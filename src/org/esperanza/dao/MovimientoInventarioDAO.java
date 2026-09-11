@@ -16,27 +16,7 @@ public class MovimientoInventarioDAO {
     public Connection obtenerConexion() throws SQLException {
         return Conexion.getInstancia().conectar();
     }
-    
-    public boolean actualizarStock(String isbn, int cantidad)
-        throws SQLException {
 
-    String sql = """
-            UPDATE libros
-            SET stock_actual = stock_actual + ?
-            WHERE isbn = ?
-              AND activo = 1
-            """;
-
-    try (Connection conexion = obtenerConexion();
-         PreparedStatement ps = conexion.prepareStatement(sql)) {
-
-        ps.setInt(1, cantidad);
-        ps.setString(2, isbn);
-
-        return ps.executeUpdate() > 0;
-    }
-}
-    
     public List<LibroDisponible> listarLibrosDisponibles()
             throws SQLException {
 
@@ -65,6 +45,57 @@ public class MovimientoInventarioDAO {
         }
 
         return libros;
+    }
+
+    public boolean actualizarStock(
+            String isbn,
+            int cantidad) throws SQLException {
+
+        String sql = """
+                UPDATE libros
+                SET stock_actual = stock_actual + ?
+                WHERE isbn = ?
+                  AND activo = 1
+                """;
+
+        try (Connection conexion = obtenerConexion();
+             PreparedStatement ps = conexion.prepareStatement(sql)) {
+
+            ps.setInt(1, cantidad);
+            ps.setString(2, isbn);
+
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    public boolean registrarMovimiento(
+            String isbn,
+            int idUsuario,
+            int cantidad,
+            String observacion) throws SQLException {
+
+        String sql = """
+                INSERT INTO movimientos_inventario
+                (
+                    isbn,
+                    tipo_movimiento,
+                    cantidad,
+                    id_usuario,
+                    observacion
+                )
+                VALUES (?, 'INGRESO', ?, ?, ?)
+                """;
+
+        try (Connection conexion = obtenerConexion();
+             PreparedStatement ps = conexion.prepareStatement(sql)) {
+
+            ps.setString(1, isbn);
+            ps.setInt(2, cantidad);
+            ps.setInt(3, idUsuario);
+            ps.setString(4, observacion);
+
+            return ps.executeUpdate() > 0;
+        }
     }
 
     public static class LibroDisponible {
