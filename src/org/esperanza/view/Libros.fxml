@@ -1,14 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<?import java.lang.*?>
-<?import java.net.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
 
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.esperanza.Controller.LibrosController">
-    <stylesheets>
-        <URL value="@/org/esperanza/view/style/libros.css"/>
-    </stylesheets>
-</AnchorPane>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.esperanza.controller.LibroController">
+    <left>
+        <VBox spacing="10" padding="15" prefWidth="300" style="-fx-background-color: #f4f4f4;">
+            <Label text="Gestión de Libros" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+            <TextField fx:id="txtIsbn" promptText="ISBN"/>
+            <TextField fx:id="txtTitulo" promptText="Título del Libro"/>
+            <DatePicker fx:id="dpFecha" promptText="Fecha Publicación" prefWidth="300"/>
+            <TextField fx:id="txtPrecio" promptText="Precio"/>
+            
+            <Label text="ID Categoría, Editorial (NIT) y ID Prov."/>
+            <HBox spacing="5">
+                <TextField fx:id="txtIdCategoria" promptText="Cat." prefWidth="70"/>
+                <TextField fx:id="txtNitEditorial" promptText="NIT" prefWidth="100"/>
+                <TextField fx:id="txtIdProveedor" promptText="Prov." prefWidth="70"/>
+            </HBox>
+            
+            <HBox spacing="10">
+                <TextField fx:id="txtStockActual" promptText="Stock Actual" prefWidth="130"/>
+                <TextField fx:id="txtStockMinimo" promptText="Stock Mínimo" prefWidth="130"/>
+            </HBox>
+
+            <HBox spacing="10" alignment="CENTER">
+                <Button text="Guardar" fx:id="btnGuardar" onAction="#guardarLibro" style="-fx-background-color: #28a745; -fx-text-fill: white;"/>
+                <Button text="Limpiar" fx:id="btnLimpiar" onAction="#limpiarFormulario" />
+                <Button text="Desactivar" fx:id="btnDesactivar" onAction="#desactivarLibro" style="-fx-background-color: #dc3545; -fx-text-fill: white;"/>
+            </HBox>
+        </VBox>
+    </left>
+    <center>
+        <TableView fx:id="tbLibros" onMouseClicked="#seleccionarLibro">
+            <columns>
+                <TableColumn fx:id="colIsbn" text="ISBN" prefWidth="100"/>
+                <TableColumn fx:id="colTitulo" text="Título" prefWidth="200"/>
+                <TableColumn fx:id="colPrecio" text="Precio" prefWidth="75"/>
+                <TableColumn fx:id="colStock" text="Stock" prefWidth="75"/>
+                <TableColumn fx:id="colActivo" text="Estado" prefWidth="75"/>
+            </columns>
+        </TableView>
+    </center>
+</BorderPane>
