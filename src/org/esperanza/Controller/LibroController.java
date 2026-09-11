@@ -78,7 +78,7 @@ public class LibroController {
             if (dpFecha.getValue() != null) {
                 libro.setFechaPublicacion(Date.valueOf(dpFecha.getValue()));
             } else {
-                libro.setFechaPublicacion(Date.valueOf(LocalDate.now())); // Default
+                libro.setFechaPublicacion(Date.valueOf(LocalDate.now())); 
             }
 
             libro.setIdCategoria(txtIdCategoria.getText().isEmpty() ? 1 : Integer.parseInt(txtIdCategoria.getText()));
@@ -87,7 +87,7 @@ public class LibroController {
             libro.setStockActual(stockAct);
             libro.setStockMinimo(stockMin);
 
-            // T3.4.12 (Alta) y T3.4.13 (Edición)
+         
             boolean exito;
             if (modoEdicion) {
                 exito = libroDao.actualizar(libro);
@@ -114,7 +114,7 @@ public class LibroController {
         if (seleccionado != null) {
             modoEdicion = true;
             txtIsbn.setText(seleccionado.getIsbn());
-            txtIsbn.setDisable(true); // El ISBN (Primary Key) no debe editarse[cite: 3]
+            txtIsbn.setDisable(true);
             txtTitulo.setText(seleccionado.getTitulo());
             txtPrecio.setText(String.valueOf(seleccionado.getPrecio()));
             txtIdCategoria.setText(String.valueOf(seleccionado.getIdCategoria()));
@@ -131,7 +131,7 @@ public class LibroController {
 
     @FXML
     void desactivarLibro(ActionEvent event) {
-        // T3.4.14: Activar/Desactivar (Baja lógica)
+        
         if (txtIsbn.getText().isEmpty()) {
             mostrarAlerta("Atención", "Seleccione un libro de la tabla para desactivar.");
             return;

@@ -65,6 +65,35 @@ public class LibroDAOImpl implements LibroDAO {
         return l;
     }
 
+    // --- AQUÍ ESTÁ LA CORRECCIÓN PRINCIPAL ---
+    @Override
+    public Libro buscarPorIsbn(String isbn) {
+        return buscarLibro(isbn); // Ahora devuelve un Libro, no un List<Libro>
+    }
+    // -----------------------------------------
+
+    @Override
+    public List<Libro> buscarPorTitulo(String titulo) {
+        List<Libro> resultado = new ArrayList<>();
+        for (Libro l : listarTodos()) {
+            if (l.getTitulo() != null && l.getTitulo().toLowerCase().contains(titulo.toLowerCase())) {
+                resultado.add(l);
+            }
+        }
+        return resultado;
+    }
+
+    @Override
+    public List<Libro> buscarPorAutor(String autor) {
+        List<Libro> resultado = new ArrayList<>();
+        for (Libro l : listarTodos()) {
+            if (l.getNombreAutor() != null && l.getNombreAutor().toLowerCase().contains(autor.toLowerCase())) {
+                resultado.add(l);
+            }
+        }
+        return resultado;
+    }
+
     @Override
     public boolean insertar(Libro libro) {
         String sql = "{call sp_insertarlibro(?, ?, ?, ?, ?, ?, ?, ?, ?)}";
@@ -90,7 +119,6 @@ public class LibroDAOImpl implements LibroDAO {
 
     @Override
     public boolean actualizar(Libro libro) {
-        // En el DDL, sp_actualizarlibro no pide stock_actual ni activo
         String sql = "{call sp_actualizarlibro(?, ?, ?, ?, ?, ?, ?, ?)}";
         try (Connection con = Conexion.getInstancia().conectar();
              CallableStatement cs = con.prepareCall(sql)) {
@@ -113,7 +141,6 @@ public class LibroDAOImpl implements LibroDAO {
 
     @Override
     public boolean eliminar(String isbn) {
-        // En el DDL, sp_eliminarlibro hace un UPDATE libros SET activo = FALSE
         String sql = "{call sp_eliminarlibro(?)}";
         try (Connection con = Conexion.getInstancia().conectar();
              CallableStatement cs = con.prepareCall(sql)) {

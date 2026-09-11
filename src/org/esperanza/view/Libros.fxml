@@ -1,44 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.esperanza.controller.LibroController">
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.esperanza.controller.LibroController">
     <left>
-        <VBox spacing="10" padding="15" prefWidth="300" style="-fx-background-color: #f4f4f4;">
-            <Label text="Gestión de Libros" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
-            <TextField fx:id="txtIsbn" promptText="ISBN"/>
-            <TextField fx:id="txtTitulo" promptText="Título del Libro"/>
-            <DatePicker fx:id="dpFecha" promptText="Fecha Publicación" prefWidth="300"/>
-            <TextField fx:id="txtPrecio" promptText="Precio"/>
+        <VBox prefWidth="300" spacing="10" style="-fx-background-color: #f4f4f4;">
+            <padding>
+                <Insets bottom="15" left="15" right="15" top="15" />
+            </padding>
+            <Label style="-fx-font-size: 18px; -fx-font-weight: bold;" text="Gestión de Libros" />
+            <TextField fx:id="txtIsbn" promptText="ISBN" />
+            <TextField fx:id="txtTitulo" promptText="Título del Libro" />
+            <DatePicker fx:id="dpFecha" prefWidth="300" promptText="Fecha Publicación" />
+            <TextField fx:id="txtPrecio" promptText="Precio" />
             
-            <Label text="ID Categoría, Editorial (NIT) y ID Prov."/>
+            <Label text="ID Categoría, Editorial (NIT) y ID Prov." />
             <HBox spacing="5">
-                <TextField fx:id="txtIdCategoria" promptText="Cat." prefWidth="70"/>
-                <TextField fx:id="txtNitEditorial" promptText="NIT" prefWidth="100"/>
-                <TextField fx:id="txtIdProveedor" promptText="Prov." prefWidth="70"/>
+                <TextField fx:id="txtIdCategoria" prefWidth="70" promptText="Cat." />
+                <TextField fx:id="txtNitEditorial" prefWidth="100" promptText="NIT" />
+                <TextField fx:id="txtIdProveedor" prefWidth="70" promptText="Prov." />
             </HBox>
             
             <HBox spacing="10">
-                <TextField fx:id="txtStockActual" promptText="Stock Actual" prefWidth="130"/>
-                <TextField fx:id="txtStockMinimo" promptText="Stock Mínimo" prefWidth="130"/>
+                <TextField fx:id="txtStockActual" prefWidth="130" promptText="Stock Actual" />
+                <TextField fx:id="txtStockMinimo" prefWidth="130" promptText="Stock Mínimo" />
             </HBox>
 
-            <HBox spacing="10" alignment="CENTER">
-                <Button text="Guardar" fx:id="btnGuardar" onAction="#guardarLibro" style="-fx-background-color: #28a745; -fx-text-fill: white;"/>
-                <Button text="Limpiar" fx:id="btnLimpiar" onAction="#limpiarFormulario" />
-                <Button text="Desactivar" fx:id="btnDesactivar" onAction="#desactivarLibro" style="-fx-background-color: #dc3545; -fx-text-fill: white;"/>
+            <HBox alignment="CENTER" spacing="10">
+                <Button fx:id="btnGuardar" onAction="#guardarLibro" style="-fx-background-color: #28a745; -fx-text-fill: white;" text="Guardar" />
+                <Button fx:id="btnLimpiar" onAction="#limpiarFormulario" text="Limpiar" />
+                <Button fx:id="btnDesactivar" onAction="#desactivarLibro" style="-fx-background-color: #dc3545; -fx-text-fill: white;" text="Desactivar" />
             </HBox>
         </VBox>
     </left>
     <center>
         <TableView fx:id="tbLibros" onMouseClicked="#seleccionarLibro">
             <columns>
-                <TableColumn fx:id="colIsbn" text="ISBN" prefWidth="100"/>
-                <TableColumn fx:id="colTitulo" text="Título" prefWidth="200"/>
-                <TableColumn fx:id="colPrecio" text="Precio" prefWidth="75"/>
-                <TableColumn fx:id="colStock" text="Stock" prefWidth="75"/>
-                <TableColumn fx:id="colActivo" text="Estado" prefWidth="75"/>
+                <TableColumn fx:id="colIsbn" prefWidth="100" text="ISBN" />
+                <TableColumn fx:id="colTitulo" prefWidth="200" text="Título" />
+                <TableColumn fx:id="colPrecio" prefWidth="75" text="Precio" />
+                <TableColumn fx:id="colStock" prefWidth="75" text="Stock" />
+                <TableColumn fx:id="colActivo" prefWidth="75" text="Estado" />
             </columns>
         </TableView>
     </center>
