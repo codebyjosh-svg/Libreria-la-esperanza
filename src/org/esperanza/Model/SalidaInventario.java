@@ -9,9 +9,9 @@ public record SalidaInventario(String isbn, TipoSalida tipo, int cantidad,
         if (tipo == null) throw new IllegalArgumentException("Selecciona el tipo de salida.");
         if (cantidad <= 0) throw new IllegalArgumentException("La cantidad debe ser mayor que cero.");
         if (observacion == null || observacion.isBlank() || observacion.trim().length() > 500) {
-            throw new IllegalArgumentException("Ingresa un motivo de entre 1 y 500 caracteres.");
+            throw new IllegalArgumentException("Ingresa un motivo de entre 1 y 500 caracteres. por favor");
         }
-        if (usuarioId <= 0) throw new IllegalArgumentException("Se requiere un usuario válido.");
+        if (usuarioId <= 0) throw new IllegalArgumentException("favor de ingresar un usuario valido.");
         isbn = isbn.trim();
         observacion = observacion.trim();
     }

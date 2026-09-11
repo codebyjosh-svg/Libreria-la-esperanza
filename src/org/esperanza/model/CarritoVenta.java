@@ -67,7 +67,7 @@ public class CarritoVenta {
                     .compareTo(precio) != 0) {
 
                 throw new IllegalArgumentException(
-                        "El libro ya tiene otro precio"
+                        "El libro ya tiene otro precio por favor ingrese el precio correcto"
                 );
             }
 

@@ -36,7 +36,7 @@ public class LibroDAOImpl implements LibroDAO {
                 }
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error en buscar por ISBN: " + isbn, e);
+            LOGGER.log(Level.SEVERE, "Error no se ah poddido encontrar el ISBN: " + isbn, e);
         }
         return libro;
     }
@@ -54,7 +54,7 @@ public class LibroDAOImpl implements LibroDAO {
                 }
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error en buscar por título: " + titulo, e);
+            LOGGER.log(Level.SEVERE, "Error Titutlo no ecnontrado: " + titulo, e);
         }
         return lista;
     }
@@ -72,7 +72,7 @@ public class LibroDAOImpl implements LibroDAO {
                 }
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error en buscar por autor: " + autor, e);
+            LOGGER.log(Level.SEVERE, "Error el autor no ah sido encontrado: " + autor, e);
         }
         return lista;
     }
@@ -88,7 +88,7 @@ public class LibroDAOImpl implements LibroDAO {
                 lista.add(extraerLibro(rs));
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error al listar todos los libros", e);
+            LOGGER.log(Level.SEVERE, "Error no se han podido listar los libros", e);
         }
         return lista;
     }
