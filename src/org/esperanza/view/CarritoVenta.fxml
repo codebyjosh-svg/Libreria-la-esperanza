@@ -4,118 +4,297 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane prefHeight="600.0" prefWidth="950.0"
+<BorderPane prefHeight="850.0"
+            prefWidth="1050.0"
             style="-fx-background-color: white;"
             xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.esperanza.controller.CarritoVentaController">
 
     <padding>
-        <Insets top="20" right="20" bottom="20" left="20"/>
+        <Insets top="15"
+                right="20"
+                bottom="15"
+                left="20"/>
     </padding>
 
     <top>
-        <VBox spacing="12">
+
+        <VBox spacing="5">
+
             <Label text="Carrito de venta · Librería La Esperanza"
                    style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
 
-            <HBox spacing="10">
-                <VBox spacing="5">
-                    <Label text="ISBN"/>
-                    <TextField fx:id="txtIsbn"
-                               promptText="Ej. 978-0-124"
-                               prefWidth="170"/>
-                </VBox>
+            <Label text="Seleccione el cliente y los libros que desea agregar a la venta."/>
 
-                <VBox spacing="5">
-                    <Label text="Precio unitario"/>
-                    <TextField fx:id="txtPrecio"
-                               promptText="Ej. 135.50"
-                               prefWidth="120"/>
-                </VBox>
-
-                <VBox spacing="5">
-                    <Label text="Cantidad"/>
-                    <TextField fx:id="txtCantidad"
-                               text="1"
-                               prefWidth="80"/>
-                </VBox>
-
-                <VBox alignment="BOTTOM_LEFT">
-                    <Button text="Agregar libro"
-                            defaultButton="true"
-                            onAction="#agregarProducto"/>
-                </VBox>
-            </HBox>
-
-            <Label text="El mismo ISBN suma cantidades. Selecciona una fila para modificarla."
-                   wrapText="true"/>
         </VBox>
+
     </top>
 
     <center>
-        <TableView fx:id="tabla" prefHeight="380">
-            <columns>
-                <TableColumn fx:id="colIsbn"
-                             text="ISBN"
-                             prefWidth="220"/>
 
-                <TableColumn fx:id="colCantidad"
-                             text="Cantidad"
-                             prefWidth="120"/>
+        <ScrollPane fitToWidth="true"
+                    hbarPolicy="NEVER">
 
-                <TableColumn fx:id="colPrecio"
-                             text="Precio unitario"
-                             prefWidth="170"/>
+            <content>
 
-                <TableColumn fx:id="colSubtotal"
-                             text="Subtotal"
-                             prefWidth="170"/>
-            </columns>
-        </TableView>
+                <VBox spacing="12">
+
+                    <padding>
+                        <Insets top="15"
+                                right="5"
+                                bottom="15"
+                                left="5"/>
+                    </padding>
+
+                    <Label text="Cliente"
+                           style="-fx-font-size: 17px; -fx-font-weight: bold;"/>
+
+                    <HBox spacing="10"
+                          alignment="CENTER_LEFT">
+
+                        <Label text="Buscar cliente:"/>
+
+                        <TextField fx:id="txtBuscarCliente"
+                                   promptText="Buscar por CUI, nombre, apellido o correo"
+                                   prefWidth="400"/>
+
+                        <Button text="+ Nuevo cliente"
+                                onAction="#mostrarNuevoCliente"/>
+
+                    </HBox>
+
+                    <TableView fx:id="tblClientes"
+                               prefHeight="150">
+
+                        <columns>
+
+                            <TableColumn fx:id="colClienteCui"
+                                         text="CUI"
+                                         prefWidth="180"/>
+
+                            <TableColumn fx:id="colClienteNombre"
+                                         text="Nombre"
+                                         prefWidth="180"/>
+
+                            <TableColumn fx:id="colClienteApellido"
+                                         text="Apellido"
+                                         prefWidth="180"/>
+
+                            <TableColumn fx:id="colClienteCorreo"
+                                         text="Correo"
+                                         prefWidth="280"/>
+
+                        </columns>
+
+                    </TableView>
+
+                    <Label fx:id="lblClienteSeleccionado"
+                           text="Cliente seleccionado: ninguno"
+                           style="-fx-font-weight: bold;"/>
+
+                    <VBox fx:id="panelNuevoCliente"
+                          spacing="8"
+                          visible="false"
+                          managed="false"
+                          style="-fx-border-color: #cccccc; -fx-border-radius: 4; -fx-padding: 10;">
+
+                        <Label text="Registrar nuevo cliente"
+                               style="-fx-font-size: 15px; -fx-font-weight: bold;"/>
+
+                        <HBox spacing="8">
+
+                            <VBox spacing="4">
+                                <Label text="CUI"/>
+                                <TextField fx:id="txtNuevoCui"
+                                           promptText="13 dígitos"
+                                           prefWidth="150"/>
+                            </VBox>
+
+                            <VBox spacing="4">
+                                <Label text="Nombre"/>
+                                <TextField fx:id="txtNuevoNombre"
+                                           prefWidth="160"/>
+                            </VBox>
+
+                            <VBox spacing="4">
+                                <Label text="Apellido"/>
+                                <TextField fx:id="txtNuevoApellido"
+                                           prefWidth="160"/>
+                            </VBox>
+
+                            <VBox spacing="4">
+                                <Label text="Correo"/>
+                                <TextField fx:id="txtNuevoCorreo"
+                                           promptText="Opcional"
+                                           prefWidth="220"/>
+                            </VBox>
+
+                        </HBox>
+
+                        <HBox spacing="10">
+
+                            <Button text="Guardar cliente"
+                                    onAction="#guardarNuevoCliente"/>
+
+                            <Button text="Cancelar"
+                                    onAction="#cancelarNuevoCliente"/>
+
+                        </HBox>
+
+                    </VBox>
+
+                    <Separator/>
+
+                    <Label text="Libros disponibles"
+                           style="-fx-font-size: 17px; -fx-font-weight: bold;"/>
+
+                    <HBox spacing="10"
+                          alignment="CENTER_LEFT">
+
+                        <Label text="Buscar libro:"/>
+
+                        <TextField fx:id="txtBuscar"
+                                   promptText="Buscar por ISBN, título o autor"
+                                   prefWidth="400"/>
+
+                    </HBox>
+
+                    <TableView fx:id="tblDisponibles"
+                               prefHeight="200">
+
+                        <columns>
+
+                            <TableColumn fx:id="colDisponibleIsbn"
+                                         text="ISBN"
+                                         prefWidth="190"/>
+
+                            <TableColumn fx:id="colDisponibleTitulo"
+                                         text="Título"
+                                         prefWidth="330"/>
+
+                            <TableColumn fx:id="colDisponiblePrecio"
+                                         text="Precio"
+                                         prefWidth="130"/>
+
+                            <TableColumn fx:id="colDisponibleStock"
+                                         text="Stock disponible"
+                                         prefWidth="150"/>
+
+                        </columns>
+
+                    </TableView>
+
+                    <HBox spacing="10"
+                          alignment="CENTER_LEFT">
+
+                        <VBox spacing="5">
+
+                            <Label text="Cantidad"/>
+
+                            <TextField fx:id="txtCantidad"
+                                       text="1"
+                                       prefWidth="100"/>
+
+                        </VBox>
+
+                        <VBox alignment="BOTTOM_LEFT">
+
+                            <Button fx:id="btnAgregar"
+                                    text="Agregar al carrito"
+                                    onAction="#agregarProducto"
+                                    prefWidth="150"/>
+
+                        </VBox>
+
+                    </HBox>
+
+                    <Separator/>
+
+                    <Label text="Productos en el carrito"
+                           style="-fx-font-size: 17px; -fx-font-weight: bold;"/>
+
+                    <TableView fx:id="tabla"
+                               prefHeight="200">
+
+                        <columns>
+
+                            <TableColumn fx:id="colIsbn"
+                                         text="ISBN"
+                                         prefWidth="220"/>
+
+                            <TableColumn fx:id="colCantidad"
+                                         text="Cantidad"
+                                         prefWidth="120"/>
+
+                            <TableColumn fx:id="colPrecio"
+                                         text="Precio unitario"
+                                         prefWidth="170"/>
+
+                            <TableColumn fx:id="colSubtotal"
+                                         text="Subtotal"
+                                         prefWidth="170"/>
+
+                        </columns>
+
+                    </TableView>
+
+                </VBox>
+
+            </content>
+
+        </ScrollPane>
+
     </center>
 
     <bottom>
-        <VBox spacing="12">
+
+        <VBox spacing="10">
 
             <HBox spacing="10">
+
                 <VBox spacing="5">
+
                     <Label text="Nueva cantidad"/>
+
                     <TextField fx:id="txtNuevaCantidad"
                                text="1"
                                prefWidth="100"/>
-                </VBox>
 
-                <VBox spacing="5">
-                    <Label text="CUI del cliente"/>
-                    <TextField fx:id="txtCuiCliente"
-                               promptText="Ej. 2000100010101"
-                               prefWidth="170"/>
                 </VBox>
 
                 <VBox alignment="BOTTOM_LEFT">
+
                     <Button fx:id="btnActualizar"
                             text="Actualizar cantidad"
                             onAction="#actualizarCantidad"/>
+
                 </VBox>
 
                 <VBox alignment="BOTTOM_LEFT">
+
                     <Button fx:id="btnEliminar"
                             text="Eliminar libro"
                             onAction="#eliminarProducto"/>
+
                 </VBox>
 
                 <VBox alignment="BOTTOM_LEFT">
+
                     <Button fx:id="btnVaciar"
                             text="Vaciar carrito"
                             onAction="#vaciarCarrito"/>
+
                 </VBox>
 
                 <VBox alignment="BOTTOM_LEFT">
+
                     <Button fx:id="btnConfirmar"
                             text="Confirmar venta"
                             onAction="#confirmarVenta"/>
+
                 </VBox>
+
             </HBox>
 
             <Label fx:id="lblTotal"
@@ -124,7 +303,9 @@
 
             <Label fx:id="lblMensaje"
                    wrapText="true"/>
+
         </VBox>
+
     </bottom>
 
 </BorderPane>
