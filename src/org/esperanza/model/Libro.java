@@ -1,9 +1,11 @@
 package org.esperanza.model;
 
+import java.sql.Date;
+
 public class Libro {
     private String isbn;
     private String titulo;
-    private String fechaPublicacion;
+    private Date fechaPublicacion;
     private double precio;
     private int idCategoria;
     private String nitEditorial;
@@ -11,9 +13,38 @@ public class Libro {
     private int stockActual;
     private int stockMinimo;
     private boolean activo;
-    private String nombreAutor;
+    private String nombreAutor; 
 
     public Libro() {}
+
+    public Libro(String isbn, String titulo, Date fechaPublicacion, double precio, int idCategoria, 
+                 String nitEditorial, int idProveedor, int stockActual, int stockMinimo, boolean activo) {
+        this.isbn = isbn;
+        this.titulo = titulo;
+        this.fechaPublicacion = fechaPublicacion;
+        this.precio = precio;
+        this.idCategoria = idCategoria;
+        this.nitEditorial = nitEditorial;
+        this.idProveedor = idProveedor;
+        this.stockActual = stockActual;
+        this.stockMinimo = stockMinimo;
+        this.activo = activo;
+    }
+
+    public Libro(String isbn, String titulo, Date fechaPublicacion, double precio, int idCategoria, 
+                 String nitEditorial, int idProveedor, int stockActual, int stockMinimo, boolean activo, String nombreAutor) {
+        this.isbn = isbn;
+        this.titulo = titulo;
+        this.fechaPublicacion = fechaPublicacion;
+        this.precio = precio;
+        this.idCategoria = idCategoria;
+        this.nitEditorial = nitEditorial;
+        this.idProveedor = idProveedor;
+        this.stockActual = stockActual;
+        this.stockMinimo = stockMinimo;
+        this.activo = activo;
+        this.nombreAutor = nombreAutor;
+    }
 
     public String getIsbn() { return isbn; }
     public void setIsbn(String isbn) { this.isbn = isbn; }
@@ -21,8 +52,8 @@ public class Libro {
     public String getTitulo() { return titulo; }
     public void setTitulo(String titulo) { this.titulo = titulo; }
 
-    public String getFechaPublicacion() { return fechaPublicacion; }
-    public void setFechaPublicacion(String fechaPublicacion) { this.fechaPublicacion = fechaPublicacion; }
+    public Date getFechaPublicacion() { return fechaPublicacion; }
+    public void setFechaPublicacion(Date fechaPublicacion) { this.fechaPublicacion = fechaPublicacion; }
 
     public double getPrecio() { return precio; }
     public void setPrecio(double precio) { this.precio = precio; }
