@@ -15,6 +15,13 @@ public class Libro {
 
     public Libro() {}
 
+    // =========================================================================
+    // T3.3.1: Regla de negocio para stock crítico
+    // =========================================================================
+    public boolean esStockCritico() {
+        return this.stockActual <= this.stockMinimo;
+    }
+
     public String getIsbn() { return isbn; }
     public void setIsbn(String isbn) { this.isbn = isbn; }
 

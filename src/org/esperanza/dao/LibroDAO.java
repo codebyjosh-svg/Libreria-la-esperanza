@@ -12,11 +12,10 @@ public interface LibroDAO {
     List<Libro> buscarPorAutor(String autor);
 
     List<Libro> listarTodos();
+
+    // T3.3: Obtener libros con stock crítico (stock_actual <= stock_minimo)
+    List<Libro> obtenerStockCritico();
 }
-
-
-
-
 
 
 
