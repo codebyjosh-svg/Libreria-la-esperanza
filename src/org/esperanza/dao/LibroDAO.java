@@ -15,10 +15,12 @@ public interface LibroDAO {
 
     // T3.3: Obtener libros con stock crítico (stock_actual <= stock_minimo)
     List<Libro> obtenerStockCritico();
+
+    List<Libro> obtenerTodos();
+
+    // Método requerido para el registro de entradas y movimientos de inventario
+    boolean registrarMovimiento(String isbn, String tipoMovimiento, int cantidad, int idUsuario, String observacion);
 }
-
-
-
 
 
 

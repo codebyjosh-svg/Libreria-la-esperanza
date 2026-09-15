@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+
+<VBox alignment="CENTER_LEFT" prefWidth="450.0" spacing="12.0" stylesheets="@../style/alerta.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.esperanza.Controller.RegistroEntradaController">
+   <padding>
+      <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
+   </padding>
+   <children>
+      <Label text="📦 Registrar Entrada de Inventario" styleClass="alerta-titulo" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+      
+      <Label text="Seleccionar Libro (ISBN / Título):" />
+      <ComboBox fx:id="cmbLibros" prefWidth="400.0" promptText="Seleccione un libro..." />
+
+      <Label text="Cantidad a Ingresar:" />
+      <TextField fx:id="txtCantidad" promptText="Ej. 10" />
+
+      <Label text="Observación / Proveedor:" />
+      <TextArea fx:id="txtObservacion" prefHeight="80.0" promptText="Ej. Reposición de stock por proveedor..." wrapText="true" />
+
+      <HBox alignment="CENTER_RIGHT" spacing="10.0" style="-fx-padding: 10 0 0 0;">
+         <children>
+            <Button fx:id="btnCancelar" mnemonicParsing="false" onAction="#onCancelar" text="Cancelar" styleClass="btn-secundario" />
+            <Button fx:id="btnGuardar" mnemonicParsing="false" onAction="#onGuardarEntrada" text="Registrar Entrada" styleClass="btn-alerta" />
+         </children>
+      </HBox>
+   </children>
+</VBox>

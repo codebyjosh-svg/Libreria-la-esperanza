@@ -109,6 +109,26 @@ public class LibroDAOImpl implements LibroDAO {
         return lista;
     }
 
+    public boolean registrarMovimiento(String isbn, String tipoMovimiento, int cantidad, int idUsuario, String observacion) {
+        String sql = "{CALL sp_registrar_movimiento(?, ?, ?, ?, ?)}";
+        try (Connection con = Conexion.getInstancia().conectar();
+             CallableStatement cs = con.prepareCall(sql)) {
+            
+            cs.setString(1, isbn);
+            cs.setString(2, tipoMovimiento);
+            cs.setInt(3, cantidad);
+            cs.setInt(4, idUsuario);
+            cs.setString(5, observacion);
+            
+            cs.executeUpdate();
+            return true;
+            
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al registrar movimiento de inventario para el ISBN: " + isbn, e);
+            return false;
+        }
+    }
+
     private Libro extraerLibro(ResultSet rs) throws SQLException {
         Libro libro = new Libro();
         try { libro.setIsbn(rs.getString("isbn")); } catch (Exception e) {}
@@ -123,5 +143,11 @@ public class LibroDAOImpl implements LibroDAO {
         try { libro.setActivo(rs.getBoolean("activo")); } catch (Exception e) {}
         try { libro.setNombreAutor(rs.getString("nombre_autor")); } catch (Exception e) {}
         return libro;
+    }
+
+    @Override
+    public List<Libro> obtenerTodos() {
+        // Redirigido a listarTodos para evitar excepciones innecesarias
+        return listarTodos();
     }
 }

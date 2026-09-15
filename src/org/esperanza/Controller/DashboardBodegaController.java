@@ -11,14 +11,15 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import org.esperanza.Model.Rol;
 import org.esperanza.Service.NavegacionRol;
 import org.esperanza.Service.SesionUsuario;
 import org.esperanza.dao.LibroDAO;
 import org.esperanza.dao.impl.LibroDAOImpl;
 import org.esperanza.model.Libro;
+import org.esperanza.Model.Rol;
 
 public class DashboardBodegaController {
 
@@ -26,6 +27,7 @@ public class DashboardBodegaController {
     @FXML private Label lblRol;
     @FXML private Label lblPermisos;
     @FXML private Button btnCerrarSesion;
+    @FXML private Label lblCantidadStockCritico; // T3.5: Indicador numérico en el Dashboard
 
     private LibroDAO libroDAO;
 
@@ -53,7 +55,19 @@ public class DashboardBodegaController {
 
         try {
             List<Libro> librosCriticos = libroDAO.obtenerStockCritico();
+            int cantidadCritica = (librosCriticos != null) ? librosCriticos.size() : 0;
 
+            // Actualizar el indicador numérico (Tarea 3.5)
+            if (lblCantidadStockCritico != null) {
+                lblCantidadStockCritico.setText(String.valueOf(cantidadCritica));
+                if (cantidadCritica > 0) {
+                    lblCantidadStockCritico.setStyle("-fx-text-fill: #EF4444; -fx-font-weight: bold;"); // Rojo alerta
+                } else {
+                    lblCantidadStockCritico.setStyle("-fx-text-fill: #10B981; -fx-font-weight: bold;"); // Verde OK
+                }
+            }
+
+            // Alerta emergente detallada (Tarea 3.4)
             if (librosCriticos != null && !librosCriticos.isEmpty()) {
                 StringBuilder mensaje = new StringBuilder();
                 mensaje.append("Los siguientes libros alcanzaron o cayeron por debajo del stock mínimo:\n\n");
@@ -115,7 +129,26 @@ public class DashboardBodegaController {
         if (!NavegacionRol.validarPermiso("ENTRADAS_SALIDAS")) {
             return;
         }
-        mostrarInfo("Entradas / Salidas", "Acceso al registro de entradas y salidas autorizado.");
+        
+        try {
+            // Cargar la vista de Registro de Entradas que construimos antes
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/esperanza/view/RegistroEntrada.fxml"));
+            Parent root = loader.load();
+            
+            Stage stage = new Stage();
+            stage.setTitle("Registro de Entradas de Inventario");
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL); // Bloquea la ventana principal mientras está abierto
+            stage.setResizable(false);
+            stage.showAndWait();
+            
+            // Al cerrar la ventana de entradas, refrescamos el indicador de stock por si se reabasteció algo
+            verificarAlertaStock();
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+            mostrarError("No se pudo abrir la ventana de Registro de Entradas.\n" + e.getMessage());
+        }
     }
 
     @FXML
