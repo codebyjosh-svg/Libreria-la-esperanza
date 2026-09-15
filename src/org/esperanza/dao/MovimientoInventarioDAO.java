@@ -136,6 +136,12 @@ public class MovimientoInventarioDAO {
             int cantidad,
             String observacion) throws SQLException {
 
+        if (cantidad <= 0) {
+            throw new IllegalArgumentException(
+                    "La cantidad debe ser mayor que 0."
+            );
+        }
+
         try (Connection conexion = obtenerConexion()) {
 
             boolean autoCommitOriginal =
