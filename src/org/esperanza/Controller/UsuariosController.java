@@ -178,22 +178,11 @@ public class UsuariosController {
         cargarUsuarios();
     }
 
-    @FXML
-    private void onVolverDashboard() {
-        try {
-            Parent root = FXMLLoader.load(
-                    getClass().getResource("/org/esperanza/view/DashboardAdmin.fxml")
-            );
-
-            Stage stage = (Stage) tablaUsuarios.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Librería La Esperanza - Panel Administrador");
-            stage.centerOnScreen();
-
-        } catch (IOException e) {
-            mostrarError("No se pudo regresar al Dashboard.");
-        }
-    }
+@FXML
+private void onVolverDashboard() {
+    Stage stage = (Stage) tablaUsuarios.getScene().getWindow();
+    stage.close();
+}
 
     private void cargarUsuarios() {
         datos.setAll(usuarioDao.listarUsuarios());

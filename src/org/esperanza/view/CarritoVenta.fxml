@@ -4,47 +4,33 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane prefHeight="850.0"
-            prefWidth="1050.0"
+<BorderPane prefHeight="680.0"
+            prefWidth="920.0"
             style="-fx-background-color: white;"
             xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.esperanza.controller.CarritoVentaController">
 
     <padding>
-        <Insets top="15"
-                right="20"
-                bottom="15"
-                left="20"/>
+        <Insets top="15" right="20" bottom="15" left="20"/>
     </padding>
 
     <top>
-
         <VBox spacing="5">
-
             <Label text="Carrito de venta · Librería La Esperanza"
                    style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
-
             <Label text="Seleccione el cliente y los libros que desea agregar a la venta."/>
-
         </VBox>
-
     </top>
 
     <center>
-
         <ScrollPane fitToWidth="true"
                     hbarPolicy="NEVER">
-
             <content>
-
                 <VBox spacing="12">
 
                     <padding>
-                        <Insets top="15"
-                                right="5"
-                                bottom="15"
-                                left="5"/>
+                        <Insets top="15" right="5" bottom="15" left="5"/>
                     </padding>
 
                     <Label text="Cliente"
@@ -65,10 +51,9 @@
                     </HBox>
 
                     <TableView fx:id="tblClientes"
-                               prefHeight="150">
+                               prefHeight="110">
 
                         <columns>
-
                             <TableColumn fx:id="colClienteCui"
                                          text="CUI"
                                          prefWidth="180"/>
@@ -84,7 +69,6 @@
                             <TableColumn fx:id="colClienteCorreo"
                                          text="Correo"
                                          prefWidth="280"/>
-
                         </columns>
 
                     </TableView>
@@ -133,13 +117,10 @@
                         </HBox>
 
                         <HBox spacing="10">
-
                             <Button text="Guardar cliente"
                                     onAction="#guardarNuevoCliente"/>
-
                             <Button text="Cancelar"
                                     onAction="#cancelarNuevoCliente"/>
-
                         </HBox>
 
                     </VBox>
@@ -161,10 +142,9 @@
                     </HBox>
 
                     <TableView fx:id="tblDisponibles"
-                               prefHeight="200">
+                               prefHeight="140">
 
                         <columns>
-
                             <TableColumn fx:id="colDisponibleIsbn"
                                          text="ISBN"
                                          prefWidth="190"/>
@@ -180,7 +160,6 @@
                             <TableColumn fx:id="colDisponibleStock"
                                          text="Stock disponible"
                                          prefWidth="150"/>
-
                         </columns>
 
                     </TableView>
@@ -189,22 +168,17 @@
                           alignment="CENTER_LEFT">
 
                         <VBox spacing="5">
-
                             <Label text="Cantidad"/>
-
                             <TextField fx:id="txtCantidad"
                                        text="1"
                                        prefWidth="100"/>
-
                         </VBox>
 
                         <VBox alignment="BOTTOM_LEFT">
-
                             <Button fx:id="btnAgregar"
                                     text="Agregar al carrito"
                                     onAction="#agregarProducto"
                                     prefWidth="150"/>
-
                         </VBox>
 
                     </HBox>
@@ -215,10 +189,9 @@
                            style="-fx-font-size: 17px; -fx-font-weight: bold;"/>
 
                     <TableView fx:id="tabla"
-                               prefHeight="200">
+                               prefHeight="140">
 
                         <columns>
-
                             <TableColumn fx:id="colIsbn"
                                          text="ISBN"
                                          prefWidth="220"/>
@@ -234,65 +207,49 @@
                             <TableColumn fx:id="colSubtotal"
                                          text="Subtotal"
                                          prefWidth="170"/>
-
                         </columns>
 
                     </TableView>
 
                 </VBox>
-
             </content>
-
         </ScrollPane>
-
     </center>
 
     <bottom>
-
         <VBox spacing="10">
 
             <HBox spacing="10">
 
                 <VBox spacing="5">
-
                     <Label text="Nueva cantidad"/>
-
                     <TextField fx:id="txtNuevaCantidad"
                                text="1"
                                prefWidth="100"/>
-
                 </VBox>
 
                 <VBox alignment="BOTTOM_LEFT">
-
                     <Button fx:id="btnActualizar"
                             text="Actualizar cantidad"
                             onAction="#actualizarCantidad"/>
-
                 </VBox>
 
                 <VBox alignment="BOTTOM_LEFT">
-
                     <Button fx:id="btnEliminar"
                             text="Eliminar libro"
                             onAction="#eliminarProducto"/>
-
                 </VBox>
 
                 <VBox alignment="BOTTOM_LEFT">
-
                     <Button fx:id="btnVaciar"
                             text="Vaciar carrito"
                             onAction="#vaciarCarrito"/>
-
                 </VBox>
 
                 <VBox alignment="BOTTOM_LEFT">
-
                     <Button fx:id="btnConfirmar"
                             text="Confirmar venta"
                             onAction="#confirmarVenta"/>
-
                 </VBox>
 
             </HBox>
@@ -305,7 +262,6 @@
                    wrapText="true"/>
 
         </VBox>
-
     </bottom>
 
 </BorderPane>
