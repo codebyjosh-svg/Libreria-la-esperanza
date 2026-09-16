@@ -107,10 +107,24 @@ public class DashboardBodegaController {
             return;
         }
 
-        mostrarInfo(
-                "Entradas / Salidas",
-                "Acceso al registro de entradas y salidas autorizado."
-        );
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(
+                    "/org/esperanza/view/SalidaInventario.fxml"));
+            Parent root = loader.load();
+            SalidaInventarioController controller = loader.getController();
+            Stage ventana = new Stage();
+            ventana.initOwner(lblBienvenida.getScene().getWindow());
+            ventana.initModality(javafx.stage.Modality.WINDOW_MODAL);
+            ventana.setTitle("Salida de inventario - Librería La Esperanza");
+            ventana.setScene(new Scene(root));
+            ventana.setResizable(false);
+            ventana.setOnCloseRequest(event -> {
+                if (controller.estaOcupado()) event.consume();
+            });
+            ventana.showAndWait();
+        } catch (IOException ex) {
+            mostrarError("No se pudo abrir el formulario de salida.\n" + ex.getMessage());
+        }
     }
 
     @FXML
