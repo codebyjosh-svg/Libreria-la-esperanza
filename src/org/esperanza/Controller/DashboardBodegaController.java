@@ -1,8 +1,12 @@
 package org.esperanza.Controller;
 
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
 
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -10,11 +14,15 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
-import org.esperanza.Model.Rol;
 import org.esperanza.Service.NavegacionRol;
 import org.esperanza.Service.SesionUsuario;
+import org.esperanza.dao.StockDao;
+import org.esperanza.model.Libro;
 
 public class DashboardBodegaController {
 
@@ -22,19 +30,49 @@ public class DashboardBodegaController {
     @FXML private Label lblRol;
     @FXML private Label lblPermisos;
     @FXML private Button btnCerrarSesion;
+    @FXML private Label lblContadorCritico;
+
+    @FXML private TableView<Libro> tablaStockCritico;
+    @FXML private TableColumn<Libro, String> colIsbn;
+    @FXML private TableColumn<Libro, String> colTitulo;
+    @FXML private TableColumn<Libro, Integer> colStock;
+
+    private StockDao stockDao = new StockDao();
 
     @FXML
     private void initialize() {
 
-        if (!NavegacionRol.validarRol(Rol.BODEGA)) {
-            Platform.runLater(
-                    this::redirigirDashboardCorrecto
-            );
-            return;
-        }
-
         actualizarEncabezado();
         configurarCierre();
+
+        colIsbn.setCellValueFactory(new PropertyValueFactory<>("isbn"));
+        colTitulo.setCellValueFactory(new PropertyValueFactory<>("titulo"));
+        colStock.setCellValueFactory(new PropertyValueFactory<>("stockActual"));
+
+        cargarInventarioCritico();
+    }
+
+    private void cargarInventarioCritico() {
+        try {
+            List<Libro> listaPura = stockDao.obtenerStockCritico(5);
+            ObservableList<Libro> librosCriticos = FXCollections.observableArrayList(listaPura);
+
+            tablaStockCritico.setItems(librosCriticos);
+            lblContadorCritico.setText(String.valueOf(librosCriticos.size()));
+
+        } catch (SQLException e) {
+            mostrarError("No se pudo cargar el stock crítico:\n" + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void abrirFichaLibro() {
+        Libro libroSeleccionado = tablaStockCritico.getSelectionModel().getSelectedItem();
+        if (libroSeleccionado != null) {
+            mostrarInfo("Ficha del Libro", "Abriendo ficha para ISBN: " + libroSeleccionado.getIsbn());
+        } else {
+            mostrarError("Por favor, seleccione un libro de la tabla.");
+        }
     }
 
     private void actualizarEncabezado() {
@@ -49,10 +87,7 @@ public class DashboardBodegaController {
         );
 
         lblRol.setText(
-                "Rol: "
-                + sesion
-                        .getRolActual()
-                        .getNombreVisible()
+                "Rol: BODEGA"
         );
 
         lblPermisos.setText(
@@ -159,36 +194,6 @@ public class DashboardBodegaController {
                     "No se pudo regresar al login.\n"
                     + e.getMessage()
             );
-        }
-    }
-
-    private void redirigirDashboardCorrecto() {
-
-        if (lblBienvenida == null
-                || lblBienvenida.getScene() == null
-                || lblBienvenida
-                        .getScene()
-                        .getWindow() == null) {
-
-            return;
-        }
-
-        Stage stage = (Stage) lblBienvenida
-                .getScene()
-                .getWindow();
-
-        if (SesionUsuario
-                .getInstancia()
-                .haySesionActiva()) {
-
-            NavegacionRol
-                    .abrirDashboardSegunRol(
-                            stage
-                    );
-
-        } else {
-
-            stage.close();
         }
     }
 
