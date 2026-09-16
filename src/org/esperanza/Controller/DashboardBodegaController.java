@@ -223,4 +223,5 @@ public class DashboardBodegaController {
         alert.setContentText(mensaje);
         alert.showAndWait();
     }
+    
 }
