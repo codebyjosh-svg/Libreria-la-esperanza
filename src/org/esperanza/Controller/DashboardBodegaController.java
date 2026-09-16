@@ -3,7 +3,6 @@ package org.esperanza.Controller;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
