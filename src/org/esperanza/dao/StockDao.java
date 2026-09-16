@@ -4,8 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-
+import org.esperanza.model.Libro;
 import org.esperanza.util.Conexion;
 
 public class StockDao {
@@ -13,90 +15,73 @@ public class StockDao {
     private final ProveedorConexion conexiones;
 
     public StockDao() {
-
-        this(
-                () -> Conexion
-                        .getInstancia()
-                        .conectar()
-        );
+        this(() -> Conexion.getInstancia().conectar());
     }
 
-    public StockDao(
-            ProveedorConexion conexiones) {
-
-        this.conexiones =
-                Objects.requireNonNull(
-                        conexiones,
-                        "El proveedor de conexion es obligatorio"
-                );
+    public StockDao(ProveedorConexion conexiones) {
+        this.conexiones = Objects.requireNonNull(conexiones, "El proveedor de conexion es obligatorio");
     }
 
-    public int obtenerStockActual(
-            String isbn) throws SQLException {
+    public List<Libro> obtenerStockCritico(int limiteMinimo) throws SQLException {
+        List<Libro> listaCritica = new ArrayList<>();
+        
+        String sql = """
+                SELECT isbn, titulo, stock_actual
+                FROM libros
+                WHERE stock_actual <= ?
+                  AND activo = 1
+                """;
 
+        try (Connection conexion = conexiones.conectar();
+             PreparedStatement ps = conexion.prepareStatement(sql)) {
+
+            ps.setInt(1, limiteMinimo);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Libro libro = new Libro();
+                    libro.setIsbn(rs.getString("isbn"));
+                    libro.setTitulo(rs.getString("titulo"));
+                    libro.setStockActual(rs.getInt("stock_actual")); 
+                    
+                    listaCritica.add(libro);
+                }
+            }
+        }
+        return listaCritica;
+    }
+
+    public int obtenerStockActual(String isbn) throws SQLException {
         validarIsbn(isbn);
-
         String sql = """
                 SELECT stock_actual
                 FROM libros
                 WHERE isbn = ?
                   AND activo = 1
                 """;
-
-        try (
-                Connection conexion =
-                        conexiones.conectar();
-
-                PreparedStatement ps =
-                        conexion.prepareStatement(sql)
-        ) {
-
-            ps.setString(
-                    1,
-                    isbn.trim()
-            );
-
-            try (ResultSet rs =
-                    ps.executeQuery()) {
-
+        try (Connection conexion = conexiones.conectar();
+             PreparedStatement ps = conexion.prepareStatement(sql)) {
+            ps.setString(1, isbn.trim());
+            try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-
-                    return rs.getInt(
-                            "stock_actual"
-                    );
+                    return rs.getInt("stock_actual");
                 }
-
                 return -1;
             }
         }
     }
 
-    public boolean hayStockSuficiente(
-            String isbn,
-            int cantidad) throws SQLException {
-
+    public boolean hayStockSuficiente(String isbn, int cantidad) throws SQLException {
         validarIsbn(isbn);
         validarCantidad(cantidad);
-
-        int stockActual =
-                obtenerStockActual(isbn);
-
+        int stockActual = obtenerStockActual(isbn);
         return stockActual >= cantidad;
     }
 
-    public boolean hayStockSuficiente(
-            Connection conexion,
-            String isbn,
-            int cantidad) throws SQLException {
-
-        Objects.requireNonNull(
-                conexion,
-                "La conexion es obligatoria"
-        );
-
+    public boolean hayStockSuficiente(Connection conexion, String isbn, int cantidad) throws SQLException {
+        Objects.requireNonNull(conexion, "La conexion es obligatoria");
         validarIsbn(isbn);
         validarCantidad(cantidad);
-
         String sql = """
                 SELECT stock_actual
                 FROM libros
@@ -104,46 +89,22 @@ public class StockDao {
                   AND activo = 1
                 FOR UPDATE
                 """;
-
-        try (PreparedStatement ps =
-                conexion.prepareStatement(sql)) {
-
-            ps.setString(
-                    1,
-                    isbn.trim()
-            );
-
-            try (ResultSet rs =
-                    ps.executeQuery()) {
-
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+            ps.setString(1, isbn.trim());
+            try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) {
-
                     return false;
                 }
-
-                int stockActual =
-                        rs.getInt(
-                                "stock_actual"
-                        );
-
+                int stockActual = rs.getInt("stock_actual");
                 return stockActual >= cantidad;
             }
         }
     }
 
-    public void validarStock(
-            Connection conexion,
-            String isbn,
-            int cantidad) throws SQLException {
-
-        Objects.requireNonNull(
-                conexion,
-                "La conexion es obligatoria"
-        );
-
+    public void validarStock(Connection conexion, String isbn, int cantidad) throws SQLException {
+        Objects.requireNonNull(conexion, "La conexion es obligatoria");
         validarIsbn(isbn);
         validarCantidad(cantidad);
-
         String sql = """
                 SELECT titulo, stock_actual
                 FROM libros
@@ -151,63 +112,27 @@ public class StockDao {
                   AND activo = 1
                 FOR UPDATE
                 """;
-
-        try (PreparedStatement ps =
-                conexion.prepareStatement(sql)) {
-
-            ps.setString(
-                    1,
-                    isbn.trim()
-            );
-
-            try (ResultSet rs =
-                    ps.executeQuery()) {
-
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+            ps.setString(1, isbn.trim());
+            try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) {
-
-                    throw new IllegalArgumentException(
-                            "El libro no existe o esta inactivo."
-                    );
+                    throw new IllegalArgumentException("El libro no existe o esta inactivo.");
                 }
-
-                String titulo =
-                        rs.getString(
-                                "titulo"
-                        );
-
-                int stockActual =
-                        rs.getInt(
-                                "stock_actual"
-                        );
-
+                String titulo = rs.getString("titulo");
+                int stockActual = rs.getInt("stock_actual");
                 if (stockActual < cantidad) {
-
                     throw new IllegalArgumentException(
-                            "Stock insuficiente para "
-                            + titulo
-                            + ". Disponible: "
-                            + stockActual
-                            + ", solicitado: "
-                            + cantidad
+                            "Stock insuficiente para " + titulo + ". Disponible: " + stockActual + ", solicitado: " + cantidad
                     );
                 }
             }
         }
     }
 
-    public void descontarStock(
-            Connection conexion,
-            String isbn,
-            int cantidad) throws SQLException {
-
-        Objects.requireNonNull(
-                conexion,
-                "La conexion es obligatoria"
-        );
-
+    public void descontarStock(Connection conexion, String isbn, int cantidad) throws SQLException {
+        Objects.requireNonNull(conexion, "La conexion es obligatoria");
         validarIsbn(isbn);
         validarCantidad(cantidad);
-
         String sql = """
                 UPDATE libros
                 SET stock_actual = stock_actual - ?
@@ -215,59 +140,26 @@ public class StockDao {
                   AND activo = 1
                   AND stock_actual >= ?
                 """;
-
-        try (PreparedStatement ps =
-                conexion.prepareStatement(sql)) {
-
-            ps.setInt(
-                    1,
-                    cantidad
-            );
-
-            ps.setString(
-                    2,
-                    isbn.trim()
-            );
-
-            ps.setInt(
-                    3,
-                    cantidad
-            );
-
-            int filasAfectadas =
-                    ps.executeUpdate();
-
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+            ps.setInt(1, cantidad);
+            ps.setString(2, isbn.trim());
+            ps.setInt(3, cantidad);
+            int filasAfectadas = ps.executeUpdate();
             if (filasAfectadas != 1) {
-
-                throw new SQLException(
-                        "No se pudo descontar el stock "
-                        + "del libro con ISBN: "
-                        + isbn
-                );
+                throw new SQLException("No se pudo descontar el stock del libro con ISBN: " + isbn);
             }
         }
     }
 
-    private void validarIsbn(
-            String isbn) {
-
-        if (isbn == null
-                || isbn.trim().isEmpty()) {
-
-            throw new IllegalArgumentException(
-                    "El ISBN es obligatorio."
-            );
+    private void validarIsbn(String isbn) {
+        if (isbn == null || isbn.trim().isEmpty()) {
+            throw new IllegalArgumentException("El ISBN es obligatorio.");
         }
     }
 
-    private void validarCantidad(
-            int cantidad) {
-
+    private void validarCantidad(int cantidad) {
         if (cantidad <= 0) {
-
-            throw new IllegalArgumentException(
-                    "La cantidad debe ser mayor que cero."
-            );
+            throw new IllegalArgumentException("La cantidad debe ser mayor que cero.");
         }
     }
 }
