@@ -1,0 +1,4 @@
+.root { -fx-font-family: "Segoe UI"; -fx-background-color: #f8fafc; }
+.alerta-container { -fx-padding: 24; -fx-background-radius: 12; }
+.btn-alerta { -fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 9 18; -fx-cursor: hand; }
+.btn-secundario { -fx-background-color: #e2e8f0; -fx-text-fill: #1e293b; -fx-padding: 9 18; -fx-cursor: hand; }
