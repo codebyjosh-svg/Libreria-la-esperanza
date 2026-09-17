@@ -3,6 +3,7 @@ package org.esperanza.controller;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javafx.application.Platform;
@@ -73,17 +74,10 @@ public class CarritoVentaController {
     @FXML private Label lblTotal;
     @FXML private Label lblMensaje;
 
-    private final CarritoVenta carrito =
-            new CarritoVenta();
-
-    private final VentaDao ventaDao =
-            new VentaDao();
-
-    private final LibroDAO libroDAO =
-            new LibroDAOImpl();
-
-    private final ClienteDao clienteDao =
-            new ClienteDao();
+    private final CarritoVenta carrito = new CarritoVenta();
+    private final VentaDao ventaDao = new VentaDao();
+    private final LibroDAO libroDAO = new LibroDAOImpl();
+    private final ClienteDao clienteDao = new ClienteDao();
 
     private final ObservableList<Libro> librosDisponibles =
             FXCollections.observableArrayList();
@@ -94,14 +88,14 @@ public class CarritoVentaController {
     private FilteredList<Libro> librosFiltrados;
     private FilteredList<Cliente> clientesFiltrados;
 
-    private int idUsuario = 5;
+    private int idUsuario = 0;
 
     @FXML
     public void initialize() {
-
         configurarTablaClientes();
         configurarTablaDisponibles();
         configurarTablaCarrito();
+        configurarSeleccionTabla();
 
         cargarClientes();
         cargarLibrosDisponibles();
@@ -111,11 +105,7 @@ public class CarritoVentaController {
 
         txtCantidad.setText("1");
         txtNuevaCantidad.setText("1");
-
-        lblTotal.setText(
-                "Total: Q0.00"
-        );
-
+        lblTotal.setText("Total: Q0.00");
         lblClienteSeleccionado.setText(
                 "Cliente seleccionado: ninguno"
         );
@@ -153,6 +143,10 @@ public class CarritoVentaController {
                 )
         );
 
+        configurarCierre();
+    }
+
+    private void configurarSeleccionTabla() {
         tblClientes
                 .getSelectionModel()
                 .selectedItemProperty()
@@ -160,13 +154,10 @@ public class CarritoVentaController {
                         (obs, anterior, cliente) -> {
 
                             if (cliente == null) {
-
                                 lblClienteSeleccionado.setText(
                                         "Cliente seleccionado: ninguno"
                                 );
-
                             } else {
-
                                 lblClienteSeleccionado.setText(
                                         "Cliente seleccionado: "
                                         + cliente.getNombreCompleto()
@@ -184,7 +175,6 @@ public class CarritoVentaController {
                         (obs, anterior, seleccionado) -> {
 
                             if (seleccionado != null) {
-
                                 txtNuevaCantidad.setText(
                                         String.valueOf(
                                                 seleccionado.getCantidad()
@@ -193,12 +183,9 @@ public class CarritoVentaController {
                             }
                         }
                 );
-
-        configurarCierre();
     }
 
     private void configurarTablaClientes() {
-
         colClienteCui.setCellValueFactory(
                 c -> new ReadOnlyObjectWrapper<>(
                         c.getValue().getCui()
@@ -235,9 +222,7 @@ public class CarritoVentaController {
     }
 
     private void cargarClientes() {
-
         try {
-
             clientes.setAll(
                     clienteDao.listar()
             );
@@ -253,7 +238,6 @@ public class CarritoVentaController {
             );
 
         } catch (SQLException e) {
-
             mostrarError(
                     "No se pudieron cargar los clientes: "
                     + e.getMessage()
@@ -262,7 +246,6 @@ public class CarritoVentaController {
     }
 
     private void configurarBusquedaClientes() {
-
         txtBuscarCliente
                 .textProperty()
                 .addListener(
@@ -324,7 +307,6 @@ public class CarritoVentaController {
 
     @FXML
     private void mostrarNuevoCliente() {
-
         panelNuevoCliente.setVisible(
                 true
         );
@@ -338,7 +320,6 @@ public class CarritoVentaController {
 
     @FXML
     private void cancelarNuevoCliente() {
-
         panelNuevoCliente.setVisible(
                 false
         );
@@ -352,16 +333,13 @@ public class CarritoVentaController {
 
     @FXML
     private void guardarNuevoCliente() {
-
         try {
-
             String cuiTexto =
                     txtNuevoCui
                             .getText()
                             .trim();
 
             if (!cuiTexto.matches("\\d{13}")) {
-
                 throw new IllegalArgumentException(
                         "El CUI debe contener 13 dígitos."
                 );
@@ -388,14 +366,12 @@ public class CarritoVentaController {
                             .trim();
 
             if (nombre.isEmpty()) {
-
                 throw new IllegalArgumentException(
                         "El nombre es obligatorio."
                 );
             }
 
             if (apellido.isEmpty()) {
-
                 throw new IllegalArgumentException(
                         "El apellido es obligatorio."
                 );
@@ -412,7 +388,6 @@ public class CarritoVentaController {
             }
 
             if (clienteDao.buscarPorCui(cui) != null) {
-
                 throw new IllegalArgumentException(
                         "Ya existe un cliente con ese CUI."
                 );
@@ -429,7 +404,6 @@ public class CarritoVentaController {
             if (!clienteDao.insertar(
                     nuevoCliente
             )) {
-
                 throw new SQLException(
                         "No se pudo registrar el cliente."
                 );
@@ -445,16 +419,11 @@ public class CarritoVentaController {
 
             cancelarNuevoCliente();
 
-            lblMensaje.setStyle(
-                    "-fx-text-fill: #166534;"
-            );
-
-            lblMensaje.setText(
+            mostrarExito(
                     "Cliente registrado y seleccionado."
             );
 
         } catch (NumberFormatException e) {
-
             mostrarError(
                     "El CUI no es válido."
             );
@@ -490,7 +459,6 @@ public class CarritoVentaController {
     }
 
     private void limpiarFormularioCliente() {
-
         txtNuevoCui.clear();
         txtNuevoNombre.clear();
         txtNuevoApellido.clear();
@@ -498,7 +466,6 @@ public class CarritoVentaController {
     }
 
     private void configurarTablaDisponibles() {
-
         colDisponibleIsbn.setCellValueFactory(
                 c -> new ReadOnlyObjectWrapper<>(
                         c.getValue().getIsbn()
@@ -548,7 +515,6 @@ public class CarritoVentaController {
     }
 
     private void configurarTablaCarrito() {
-
         colIsbn.setCellValueFactory(
                 c -> new ReadOnlyObjectWrapper<>(
                         c.getValue().getIsbn()
@@ -585,7 +551,6 @@ public class CarritoVentaController {
     }
 
     private void cargarLibrosDisponibles() {
-
         librosDisponibles.clear();
 
         List<Libro> libros =
@@ -616,7 +581,6 @@ public class CarritoVentaController {
     }
 
     private void configurarBusquedaLibros() {
-
         txtBuscar
                 .textProperty()
                 .addListener(
@@ -672,7 +636,6 @@ public class CarritoVentaController {
 
     @FXML
     private void agregarProducto() {
-
         ejecutar(() -> {
 
             Libro libro =
@@ -681,7 +644,6 @@ public class CarritoVentaController {
                             .getSelectedItem();
 
             if (libro == null) {
-
                 throw new IllegalArgumentException(
                         "Selecciona un libro de la lista."
                 );
@@ -748,7 +710,6 @@ public class CarritoVentaController {
 
     @FXML
     private void actualizarCantidad() {
-
         ejecutar(() -> {
 
             DetalleVenta detalle =
@@ -757,7 +718,6 @@ public class CarritoVentaController {
                             .getSelectedItem();
 
             if (detalle == null) {
-
                 throw new IllegalArgumentException(
                         "Selecciona un libro del carrito."
                 );
@@ -815,7 +775,6 @@ public class CarritoVentaController {
 
     @FXML
     private void eliminarProducto() {
-
         ejecutar(() -> {
 
             DetalleVenta detalle =
@@ -824,7 +783,6 @@ public class CarritoVentaController {
                             .getSelectedItem();
 
             if (detalle == null) {
-
                 throw new IllegalArgumentException(
                         "Selecciona un libro."
                 );
@@ -834,27 +792,42 @@ public class CarritoVentaController {
                     detalle.getIsbn()
             );
 
-            refrescar(null);
+            refrescar(
+                    null
+            );
+
+            txtNuevaCantidad.setText(
+                    "1"
+            );
 
         }, "Libro eliminado.");
     }
 
     @FXML
     private void vaciarCarrito() {
-
         ejecutar(() -> {
 
             carrito.vaciar();
-            refrescar(null);
-            txtNuevaCantidad.setText("1");
+
+            refrescar(
+                    null
+            );
+
+            txtNuevaCantidad.setText(
+                    "1"
+            );
 
         }, "Carrito vacío.");
     }
 
     @FXML
     private void confirmarVenta() {
-
         try {
+            if (idUsuario <= 0) {
+                throw new IllegalArgumentException(
+                        "No se ha identificado al usuario de la sesión."
+                );
+            }
 
             Cliente cliente =
                     tblClientes
@@ -862,14 +835,21 @@ public class CarritoVentaController {
                             .getSelectedItem();
 
             if (cliente == null) {
-
                 throw new IllegalArgumentException(
                         "Debe seleccionar un cliente para la venta."
                 );
             }
 
+            if (carrito.getDetalles().isEmpty()) {
+                throw new IllegalArgumentException(
+                        "No hay productos en el carrito."
+                );
+            }
+
             List<DetalleVenta> detalles =
-                    carrito.getDetalles();
+                    new ArrayList<>(
+                            carrito.getDetalles()
+                    );
 
             Venta venta =
                     carrito.confirmarVenta(
@@ -877,6 +857,12 @@ public class CarritoVentaController {
                             idUsuario,
                             ventaDao
                     );
+
+            if (venta == null) {
+                throw new IllegalArgumentException(
+                        "No fue posible registrar la venta."
+                );
+            }
 
             Stage stage =
                     (Stage) btnConfirmar
@@ -889,7 +875,9 @@ public class CarritoVentaController {
                     stage
             );
 
-            refrescar(null);
+            refrescar(
+                    null
+            );
 
             cargarLibrosDisponibles();
 
@@ -904,16 +892,39 @@ public class CarritoVentaController {
                     "Cliente seleccionado: ninguno"
             );
 
-            txtCantidad.setText("1");
-            txtNuevaCantidad.setText("1");
+            txtCantidad.setText(
+                    "1"
+            );
 
-        } catch (IllegalArgumentException
-                | SQLException
-                | IOException e) {
+            txtNuevaCantidad.setText(
+                    "1"
+            );
 
+        } catch (IllegalArgumentException e) {
             mostrarError(
                     e.getMessage()
             );
+
+        } catch (SQLException e) {
+            mostrarError(
+                    "No fue posible registrar la venta en la base de datos."
+            );
+
+            e.printStackTrace();
+
+        } catch (IOException e) {
+            mostrarError(
+                    "La venta fue procesada, pero no se pudo mostrar el comprobante."
+            );
+
+            e.printStackTrace();
+
+        } catch (Exception e) {
+            mostrarError(
+                    "Ocurrió un error inesperado al confirmar la venta."
+            );
+
+            e.printStackTrace();
         }
     }
 
@@ -932,6 +943,11 @@ public class CarritoVentaController {
         );
 
         if (isbnSeleccionado == null) {
+
+            tabla
+                    .getSelectionModel()
+                    .clearSelection();
+
             return;
         }
 
@@ -946,6 +962,10 @@ public class CarritoVentaController {
                         .getSelectionModel()
                         .select(detalle);
 
+                tabla.scrollTo(
+                        detalle
+                );
+
                 break;
             }
         }
@@ -956,7 +976,6 @@ public class CarritoVentaController {
             String nombre) {
 
         try {
-
             int valor =
                     Integer.parseInt(
                             texto.trim()
@@ -977,31 +996,58 @@ public class CarritoVentaController {
 
     private void ejecutar(
             Runnable accion,
-            String mensaje) {
+            String mensajeExito) {
 
         try {
-
             accion.run();
 
-            lblMensaje.setStyle(
-                    "-fx-text-fill: #166534;"
+            mostrarExito(
+                    mensajeExito
             );
 
-            lblMensaje.setText(
-                    mensaje
-            );
-
-        } catch (IllegalArgumentException
-                | ArithmeticException e) {
-
+        } catch (IllegalArgumentException e) {
             mostrarError(
                     e.getMessage()
+            );
+
+        } catch (ArithmeticException e) {
+            mostrarError(
+                    "Revisa los valores numéricos ingresados."
+            );
+
+        } catch (Exception e) {
+            mostrarError(
+                    e.getMessage() == null
+                            ? "Ocurrió un error inesperado."
+                            : e.getMessage()
             );
         }
     }
 
+    private void mostrarExito(
+            String mensaje) {
+
+        if (lblMensaje == null) {
+            return;
+        }
+
+        lblMensaje.setStyle(
+                "-fx-text-fill: #166534;"
+        );
+
+        lblMensaje.setText(
+                mensaje == null
+                        ? ""
+                        : mensaje
+        );
+    }
+
     private void mostrarError(
             String mensaje) {
+
+        if (lblMensaje == null) {
+            return;
+        }
 
         lblMensaje.setStyle(
                 "-fx-text-fill: #b91c1c;"
@@ -1009,14 +1055,23 @@ public class CarritoVentaController {
 
         lblMensaje.setText(
                 mensaje == null
+                || mensaje.isBlank()
                         ? "Ocurrió un error."
                         : mensaje
         );
     }
 
     private void configurarCierre() {
-
         Platform.runLater(() -> {
+
+            if (tabla == null
+                    || tabla.getScene() == null
+                    || tabla
+                            .getScene()
+                            .getWindow() == null) {
+
+                return;
+            }
 
             Stage stage =
                     (Stage) tabla
@@ -1039,6 +1094,10 @@ public class CarritoVentaController {
     private void regresarDashboard(
             Stage stage) {
 
+        if (stage == null) {
+            return;
+        }
+
         stage.setOnCloseRequest(
                 null
         );
@@ -1053,7 +1112,6 @@ public class CarritoVentaController {
             int idUsuario) {
 
         if (idUsuario <= 0) {
-
             throw new IllegalArgumentException(
                     "El usuario no es válido."
             );

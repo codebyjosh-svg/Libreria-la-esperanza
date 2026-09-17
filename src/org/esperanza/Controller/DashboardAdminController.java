@@ -12,10 +12,10 @@ import javafx.scene.control.Label;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import org.esperanza.Model.Rol;
-import org.esperanza.Model.Usuario;
-import org.esperanza.Service.NavegacionRol;
-import org.esperanza.Service.SesionUsuario;
+import org.esperanza.model.Rol;
+import org.esperanza.model.Usuario;
+import org.esperanza.service.NavegacionRol;
+import org.esperanza.service.SesionUsuario;
 
 public class DashboardAdminController {
 

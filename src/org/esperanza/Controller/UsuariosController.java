@@ -1,4 +1,4 @@
-package org.esperanza.Controller;
+package org.esperanza.controller;
 
 import java.io.IOException;
 import javafx.collections.FXCollections;
@@ -11,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+
 import org.esperanza.Model.Usuario;
 import org.esperanza.Service.SesionUsuario;
 import org.esperanza.dao.UsuarioDao;
