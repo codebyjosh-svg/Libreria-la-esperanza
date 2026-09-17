@@ -21,10 +21,6 @@ import org.esperanza.model.DetalleVenta;
 
 public class TicketVentaController {
 
-    // =========================
-    // LABELS
-    // =========================
-
     @FXML
     private Label lblVenta;
 
@@ -46,26 +42,15 @@ public class TicketVentaController {
     @FXML
     private Label lblTotal;
 
-    // =========================
-    // CONTENEDORES
-    // =========================
-
     @FXML
     private VBox boxProductos;
 
     @FXML
     private VBox contenidoTicket;
 
-    // =========================
-    // FORMATO FECHA
-    // =========================
 
     private static final DateTimeFormatter FORMATO_FECHA =
             DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-
-    // =========================
-    // INICIALIZACIÓN
-    // =========================
 
     @FXML
     public void initialize() {
@@ -98,10 +83,6 @@ public class TicketVentaController {
             lblTotal.setText("TOTAL: Q0.00");
         }
     }
-
-    // =========================
-    // DATOS DE LA VENTA
-    // =========================
 
     public void setDatosVenta(
             int idVenta,
@@ -176,10 +157,6 @@ public class TicketVentaController {
         }
     }
 
-    // =========================
-    // NOMBRE CLIENTE
-    // =========================
-
     public void setNombreCliente(
             String nombre,
             long cui) {
@@ -207,10 +184,6 @@ public class TicketVentaController {
                 + ")"
         );
     }
-
-    // =========================
-    // NOMBRE CAJERO
-    // =========================
 
     public void setNombreCajero(
             String nombre,
@@ -240,10 +213,6 @@ public class TicketVentaController {
         );
     }
 
-    // =========================
-    // DETALLES SIN TÍTULOS
-    // =========================
-
     public void setDetalles(
             List<DetalleVenta> detalles) {
 
@@ -252,10 +221,6 @@ public class TicketVentaController {
                 Collections.emptyMap()
         );
     }
-
-    // =========================
-    // DETALLES CON TÍTULOS
-    // =========================
 
     public void setDetalles(
             List<DetalleVenta> detalles,
@@ -269,7 +234,6 @@ public class TicketVentaController {
                 .getChildren()
                 .clear();
 
-        // Si no existen productos
         if (detalles == null
                 || detalles.isEmpty()) {
 
@@ -285,7 +249,6 @@ public class TicketVentaController {
             return;
         }
 
-        // Evitar error si el mapa viene null
         Map<String, String> mapaTitulos =
                 titulos == null
                         ? Collections.emptyMap()
@@ -331,10 +294,6 @@ public class TicketVentaController {
         }
     }
 
-    // =========================
-    // CREAR FILA PRODUCTO
-    // =========================
-
     private HBox crearFila(
             String titulo,
             String isbn,
@@ -374,7 +333,6 @@ public class TicketVentaController {
                         + dinero(subtotal)
                 );
 
-        // Tamaños
 
         libro.setPrefWidth(180);
         libro.setMinWidth(180);
@@ -389,7 +347,6 @@ public class TicketVentaController {
         subtotalLabel.setPrefWidth(100);
         subtotalLabel.setMinWidth(100);
 
-        // Alineación
 
         cant.setAlignment(
                 Pos.CENTER
@@ -418,10 +375,6 @@ public class TicketVentaController {
 
         return fila;
     }
-
-    // =========================
-    // IMPRIMIR
-    // =========================
 
     @FXML
     private void imprimir() {
@@ -457,7 +410,6 @@ public class TicketVentaController {
                         ventana
                 );
 
-        // Usuario canceló
         if (!continuar) {
             return;
         }
@@ -497,10 +449,6 @@ public class TicketVentaController {
         }
     }
 
-    // =========================
-    // OBTENER VENTANA
-    // =========================
-
     private Window obtenerVentana() {
 
         if (contenidoTicket == null) {
@@ -515,10 +463,6 @@ public class TicketVentaController {
                 .getScene()
                 .getWindow();
     }
-
-    // =========================
-    // MOSTRAR MENSAJE
-    // =========================
 
     private void mostrarMensaje(
             Alert.AlertType tipo,
@@ -559,10 +503,6 @@ public class TicketVentaController {
 
         alert.showAndWait();
     }
-
-    // =========================
-    // FORMATO DE DINERO
-    // =========================
 
     private String dinero(
             BigDecimal valor) {
