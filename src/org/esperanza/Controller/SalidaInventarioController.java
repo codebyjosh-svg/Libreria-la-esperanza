@@ -1,4 +1,4 @@
-package org.esperanza.Controller;
+package org.esperanza.controller;
 
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
@@ -9,7 +9,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.esperanza.Model.SalidaInventario;
 import org.esperanza.Model.TipoSalida;
-import org.esperanza.Service.SesionUsuario;
+import org.esperanza.service.SesionUsuario;
 import org.esperanza.dao.SalidaInventarioDao;
 import org.esperanza.dao.StockDao;
 

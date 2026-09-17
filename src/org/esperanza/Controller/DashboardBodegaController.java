@@ -245,18 +245,135 @@ public class DashboardBodegaController {
         }
     }
 
-    @FXML
-    private void onInventario() {
-        if (!NavegacionRol.validarPermiso(
-                "GESTION_INVENTARIO")) {
-            return;
-        }
+  @FXML
+private void onInventario() {
 
-        mostrarInfo(
-                "Inventario",
-                "Acceso a Gestión de Inventario autorizado."
+    if (!NavegacionRol.validarPermiso(
+            "GESTION_INVENTARIO")) {
+        return;
+    }
+
+    try {
+
+        FXMLLoader loader =
+                new FXMLLoader(
+                        getClass().getResource(
+                                "/org/esperanza/view/Inventario.fxml"
+                        )
+                );
+
+        Parent root =
+                loader.load();
+
+        Stage ventana =
+                new Stage();
+
+        ventana.initOwner(
+                lblBienvenida
+                        .getScene()
+                        .getWindow()
+        );
+
+        ventana.initModality(
+                Modality.WINDOW_MODAL
+        );
+
+        ventana.setTitle(
+                "Gestión de Inventario - Librería La Esperanza"
+        );
+
+        ventana.setScene(
+                new Scene(root)
+        );
+
+        ventana.setMinWidth(900);
+        ventana.setMinHeight(560);
+
+        ventana.setResizable(true);
+
+        ventana.showAndWait();
+
+        verificarAlertaStock();
+
+    } catch (IOException e) {
+
+        mostrarError(
+                "No se pudo abrir Gestión de Inventario.\n"
+                + e.getMessage()
         );
     }
+}
+
+    @FXML
+private void onIngresoInventario() {
+
+    if (!NavegacionRol.validarPermiso(
+            "ENTRADAS_SALIDAS")) {
+        return;
+    }
+
+    try {
+
+        FXMLLoader loader =
+                new FXMLLoader(
+                        getClass().getResource(
+                                "/org/esperanza/view/IngresoInventario.fxml"
+                        )
+                );
+
+        Parent root =
+                loader.load();
+
+        IngresoInventarioController controller =
+                loader.getController();
+
+        if (SesionUsuario
+                .getInstancia()
+                .getUsuarioActual() != null) {
+
+            controller.setIdUsuarioActual(
+                    SesionUsuario
+                            .getInstancia()
+                            .getUsuarioActual()
+                            .getId()
+            );
+        }
+
+        Stage ventana =
+                new Stage();
+
+        ventana.initOwner(
+                lblBienvenida
+                        .getScene()
+                        .getWindow()
+        );
+
+        ventana.initModality(
+                Modality.WINDOW_MODAL
+        );
+
+        ventana.setTitle(
+                "Ingreso de inventario - Librería La Esperanza"
+        );
+
+        ventana.setScene(
+                new Scene(root)
+        );
+
+        ventana.setResizable(false);
+
+        ventana.showAndWait();
+
+        verificarAlertaStock();
+
+    } catch (IOException e) {
+
+        mostrarError(
+                "No se pudo abrir el formulario de ingreso.\n"
+                + e.getMessage()
+        );
+    }
+}
 
     @FXML
     private void onEntradasSalidas() {

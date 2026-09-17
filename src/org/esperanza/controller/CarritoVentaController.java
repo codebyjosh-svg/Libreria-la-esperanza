@@ -21,7 +21,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import org.esperanza.Service.NavegacionRol;
+import org.esperanza.service.NavegacionRol;
 import org.esperanza.dao.ClienteDao;
 import org.esperanza.dao.LibroDAO;
 import org.esperanza.dao.VentaDao;

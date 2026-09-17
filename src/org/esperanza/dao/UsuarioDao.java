@@ -3,7 +3,7 @@ package org.esperanza.dao;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import org.esperanza.Model.Usuario;
+import org.esperanza.model.Usuario;
 import org.esperanza.util.Conexion;
 import org.esperanza.util.PasswordUtil;
 
