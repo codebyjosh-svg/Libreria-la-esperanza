@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane
+        xmlns:fx="http://javafx.com/fxml/1"
+        fx:controller="org.esperanza.controller.DashboardVentasDiaController"
+        prefWidth="1100"
+        prefHeight="650"
+        style="-fx-background-color: #f3f4f6;">
+
+    <top>
+
+        <VBox spacing="18"
+              style="-fx-background-color: white;">
+
+            <padding>
+                <Insets
+                        top="20"
+                        right="25"
+                        bottom="20"
+                        left="25"/>
+            </padding>
+
+            <HBox
+                    alignment="CENTER_LEFT"
+                    spacing="10">
+
+                <VBox spacing="3">
+
+                    <Label
+                            text="Ventas del día"
+                            style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+
+                    <Label
+                            text="Resumen de las ventas completadas hoy"
+                            style="-fx-text-fill: #64748b;"/>
+
+                </VBox>
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <Button
+                        text="Actualizar"
+                        onAction="#actualizar"
+                        prefWidth="110"
+                        style="-fx-font-weight: bold;"/>
+
+                <Button
+                        text="Regresar"
+                        onAction="#regresarDashboard"
+                        prefWidth="110"/>
+
+            </HBox>
+
+            <HBox
+                    spacing="15"
+                    alignment="CENTER">
+
+                <VBox
+                        prefWidth="230"
+                        spacing="8"
+                        style="-fx-background-color: #ffffff;
+                               -fx-border-color: #d1d5db;
+                               -fx-border-radius: 8;
+                               -fx-background-radius: 8;">
+
+                    <padding>
+                        <Insets
+                                top="16"
+                                right="16"
+                                bottom="16"
+                                left="16"/>
+                    </padding>
+
+                    <Label
+                            text="Ventas realizadas"
+                            style="-fx-text-fill: #64748b;"/>
+
+                    <Label
+                            fx:id="lblCantidadVentas"
+                            text="0"
+                            style="-fx-font-size: 25px;
+                                   -fx-font-weight: bold;"/>
+
+                </VBox>
+
+                <VBox
+                        prefWidth="230"
+                        spacing="8"
+                        style="-fx-background-color: #ffffff;
+                               -fx-border-color: #d1d5db;
+                               -fx-border-radius: 8;
+                               -fx-background-radius: 8;">
+
+                    <padding>
+                        <Insets
+                                top="16"
+                                right="16"
+                                bottom="16"
+                                left="16"/>
+                    </padding>
+
+                    <Label
+                            text="Subtotal"
+                            style="-fx-text-fill: #64748b;"/>
+
+                    <Label
+                            fx:id="lblSubtotal"
+                            text="Q0.00"
+                            style="-fx-font-size: 25px;
+                                   -fx-font-weight: bold;"/>
+
+                </VBox>
+
+                <VBox
+                        prefWidth="230"
+                        spacing="8"
+                        style="-fx-background-color: #ffffff;
+                               -fx-border-color: #d1d5db;
+                               -fx-border-radius: 8;
+                               -fx-background-radius: 8;">
+
+                    <padding>
+                        <Insets
+                                top="16"
+                                right="16"
+                                bottom="16"
+                                left="16"/>
+                    </padding>
+
+                    <Label
+                            text="Descuentos"
+                            style="-fx-text-fill: #64748b;"/>
+
+                    <Label
+                            fx:id="lblDescuentos"
+                            text="Q0.00"
+                            style="-fx-font-size: 25px;
+                                   -fx-font-weight: bold;"/>
+
+                </VBox>
+
+                <VBox
+                        prefWidth="230"
+                        spacing="8"
+                        style="-fx-background-color: #ffffff;
+                               -fx-border-color: #d1d5db;
+                               -fx-border-radius: 8;
+                               -fx-background-radius: 8;">
+
+                    <padding>
+                        <Insets
+                                top="16"
+                                right="16"
+                                bottom="16"
+                                left="16"/>
+                    </padding>
+
+                    <Label
+                            text="Total vendido"
+                            style="-fx-text-fill: #64748b;"/>
+
+                    <Label
+                            fx:id="lblTotal"
+                            text="Q0.00"
+                            style="-fx-font-size: 25px;
+                                   -fx-font-weight: bold;"/>
+
+                </VBox>
+
+            </HBox>
+
+        </VBox>
+
+    </top>
+
+    <center>
+
+        <VBox spacing="10">
+
+            <padding>
+                <Insets
+                        top="20"
+                        right="25"
+                        bottom="25"
+                        left="25"/>
+            </padding>
+
+            <Label
+                    text="Ventas registradas hoy"
+                    style="-fx-font-size: 18px;
+                           -fx-font-weight: bold;"/>
+
+            <TableView
+                    fx:id="tablaVentas"
+                    VBox.vgrow="ALWAYS">
+
+                <columns>
+
+                    <TableColumn
+                            fx:id="colId"
+                            text="ID"
+                            prefWidth="60"/>
+
+                    <TableColumn
+                            fx:id="colHora"
+                            text="Hora"
+                            prefWidth="90"/>
+
+                    <TableColumn
+                            fx:id="colCui"
+                            text="CUI Cliente"
+                            prefWidth="130"/>
+
+                    <TableColumn
+                            fx:id="colCliente"
+                            text="Cliente"
+                            prefWidth="180"/>
+
+                    <TableColumn
+                            fx:id="colUsuario"
+                            text="Cajero"
+                            prefWidth="120"/>
+
+                    <TableColumn
+                            fx:id="colSubtotal"
+                            text="Subtotal"
+                            prefWidth="100"/>
+
+                    <TableColumn
+                            fx:id="colDescuento"
+                            text="Descuento"
+                            prefWidth="100"/>
+
+                    <TableColumn
+                            fx:id="colTotal"
+                            text="Total"
+                            prefWidth="100"/>
+
+                    <TableColumn
+                            fx:id="colEstado"
+                            text="Estado"
+                            prefWidth="110"/>
+
+                </columns>
+
+            </TableView>
+
+        </VBox>
+
+    </center>
+
+</BorderPane>

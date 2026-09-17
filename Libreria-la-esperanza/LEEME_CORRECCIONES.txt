@@ -1,0 +1,46 @@
+LIBRERÍA LA ESPERANZA - T3.3 ALERTAS DE STOCK
+
+ABRIR EL PROYECTO
+1. Extraiga este ZIP en una carpeta nueva. No lo mezcle con la carpeta anterior:
+   los paquetes model, controller y service ahora están unificados en minúsculas.
+2. Abra la carpeta Libreria-la-esperanza desde File > Open Project en NetBeans.
+3. Seleccione JDK 21 y ejecute Clean and Build; luego Run.
+4. Se conservó src/db.properties. Debe coincidir con su servidor MySQL local.
+5. Se conservaron las rutas de JavaFX y MySQL de su proyecto. Si NetBeans indica
+   bibliotecas faltantes, ajuste las rutas en Properties > Libraries.
+   JavaFX está configurado en C:\javafx-sdk-21.0.11\lib.
+
+REQUISITOS
+T3.3.1: La regla incluye stock_actual <= stock_minimo en libros activos.
+T3.3.2: sql/T3_3_stock_critico.sql contiene la consulta independiente.
+T3.3.3: LibroDAOImpl.obtenerStockCritico() ejecuta esa consulta y devuelve libros.
+T3.3.4: Alerta al ingresar a bodega cuando existen libros críticos; estilos corregidos.
+T3.3.5: Tarjeta con cantidad de títulos críticos, rojo si hay y verde si son cero.
+T3.3.6: Clic en la tarjeta abre LibrosCriticos.fxml con ISBN, título y ambos stocks.
+T3.3.7: Prueba normal 10/5: excluido.
+T3.3.8: Prueba igual 5/5: incluido.
+T3.3.9: Prueba inferior 2/5: incluido.
+
+También se corrigió el ID fijo de usuario al registrar entradas: ahora se toma
+el usuario autenticado. Una falla en la consulta de stock se informa como error,
+no se presenta como inventario normal con cero libros críticos.
+
+PRUEBAS
+- Compilación de 44 clases fuente y 5 archivos de pruebas: sin errores con
+  compilador Eclipse ECJ configurado para Java 21 y JavaFX 21.0.11.
+- Revisión estática de las 14 vistas FXML: controladores, 45 eventos y recursos.
+- PruebaStockCritico ejecutada con H2 2.3.232 en modo MySQL, base en memoria:
+  pasaron normal, igual, inferior, agotado, inactivo, cantidad, orden,
+  valores del DAO y lista vacía tras reabastecer.
+- Se usó una compilación adicional compatible con Java 17 para ejecutar las
+  pruebas en el entorno de revisión; el proyecto entregado sigue en Java 21.
+- Para repetir: Clean and Build y ejecute PROBAR_STOCK_CRITICO.bat con JDK 21
+  disponible en PATH. La prueba no modifica su base de datos.
+
+VERIFICACIÓN EN SU EQUIPO
+Inicie sesión como bodega: revise alerta, contador y listado. Registre una entrada
+para reabastecer y compruebe que el contador se actualice al cerrar la ventana.
+No se pudo ejecutar la interfaz ni conectar con su MySQL desde este entorno.
+Los módulos marcados originalmente como "en construcción" siguen pendientes;
+estas correcciones no implementan nuevos CRUD fuera del alcance de T3.3.
+No ejecute otra vez el DML completo para consultar stock: use el SQL independiente.
