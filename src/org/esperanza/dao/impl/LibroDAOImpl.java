@@ -7,25 +7,46 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.esperanza.dao.LibroDAO;
+import org.esperanza.dao.ProveedorConexion;
 import org.esperanza.model.Libro;
 import org.esperanza.util.Conexion;
 
 public class LibroDAOImpl implements LibroDAO {
 
+    private final ProveedorConexion proveedorConexion;
+
+    public LibroDAOImpl() {
+        this(() -> Conexion.getInstancia().conectar());
+    }
+
+    public LibroDAOImpl(ProveedorConexion proveedorConexion) {
+        this.proveedorConexion =
+                Objects.requireNonNull(proveedorConexion);
+    }
+
     @Override
     public List<Libro> listarTodos() {
-        List<Libro> lista = new ArrayList<>();
 
-        String sql = "{call sp_listarlibros()}";
+        List<Libro> lista =
+                new ArrayList<>();
 
-        try (Connection con = Conexion.getInstancia().conectar();
-             CallableStatement cs = con.prepareCall(sql);
-             ResultSet rs = cs.executeQuery()) {
+        String sql =
+                "{call sp_listarlibros()}";
+
+        try (Connection con =
+                     proveedorConexion.conectar();
+             CallableStatement cs =
+                     con.prepareCall(sql);
+             ResultSet rs =
+                     cs.executeQuery()) {
 
             while (rs.next()) {
-                Libro libro = new Libro();
+
+                Libro libro =
+                        new Libro();
 
                 libro.setIsbn(
                         rs.getString("isbn")
@@ -67,12 +88,11 @@ public class LibroDAOImpl implements LibroDAO {
                         rs.getBoolean("activo")
                 );
 
-                lista.add(
-                        libro
-                );
+                lista.add(libro);
             }
 
         } catch (SQLException e) {
+
             System.err.println(
                     "Error listar libros: "
                     + e.getMessage()
@@ -84,13 +104,14 @@ public class LibroDAOImpl implements LibroDAO {
 
     @Override
     public Libro buscarLibro(String isbn) {
+
         String sql =
                 "{call sp_buscarlibro(?)}";
 
         Libro libro = null;
 
         try (Connection con =
-                     Conexion.getInstancia().conectar();
+                     proveedorConexion.conectar();
              CallableStatement cs =
                      con.prepareCall(sql)) {
 
@@ -103,22 +124,25 @@ public class LibroDAOImpl implements LibroDAO {
                          cs.executeQuery()) {
 
                 if (rs.next()) {
-                    libro = new Libro(
-                            rs.getString("isbn"),
-                            rs.getString("titulo"),
-                            rs.getDate("fecha_publicacion"),
-                            rs.getDouble("precio"),
-                            rs.getInt("id_categoria"),
-                            rs.getString("nit_editorial"),
-                            rs.getInt("id_proveedor"),
-                            rs.getInt("stock_actual"),
-                            rs.getInt("stock_minimo"),
-                            rs.getBoolean("activo")
-                    );
+
+                    libro =
+                            new Libro(
+                                    rs.getString("isbn"),
+                                    rs.getString("titulo"),
+                                    rs.getDate("fecha_publicacion"),
+                                    rs.getDouble("precio"),
+                                    rs.getInt("id_categoria"),
+                                    rs.getString("nit_editorial"),
+                                    rs.getInt("id_proveedor"),
+                                    rs.getInt("stock_actual"),
+                                    rs.getInt("stock_minimo"),
+                                    rs.getBoolean("activo")
+                            );
                 }
             }
 
         } catch (SQLException e) {
+
             System.err.println(
                     "Error buscar libro: "
                     + e.getMessage()
@@ -132,9 +156,7 @@ public class LibroDAOImpl implements LibroDAO {
     public Libro buscarPorIsbn(
             String isbn) {
 
-        return buscarLibro(
-                isbn
-        );
+        return buscarLibro(isbn);
     }
 
     @Override
@@ -144,20 +166,21 @@ public class LibroDAOImpl implements LibroDAO {
         List<Libro> resultado =
                 new ArrayList<>();
 
-        for (Libro libro
-                : listarTodos()) {
+        if (titulo == null) {
+            return resultado;
+        }
+
+        String texto =
+                titulo.toLowerCase();
+
+        for (Libro libro : listarTodos()) {
 
             if (libro.getTitulo() != null
-                    && libro
-                            .getTitulo()
+                    && libro.getTitulo()
                             .toLowerCase()
-                            .contains(
-                                    titulo.toLowerCase()
-                            )) {
+                            .contains(texto)) {
 
-                resultado.add(
-                        libro
-                );
+                resultado.add(libro);
             }
         }
 
@@ -171,20 +194,21 @@ public class LibroDAOImpl implements LibroDAO {
         List<Libro> resultado =
                 new ArrayList<>();
 
-        for (Libro libro
-                : listarTodos()) {
+        if (autor == null) {
+            return resultado;
+        }
+
+        String texto =
+                autor.toLowerCase();
+
+        for (Libro libro : listarTodos()) {
 
             if (libro.getNombreAutor() != null
-                    && libro
-                            .getNombreAutor()
+                    && libro.getNombreAutor()
                             .toLowerCase()
-                            .contains(
-                                    autor.toLowerCase()
-                            )) {
+                            .contains(texto)) {
 
-                resultado.add(
-                        libro
-                );
+                resultado.add(libro);
             }
         }
 
@@ -193,6 +217,7 @@ public class LibroDAOImpl implements LibroDAO {
 
     @Override
     public List<Libro> obtenerStockCritico() {
+
         List<Libro> lista =
                 new ArrayList<>();
 
@@ -204,13 +229,14 @@ public class LibroDAOImpl implements LibroDAO {
                 + "ORDER BY stock_actual ASC, titulo ASC";
 
         try (Connection con =
-                     Conexion.getInstancia().conectar();
+                     proveedorConexion.conectar();
              PreparedStatement ps =
                      con.prepareStatement(sql);
              ResultSet rs =
                      ps.executeQuery()) {
 
             while (rs.next()) {
+
                 Libro libro =
                         new Libro();
 
@@ -230,16 +256,13 @@ public class LibroDAOImpl implements LibroDAO {
                         rs.getInt("stock_minimo")
                 );
 
-                libro.setActivo(
-                        true
-                );
+                libro.setActivo(true);
 
-                lista.add(
-                        libro
-                );
+                lista.add(libro);
             }
 
         } catch (SQLException e) {
+
             throw new IllegalStateException(
                     "No se pudo consultar el stock crítico.",
                     e
@@ -257,7 +280,7 @@ public class LibroDAOImpl implements LibroDAO {
                 "{call sp_insertarlibro(?, ?, ?, ?, ?, ?, ?, ?, ?)}";
 
         try (Connection con =
-                     Conexion.getInstancia().conectar();
+                     proveedorConexion.conectar();
              CallableStatement cs =
                      con.prepareCall(sql)) {
 
@@ -309,6 +332,7 @@ public class LibroDAOImpl implements LibroDAO {
             return cs.executeUpdate() > 0;
 
         } catch (SQLException e) {
+
             System.err.println(
                     "Error insertar libro: "
                     + e.getMessage()
@@ -326,7 +350,7 @@ public class LibroDAOImpl implements LibroDAO {
                 "{call sp_actualizarlibro(?, ?, ?, ?, ?, ?, ?, ?)}";
 
         try (Connection con =
-                     Conexion.getInstancia().conectar();
+                     proveedorConexion.conectar();
              CallableStatement cs =
                      con.prepareCall(sql)) {
 
@@ -373,6 +397,7 @@ public class LibroDAOImpl implements LibroDAO {
             return cs.executeUpdate() > 0;
 
         } catch (SQLException e) {
+
             System.err.println(
                     "Error actualizar libro: "
                     + e.getMessage()
@@ -390,7 +415,7 @@ public class LibroDAOImpl implements LibroDAO {
                 "{call sp_eliminarlibro(?)}";
 
         try (Connection con =
-                     Conexion.getInstancia().conectar();
+                     proveedorConexion.conectar();
              CallableStatement cs =
                      con.prepareCall(sql)) {
 
@@ -402,6 +427,7 @@ public class LibroDAOImpl implements LibroDAO {
             return cs.executeUpdate() > 0;
 
         } catch (SQLException e) {
+
             System.err.println(
                     "Error desactivar libro: "
                     + e.getMessage()

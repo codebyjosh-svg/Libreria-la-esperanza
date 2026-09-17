@@ -21,6 +21,12 @@ import org.esperanza.dao.impl.LibroDAOImpl;
 import org.esperanza.model.Libro;
 import org.esperanza.model.Rol;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
+
 public class DashboardBodegaController {
 
     @FXML
@@ -41,6 +47,21 @@ public class DashboardBodegaController {
     private LibroDAO libroDAO;
 
     @FXML
+    private Label lblContadorCritico;
+
+    @FXML
+    private TableView<Libro> tablaStockCritico;
+
+    @FXML
+    private TableColumn<Libro, String> colIsbn;
+
+    @FXML
+    private TableColumn<Libro, String> colTitulo;
+
+    @FXML
+    private TableColumn<Libro, Integer> colStock;
+
+    @FXML
     private void initialize() {
         try {
             libroDAO = new LibroDAOImpl();
@@ -58,8 +79,28 @@ public class DashboardBodegaController {
 
         actualizarEncabezado();
         configurarCierre();
+        configurarTablaStockCritico();
 
         Platform.runLater(this::verificarAlertaStock);
+    }
+
+    private void configurarTablaStockCritico() {
+
+        if (tablaStockCritico == null) {
+            return;
+        }
+
+        colIsbn.setCellValueFactory(
+                new PropertyValueFactory<>("isbn")
+        );
+
+        colTitulo.setCellValueFactory(
+                new PropertyValueFactory<>("titulo")
+        );
+
+        colStock.setCellValueFactory(
+                new PropertyValueFactory<>("stockActual")
+        );
     }
 
     private void verificarAlertaStock() {
@@ -68,13 +109,30 @@ public class DashboardBodegaController {
         }
 
         try {
-            List<Libro> librosCriticos =
-                    libroDAO.obtenerStockCritico();
+            List<Libro> librosCriticos
+                    = libroDAO.obtenerStockCritico();
 
-            int cantidadCritica =
-                    librosCriticos != null
-                    ? librosCriticos.size()
-                    : 0;
+            ObservableList<Libro> datosCriticos
+                    = FXCollections.observableArrayList(
+                            librosCriticos != null
+                                    ? librosCriticos
+                                    : List.of()
+                    );
+
+            if (tablaStockCritico != null) {
+                tablaStockCritico.setItems(datosCriticos);
+            }
+
+            if (lblContadorCritico != null) {
+                lblContadorCritico.setText(
+                        String.valueOf(datosCriticos.size())
+                );
+            }
+
+            int cantidadCritica
+                    = librosCriticos != null
+                            ? librosCriticos.size()
+                            : 0;
 
             if (lblCantidadStockCritico != null) {
                 lblCantidadStockCritico.setText(
@@ -114,8 +172,8 @@ public class DashboardBodegaController {
                             .append(")\n");
                 }
 
-                Alert alert =
-                        new Alert(Alert.AlertType.WARNING);
+                Alert alert
+                        = new Alert(Alert.AlertType.WARNING);
 
                 alert.setTitle("Alerta de Inventario");
                 alert.setHeaderText(
@@ -140,8 +198,8 @@ public class DashboardBodegaController {
     }
 
     private void actualizarEncabezado() {
-        SesionUsuario sesion =
-                SesionUsuario.getInstancia();
+        SesionUsuario sesion
+                = SesionUsuario.getInstancia();
 
         if (lblBienvenida != null) {
             lblBienvenida.setText(
@@ -177,8 +235,8 @@ public class DashboardBodegaController {
                             .getScene()
                             .getWindow() != null) {
 
-                Stage stage =
-                        (Stage) lblBienvenida
+                Stage stage
+                        = (Stage) lblBienvenida
                                 .getScene()
                                 .getWindow();
 
@@ -202,8 +260,8 @@ public class DashboardBodegaController {
         }
 
         try {
-            FXMLLoader loader =
-                    new FXMLLoader(
+            FXMLLoader loader
+                    = new FXMLLoader(
                             getClass().getResource(
                                     "/org/esperanza/view/"
                                     + "LibrosCriticos.fxml"
@@ -247,15 +305,132 @@ public class DashboardBodegaController {
 
     @FXML
     private void onInventario() {
+
         if (!NavegacionRol.validarPermiso(
                 "GESTION_INVENTARIO")) {
             return;
         }
 
-        mostrarInfo(
-                "Inventario",
-                "Acceso a Gestión de Inventario autorizado."
-        );
+        try {
+
+            FXMLLoader loader
+                    = new FXMLLoader(
+                            getClass().getResource(
+                                    "/org/esperanza/view/Inventario.fxml"
+                            )
+                    );
+
+            Parent root
+                    = loader.load();
+
+            Stage ventana
+                    = new Stage();
+
+            ventana.initOwner(
+                    lblBienvenida
+                            .getScene()
+                            .getWindow()
+            );
+
+            ventana.initModality(
+                    Modality.WINDOW_MODAL
+            );
+
+            ventana.setTitle(
+                    "Gestión de Inventario - Librería La Esperanza"
+            );
+
+            ventana.setScene(
+                    new Scene(root)
+            );
+
+            ventana.setMinWidth(900);
+            ventana.setMinHeight(560);
+
+            ventana.setResizable(true);
+
+            ventana.showAndWait();
+
+            verificarAlertaStock();
+
+        } catch (IOException e) {
+
+            mostrarError(
+                    "No se pudo abrir Gestión de Inventario.\n"
+                    + e.getMessage()
+            );
+        }
+    }
+
+    @FXML
+    private void onIngresoInventario() {
+
+        if (!NavegacionRol.validarPermiso(
+                "ENTRADAS_SALIDAS")) {
+            return;
+        }
+
+        try {
+
+            FXMLLoader loader
+                    = new FXMLLoader(
+                            getClass().getResource(
+                                    "/org/esperanza/view/IngresoInventario.fxml"
+                            )
+                    );
+
+            Parent root
+                    = loader.load();
+
+            IngresoInventarioController controller
+                    = loader.getController();
+
+            if (SesionUsuario
+                    .getInstancia()
+                    .getUsuarioActual() != null) {
+
+                controller.setIdUsuarioActual(
+                        SesionUsuario
+                                .getInstancia()
+                                .getUsuarioActual()
+                                .getId()
+                );
+            }
+
+            Stage ventana
+                    = new Stage();
+
+            ventana.initOwner(
+                    lblBienvenida
+                            .getScene()
+                            .getWindow()
+            );
+
+            ventana.initModality(
+                    Modality.WINDOW_MODAL
+            );
+
+            ventana.setTitle(
+                    "Ingreso de inventario - Librería La Esperanza"
+            );
+
+            ventana.setScene(
+                    new Scene(root)
+            );
+
+            ventana.setResizable(false);
+
+            ventana.showAndWait();
+
+            verificarAlertaStock();
+
+        } catch (IOException e) {
+
+            mostrarError(
+                    "No se pudo abrir el formulario de ingreso.\n"
+                    + e.getMessage()
+            );
+        }
     }
 
     @FXML
@@ -266,8 +441,8 @@ public class DashboardBodegaController {
         }
 
         try {
-            FXMLLoader loader =
-                    new FXMLLoader(
+            FXMLLoader loader
+                    = new FXMLLoader(
                             getClass().getResource(
                                     "/org/esperanza/view/"
                                     + "SalidaInventario.fxml"
@@ -276,8 +451,8 @@ public class DashboardBodegaController {
 
             Parent root = loader.load();
 
-            SalidaInventarioController controller =
-                    loader.getController();
+            SalidaInventarioController controller
+                    = loader.getController();
 
             Stage ventana = new Stage();
 
@@ -322,6 +497,37 @@ public class DashboardBodegaController {
     }
 
     @FXML
+    private void abrirFichaLibro() {
+
+        if (tablaStockCritico == null) {
+            return;
+        }
+
+        Libro libro
+                = tablaStockCritico
+                        .getSelectionModel()
+                        .getSelectedItem();
+
+        if (libro == null) {
+            mostrarError(
+                    "Por favor, seleccione un libro de la tabla."
+            );
+            return;
+        }
+
+        String informacion
+                = "ISBN: " + libro.getIsbn()
+                + "\nTítulo: " + libro.getTitulo()
+                + "\nStock actual: " + libro.getStockActual()
+                + "\nStock mínimo: " + libro.getStockMinimo();
+
+        mostrarInfo(
+                "Ficha del Libro",
+                informacion
+        );
+    }
+
+    @FXML
     private void onCerrarSesion() {
         SesionUsuario
                 .getInstancia()
@@ -332,8 +538,8 @@ public class DashboardBodegaController {
 
     private void volverLogin() {
         try {
-            FXMLLoader loader =
-                    new FXMLLoader(
+            FXMLLoader loader
+                    = new FXMLLoader(
                             getClass().getResource(
                                     "/org/esperanza/view/Login.fxml"
                             )
@@ -344,8 +550,8 @@ public class DashboardBodegaController {
             if (lblBienvenida != null
                     && lblBienvenida.getScene() != null) {
 
-                Stage stage =
-                        (Stage) lblBienvenida
+                Stage stage
+                        = (Stage) lblBienvenida
                                 .getScene()
                                 .getWindow();
 
@@ -381,8 +587,8 @@ public class DashboardBodegaController {
             return;
         }
 
-        Stage stage =
-                (Stage) lblBienvenida
+        Stage stage
+                = (Stage) lblBienvenida
                         .getScene()
                         .getWindow();
 
@@ -402,8 +608,8 @@ public class DashboardBodegaController {
             String titulo,
             String mensaje) {
 
-        Alert alert =
-                new Alert(Alert.AlertType.INFORMATION);
+        Alert alert
+                = new Alert(Alert.AlertType.INFORMATION);
 
         alert.setTitle(titulo);
         alert.setHeaderText(null);
@@ -412,8 +618,8 @@ public class DashboardBodegaController {
     }
 
     private void mostrarError(String mensaje) {
-        Alert alert =
-                new Alert(Alert.AlertType.ERROR);
+        Alert alert
+                = new Alert(Alert.AlertType.ERROR);
 
         alert.setTitle("Error");
         alert.setHeaderText(null);

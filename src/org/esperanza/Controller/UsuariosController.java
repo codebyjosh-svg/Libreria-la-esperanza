@@ -12,8 +12,8 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
-import org.esperanza.Model.Usuario;
-import org.esperanza.Service.SesionUsuario;
+import org.esperanza.model.Usuario;
+import org.esperanza.service.SesionUsuario;
 import org.esperanza.dao.UsuarioDao;
 
 public class UsuariosController {
