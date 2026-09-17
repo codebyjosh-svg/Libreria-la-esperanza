@@ -1,9 +1,13 @@
 package org.esperanza.dao;
 
-import org.esperanza.model.Libro; 
 import java.util.List;
+import org.esperanza.model.Libro;
 
 public interface LibroDAO {
+
+    List<Libro> listarTodos();
+
+    Libro buscarLibro(String isbn);
 
     Libro buscarPorIsbn(String isbn);
 
@@ -11,20 +15,11 @@ public interface LibroDAO {
 
     List<Libro> buscarPorAutor(String autor);
 
-    List<Libro> listarTodos();
-
-    // T3.3: Obtener libros con stock crítico (stock_actual <= stock_minimo)
     List<Libro> obtenerStockCritico();
 
-    List<Libro> obtenerTodos();
+    boolean insertar(Libro libro);
 
-    // Método requerido para el registro de entradas y movimientos de inventario
-    boolean registrarMovimiento(String isbn, String tipoMovimiento, int cantidad, int idUsuario, String observacion);
+    boolean actualizar(Libro libro);
+
+    boolean eliminar(String isbn);
 }
-
-
-
-
-
-
-

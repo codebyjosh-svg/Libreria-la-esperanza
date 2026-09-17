@@ -1,9 +1,12 @@
 package org.esperanza.model;
 
+import java.sql.Date;
+
 public class Libro {
+
     private String isbn;
     private String titulo;
-    private String fechaPublicacion;
+    private Date fechaPublicacion;
     private double precio;
     private int idCategoria;
     private String nitEditorial;
@@ -13,45 +16,148 @@ public class Libro {
     private boolean activo;
     private String nombreAutor;
 
-    public Libro() {}
-
-    // =========================================================================
-    // T3.3.1: Regla de negocio para stock crítico
-    // =========================================================================
-    public boolean esStockCritico() {
-        return this.stockActual <= this.stockMinimo;
+    public Libro() {
     }
 
-    public String getIsbn() { return isbn; }
-    public void setIsbn(String isbn) { this.isbn = isbn; }
+    public Libro(
+            String isbn,
+            String titulo,
+            Date fechaPublicacion,
+            double precio,
+            int idCategoria,
+            String nitEditorial,
+            int idProveedor,
+            int stockActual,
+            int stockMinimo,
+            boolean activo) {
 
-    public String getTitulo() { return titulo; }
-    public void setTitulo(String titulo) { this.titulo = titulo; }
+        this.isbn = isbn;
+        this.titulo = titulo;
+        this.fechaPublicacion = fechaPublicacion;
+        this.precio = precio;
+        this.idCategoria = idCategoria;
+        this.nitEditorial = nitEditorial;
+        this.idProveedor = idProveedor;
+        this.stockActual = stockActual;
+        this.stockMinimo = stockMinimo;
+        this.activo = activo;
+    }
 
-    public String getFechaPublicacion() { return fechaPublicacion; }
-    public void setFechaPublicacion(String fechaPublicacion) { this.fechaPublicacion = fechaPublicacion; }
+    public Libro(
+            String isbn,
+            String titulo,
+            Date fechaPublicacion,
+            double precio,
+            int idCategoria,
+            String nitEditorial,
+            int idProveedor,
+            int stockActual,
+            int stockMinimo,
+            boolean activo,
+            String nombreAutor) {
 
-    public double getPrecio() { return precio; }
-    public void setPrecio(double precio) { this.precio = precio; }
+        this.isbn = isbn;
+        this.titulo = titulo;
+        this.fechaPublicacion = fechaPublicacion;
+        this.precio = precio;
+        this.idCategoria = idCategoria;
+        this.nitEditorial = nitEditorial;
+        this.idProveedor = idProveedor;
+        this.stockActual = stockActual;
+        this.stockMinimo = stockMinimo;
+        this.activo = activo;
+        this.nombreAutor = nombreAutor;
+    }
 
-    public int getIdCategoria() { return idCategoria; }
-    public void setIdCategoria(int idCategoria) { this.idCategoria = idCategoria; }
+    public boolean esStockCritico() {
+        return stockActual <= stockMinimo;
+    }
 
-    public String getNitEditorial() { return nitEditorial; }
-    public void setNitEditorial(String nitEditorial) { this.nitEditorial = nitEditorial; }
+    public String getIsbn() {
+        return isbn;
+    }
 
-    public int getIdProveedor() { return idProveedor; }
-    public void setIdProveedor(int idProveedor) { this.idProveedor = idProveedor; }
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
+    }
 
-    public int getStockActual() { return stockActual; }
-    public void setStockActual(int stockActual) { this.stockActual = stockActual; }
+    public String getTitulo() {
+        return titulo;
+    }
 
-    public int getStockMinimo() { return stockMinimo; }
-    public void setStockMinimo(int stockMinimo) { this.stockMinimo = stockMinimo; }
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
 
-    public boolean isActivo() { return activo; }
-    public void setActivo(boolean activo) { this.activo = activo; }
+    public Date getFechaPublicacion() {
+        return fechaPublicacion;
+    }
 
-    public String getNombreAutor() { return nombreAutor; }
-    public void setNombreAutor(String nombreAutor) { this.nombreAutor = nombreAutor; }
+    public void setFechaPublicacion(Date fechaPublicacion) {
+        this.fechaPublicacion = fechaPublicacion;
+    }
+
+    public double getPrecio() {
+        return precio;
+    }
+
+    public void setPrecio(double precio) {
+        this.precio = precio;
+    }
+
+    public int getIdCategoria() {
+        return idCategoria;
+    }
+
+    public void setIdCategoria(int idCategoria) {
+        this.idCategoria = idCategoria;
+    }
+
+    public String getNitEditorial() {
+        return nitEditorial;
+    }
+
+    public void setNitEditorial(String nitEditorial) {
+        this.nitEditorial = nitEditorial;
+    }
+
+    public int getIdProveedor() {
+        return idProveedor;
+    }
+
+    public void setIdProveedor(int idProveedor) {
+        this.idProveedor = idProveedor;
+    }
+
+    public int getStockActual() {
+        return stockActual;
+    }
+
+    public void setStockActual(int stockActual) {
+        this.stockActual = stockActual;
+    }
+
+    public int getStockMinimo() {
+        return stockMinimo;
+    }
+
+    public void setStockMinimo(int stockMinimo) {
+        this.stockMinimo = stockMinimo;
+    }
+
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
+    }
+
+    public String getNombreAutor() {
+        return nombreAutor;
+    }
+
+    public void setNombreAutor(String nombreAutor) {
+        this.nombreAutor = nombreAutor;
+    }
 }
