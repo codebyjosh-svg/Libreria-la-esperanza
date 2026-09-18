@@ -35,7 +35,7 @@ public class ReporteVentasDao {
             while (rs.next()) {
                 Venta venta = new Venta();
                 venta.setIdVenta(rs.getInt("id_venta"));
-                venta.setTotal(rs.getDouble("total"));
+                venta.setTotal(rs.getBigDecimal("total"));
                 lista.add(venta);
             }
         }
