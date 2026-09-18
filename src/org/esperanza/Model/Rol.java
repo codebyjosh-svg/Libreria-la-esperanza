@@ -6,6 +6,8 @@ public enum Rol {
             "Administrador",
             new String[]{
                 "GESTION_USUARIOS",
+                "GESTION_PROVEEDORES",
+                "DEVOLUCIONES",
                 "VER_REPORTES",
                 "GESTION_INVENTARIO",
                 "VENTAS",
@@ -19,6 +21,7 @@ public enum Rol {
             "Cajero",
             new String[]{
                 "VENTAS",
+                "DEVOLUCIONES",
                 "CONSULTAR_PRODUCTOS"
             }
     ),

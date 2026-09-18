@@ -34,6 +34,7 @@ public class LibroController {
 
     @FXML
     public void initialize() {
+        if (!org.esperanza.service.NavegacionRol.validarPermiso("GESTION_INVENTARIO")) return;
         colIsbn.setCellValueFactory(new PropertyValueFactory<>("isbn"));
         colTitulo.setCellValueFactory(new PropertyValueFactory<>("titulo"));
         colPrecio.setCellValueFactory(new PropertyValueFactory<>("precio"));
@@ -43,6 +44,7 @@ public class LibroController {
     }
 
     private void cargarTabla() {
+        if (!org.esperanza.service.NavegacionRol.validarPermiso("GESTION_INVENTARIO")) return;
         List<Libro> lista = libroDao.listarTodos();
         ObservableList<Libro> obsLibros = FXCollections.observableArrayList(lista);
         tbLibros.setItems(obsLibros);
@@ -50,6 +52,7 @@ public class LibroController {
 
     @FXML
     void guardarLibro(ActionEvent event) {
+        if (!org.esperanza.service.NavegacionRol.validarPermiso("GESTION_INVENTARIO")) return;
         // T3.4.15, 16, 17: Validaciones
         if (txtIsbn.getText().isEmpty() || txtTitulo.getText().isEmpty() || txtPrecio.getText().isEmpty()) {
             mostrarAlerta("Error", "Los campos ISBN, Título y Precio son obligatorios.");
@@ -131,6 +134,7 @@ public class LibroController {
 
     @FXML
     void desactivarLibro(ActionEvent event) {
+        if (!org.esperanza.service.NavegacionRol.validarPermiso("GESTION_INVENTARIO")) return;
         
         if (txtIsbn.getText().isEmpty()) {
             mostrarAlerta("Atención", "Seleccione un libro de la tabla para desactivar.");

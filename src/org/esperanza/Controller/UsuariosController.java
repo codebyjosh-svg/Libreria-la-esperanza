@@ -31,12 +31,9 @@ public class UsuariosController {
 
     private final UsuarioDao usuarioDao = new UsuarioDao();
     private final ObservableList<Usuario> datos = FXCollections.observableArrayList();
-    private Usuario usuarioActual;
 
     @FXML
     private void initialize() {
-        usuarioActual = SesionUsuario.getInstancia().getUsuarioActual();
-
         colId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colUsuario.setCellValueFactory(new PropertyValueFactory<>("usrname"));
         colNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
@@ -103,15 +100,16 @@ public class UsuariosController {
     }
 
     private boolean esAdminActual() {
-        return usuarioActual != null
-                && usuarioActual.getRol() != null
-                && usuarioActual.getRol().equalsIgnoreCase("admin");
+        SesionUsuario sesion = SesionUsuario.getInstancia();
+        return sesion.haySesionActiva()
+                && sesion.getUsuarioActual().isActivo()
+                && sesion.esAdmin();
     }
 
     private boolean puedeGestionar(Usuario usuario) {
         return esAdminActual()
                 && usuario != null
-                && usuario.getId() != usuarioActual.getId();
+                && usuario.getId() != SesionUsuario.getInstancia().getUsuarioActual().getId();
     }
 
     private void cambiarEstado(Usuario usuario) {
@@ -175,7 +173,6 @@ public class UsuariosController {
 
     @FXML
     private void onActualizar(ActionEvent event) {
-        usuarioActual = SesionUsuario.getInstancia().getUsuarioActual();
         cargarUsuarios();
     }
 
@@ -186,6 +183,13 @@ private void onVolverDashboard() {
 }
 
     private void cargarUsuarios() {
+        if (!esAdminActual()) {
+            datos.clear();
+            tablaUsuarios.setItems(datos);
+            lblMensaje.setStyle("-fx-text-fill:#b91c1c;");
+            lblMensaje.setText("Solo un administrador con sesión activa puede gestionar usuarios.");
+            return;
+        }
         datos.setAll(usuarioDao.listarUsuarios());
         tablaUsuarios.setItems(datos);
         tablaUsuarios.refresh();

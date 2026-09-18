@@ -9,6 +9,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import org.esperanza.dao.UsuarioDao;
+import org.esperanza.service.SesionUsuario;
 import org.esperanza.util.PasswordUtil;
 
 public class UsuarioAltaController {
@@ -25,6 +26,16 @@ public class UsuarioAltaController {
 
     @FXML
     private void initialize() {
+        if (!puedeGestionarUsuarios()) {
+            txtUsername.setDisable(true);
+            txtPassword.setDisable(true);
+            txtConfirmar.setDisable(true);
+            txtNombre.setDisable(true);
+            txtApellido.setDisable(true);
+            txtCorreo.setDisable(true);
+            cmbRol.setDisable(true);
+            return;
+        }
         cmbRol.getItems().addAll(
                 "ADMIN",
                 "CAJERO",
@@ -36,6 +47,10 @@ public class UsuarioAltaController {
 
     @FXML
     private void onGuardar(ActionEvent event) {
+        if (!puedeGestionarUsuarios()) {
+            mostrarError("Solo un administrador con sesión activa puede registrar usuarios.");
+            return;
+        }
 
         if (!validarCampos()) {
             return;
@@ -90,6 +105,13 @@ public class UsuarioAltaController {
                     + "Revisa la conexión y la base de datos."
             );
         }
+    }
+
+    private boolean puedeGestionarUsuarios() {
+        SesionUsuario sesion = SesionUsuario.getInstancia();
+        return sesion.haySesionActiva()
+                && sesion.getUsuarioActual().isActivo()
+                && sesion.esAdmin();
     }
 
     private boolean validarCampos() {

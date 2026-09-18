@@ -59,7 +59,7 @@ public class DashboardCajeroController {
         );
 
         lblPermisos.setText(
-                "Permisos: VENTAS | CONSULTAR_PRODUCTOS"
+                "Permisos: VENTAS | DEVOLUCIONES | CONSULTAR_PRODUCTOS"
         );
     }
 
@@ -137,6 +137,25 @@ public class DashboardCajeroController {
                     "No se pudo abrir el carrito de venta.\n"
                     + e.getMessage()
             );
+        }
+    }
+
+    @FXML
+    private void onDevoluciones() {
+        if (!NavegacionRol.validarPermiso("DEVOLUCIONES")) return;
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/esperanza/view/Devoluciones.fxml"));
+            Parent root = loader.load();
+            Stage ventana = new Stage();
+            ventana.initOwner(lblBienvenida.getScene().getWindow());
+            ventana.initModality(javafx.stage.Modality.WINDOW_MODAL);
+            ventana.setScene(new Scene(root));
+            DevolucionesController controller = loader.getController();
+            ventana.setOnCloseRequest(event -> { if (controller.estaOcupado()) event.consume(); });
+            ventana.setTitle("Devoluciones de ventas - Librería La Esperanza");
+            ventana.showAndWait();
+        } catch (IOException e) {
+            mostrarError("No se pudo abrir Devoluciones.\n" + e.getMessage());
         }
     }
 

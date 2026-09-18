@@ -31,6 +31,7 @@ public class IngresoInventarioController {
 
     @FXML
     public void initialize() {
+        if (!org.esperanza.service.NavegacionRol.validarPermiso("ENTRADAS_SALIDAS")) return;
 
         txtCantidad.setTextFormatter(
                 new TextFormatter<String>(cambio ->
@@ -114,6 +115,8 @@ public class IngresoInventarioController {
 
     @FXML
     private void onRegistrarClick() {
+        if (!org.esperanza.service.NavegacionRol.validarPermiso("ENTRADAS_SALIDAS")) return;
+        idUsuarioActual = org.esperanza.service.SesionUsuario.getInstancia().getUsuarioActual().getId();
 
         try {
 

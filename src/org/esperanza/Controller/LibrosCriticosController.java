@@ -33,6 +33,7 @@ public class LibrosCriticosController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        if (!org.esperanza.service.NavegacionRol.validarPermiso("GESTION_INVENTARIO")) return;
         try {
             this.libroDAO = new LibroDAOImpl();
             configurarColumnas();

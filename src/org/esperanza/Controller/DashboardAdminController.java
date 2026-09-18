@@ -131,6 +131,7 @@ private void onUsuariosClick() {
 
 @FXML
 private void onLibrosClick() {
+    if (!NavegacionRol.validarPermiso("GESTION_INVENTARIO")) return;
     try {
         FXMLLoader loader = new FXMLLoader(
                 getClass().getResource("/org/esperanza/view/Libros.fxml")
@@ -155,6 +156,37 @@ private void onLibrosClick() {
     @FXML
     private void onAutoresClick() {
         mostrarEnConstruccion("Autores");
+    }
+
+    @FXML
+    private void onProveedoresClick() {
+        abrirModulo("GESTION_PROVEEDORES", "Proveedores", "Gestión de proveedores");
+    }
+
+    @FXML
+    private void onDevolucionesClick() {
+        abrirModulo("DEVOLUCIONES", "Devoluciones", "Devoluciones de ventas");
+    }
+
+    private void abrirModulo(String permiso, String vista, String titulo) {
+        if (!NavegacionRol.validarPermiso(permiso)) return;
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/esperanza/view/" + vista + ".fxml"));
+            Parent root = loader.load();
+            Stage ventana = new Stage();
+            ventana.initOwner(lblUsuario.getScene().getWindow());
+            ventana.initModality(Modality.WINDOW_MODAL);
+            ventana.setScene(new Scene(root));
+            ventana.setOnCloseRequest(event -> {
+                Object controller = loader.getController();
+                if ((controller instanceof ProveedoresController p && p.estaOcupado())
+                        || (controller instanceof DevolucionesController d && d.estaOcupado())) event.consume();
+            });
+            ventana.setTitle(titulo + " - Librería La Esperanza");
+            ventana.showAndWait();
+        } catch (IOException e) {
+            mostrarError("No se pudo abrir " + titulo + ".\n" + e.getMessage());
+        }
     }
 
     @FXML

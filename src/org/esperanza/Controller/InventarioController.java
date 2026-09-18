@@ -69,6 +69,7 @@ public class InventarioController implements Initializable {
     public void initialize(
             URL location,
             ResourceBundle resources) {
+        if (!org.esperanza.service.NavegacionRol.validarPermiso("GESTION_INVENTARIO")) return;
 
         configurarTabla();
 
@@ -329,6 +330,7 @@ public class InventarioController implements Initializable {
 
     @FXML
     private void onActualizar() {
+        if (!org.esperanza.service.NavegacionRol.validarPermiso("GESTION_INVENTARIO")) return;
 
         cargarInventario();
 

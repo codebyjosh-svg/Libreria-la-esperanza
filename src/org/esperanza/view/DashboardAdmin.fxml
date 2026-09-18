@@ -58,6 +58,9 @@
                     onAction="#onAutoresClick"
                     maxWidth="Infinity"/>
 
+                <Button text="Proveedores" onAction="#onProveedoresClick" maxWidth="Infinity"/>
+                <Button text="Devoluciones" onAction="#onDevolucionesClick" maxWidth="Infinity"/>
+
                 <Button
                     text="Categorías"
                     onAction="#onCategoriasClick"
