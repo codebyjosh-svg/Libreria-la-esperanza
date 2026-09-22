@@ -1,100 +1,54 @@
 package org.esperanza.controller;
 
-import java.io.IOException;
+import java.util.ArrayList;
 
-import javafx.application.Platform;
+
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
+
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
-import org.esperanza.model.Rol;
-import org.esperanza.service.NavegacionRol;
+import org.esperanza.service.Pantallas;
 import org.esperanza.service.SesionUsuario;
-import org.esperanza.controller.CarritoVentaController;
 
 public class DashboardCajeroController {
 
     @FXML private Label lblBienvenida;
     @FXML private Label lblRol;
     @FXML private Label lblPermisos;
-    @FXML private Button btnCerrarSesion;
 
     @FXML
     private void initialize() {
+        SesionUsuario sesion = SesionUsuario.getInstancia();
 
-        if (!NavegacionRol.validarRol(Rol.CAJERO)) {
-
-            Platform.runLater(
-                    this::redirigirDashboardCorrecto
+        if (!sesion.esCajero()) {
+            throw new SecurityException(
+                    "Este panel es para Cajero."
             );
-
-            return;
         }
 
-        actualizarEncabezado();
-        configurarCierre();
+        lblBienvenida.setText(sesion.getNombreCompleto());
+        lblRol.setText("Cajero");
+        lblPermisos.setText("");
     }
 
-    private void actualizarEncabezado() {
-
-        SesionUsuario sesion =
-                SesionUsuario
-                        .getInstancia();
-
-        lblBienvenida.setText(
-                "Bienvenido, "
-                + sesion.getNombreCompleto()
-        );
-
-        lblRol.setText(
-                "Rol: "
-                + sesion
-                        .getRolActual()
-                        .getNombreVisible()
-        );
-
-        lblPermisos.setText(
-                "Permisos: VENTAS | CONSULTAR_PRODUCTOS"
-        );
-    }
-
-    private void configurarCierre() {
-
-        Platform.runLater(() -> {
-
-            Stage stage = (Stage) lblBienvenida
-                    .getScene()
-                    .getWindow();
-
-            stage.setOnCloseRequest(event -> {
-
-                event.consume();
-
-                SesionUsuario
-                        .getInstancia()
-                        .cerrarSesion();
-
-                volverLogin();
-            });
-        });
+    private Stage ventana() {
+        return (Stage) lblBienvenida
+                .getScene()
+                .getWindow();
     }
 
     @FXML
     private void onNuevaVenta() {
-
-        if (!NavegacionRol.validarPermiso(
-                "VENTAS")) {
-
+        if (!SesionUsuario.getInstancia().esCajero()) {
             return;
         }
 
         try {
-
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource(
                             "/org/esperanza/view/CarritoVenta.fxml"
@@ -103,161 +57,94 @@ public class DashboardCajeroController {
 
             Parent root = loader.load();
 
-            CarritoVentaController controller =
-                    loader.getController();
+            CarritoVentaController controller = loader.getController();
 
             controller.setIdUsuario(
-                    SesionUsuario
-                            .getInstancia()
+                    SesionUsuario.getInstancia()
                             .getUsuarioActual()
                             .getId()
             );
 
-            Stage stage = (Stage) lblBienvenida
-                    .getScene()
-                    .getWindow();
+            Stage stage = ventana();
 
             stage.setOnCloseRequest(null);
-
-            stage.setScene(
-                    new Scene(root)
-            );
+            stage.setScene(new Scene(root));
 
             stage.setTitle(
-                    "Registrar Venta - Librería La Esperanza"
+                    "Nueva venta - Librería La Esperanza"
             );
 
+            stage.sizeToScene();
             stage.centerOnScreen();
 
-        } catch (IOException e) {
-
-            e.printStackTrace();
-
-            mostrarError(
-                    "No se pudo abrir el carrito de venta.\n"
-                    + e.getMessage()
-            );
+        } catch (Exception ex) {
+            Pantallas.error(ex.getMessage());
         }
     }
 
     @FXML
-    private void onConsultarProductos() {
-
-        if (!NavegacionRol.validarPermiso(
-                "CONSULTAR_PRODUCTOS")) {
-
-            return;
-        }
-
-        mostrarInfo(
-                "Productos",
-                "Acceso a consulta de productos autorizado."
+    private void onClientes() {
+        Pantallas.catalogo(
+                lblBienvenida,
+                "clientes",
+                "Clientes"
         );
     }
 
     @FXML
-    private void onCerrarSesion() {
-
-        SesionUsuario
-                .getInstancia()
-                .cerrarSesion();
-
-        volverLogin();
+    private void onConsultarProductos() {
+        ModulosCajero.stock(ventana());
     }
 
-    private void volverLogin() {
+    @FXML
+    private void onMisVentas() {
+        ModulosCajero.ventas(ventana());
+    }
 
+  @FXML
+private void onEditarClientes() {
+    EdicionClientes.mostrar(ventana());
+}
+
+    @FXML
+    private void onCerrarSesion() {
         try {
-
-            FXMLLoader loader = new FXMLLoader(
+            Parent root = FXMLLoader.load(
                     getClass().getResource(
                             "/org/esperanza/view/Login.fxml"
                     )
             );
 
-            Parent root = loader.load();
+            Stage principal = ventana();
 
-            Stage stage = (Stage) lblBienvenida
-                    .getScene()
-                    .getWindow();
+            while (principal.getOwner() instanceof Stage) {
+                principal = (Stage) principal.getOwner();
+            }
 
-            stage.setOnCloseRequest(null);
+            principal.setOnCloseRequest(null);
 
-            stage.setScene(
-                    new Scene(root)
-            );
+            SesionUsuario.getInstancia().cerrarSesion();
 
-            stage.setTitle(
-                    "Librería La Esperanza"
-            );
+            principal.setScene(new Scene(root));
 
-            stage.centerOnScreen();
+            for (Window otra : new ArrayList<>(Window.getWindows())) {
+                if (otra != principal) {
+                    if (otra instanceof Stage) {
+                        ((Stage) otra).setOnCloseRequest(null);
+                    }
 
-        } catch (IOException e) {
+                    otra.hide();
+                }
+            }
 
-            e.printStackTrace();
+            principal.setTitle("Librería La Esperanza");
+            principal.sizeToScene();
+            principal.centerOnScreen();
+            principal.show();
+            principal.toFront();
 
-            mostrarError(
-                    "No se pudo regresar al login.\n"
-                    + e.getMessage()
-            );
+        } catch (Exception ex) {
+            Pantallas.error(ex.getMessage());
         }
-    }
-
-    private void redirigirDashboardCorrecto() {
-
-        if (lblBienvenida == null
-                || lblBienvenida.getScene() == null
-                || lblBienvenida
-                        .getScene()
-                        .getWindow() == null) {
-
-            return;
-        }
-
-        Stage stage = (Stage) lblBienvenida
-                .getScene()
-                .getWindow();
-
-        if (SesionUsuario
-                .getInstancia()
-                .haySesionActiva()) {
-
-            NavegacionRol
-                    .abrirDashboardSegunRol(
-                            stage
-                    );
-
-        } else {
-
-            stage.close();
-        }
-    }
-
-    private void mostrarInfo(
-            String titulo,
-            String mensaje) {
-
-        Alert alert = new Alert(
-                Alert.AlertType.INFORMATION
-        );
-
-        alert.setTitle(titulo);
-        alert.setHeaderText(null);
-        alert.setContentText(mensaje);
-        alert.showAndWait();
-    }
-
-    private void mostrarError(
-            String mensaje) {
-
-        Alert alert = new Alert(
-                Alert.AlertType.ERROR
-        );
-
-        alert.setTitle("Error");
-        alert.setHeaderText(null);
-        alert.setContentText(mensaje);
-        alert.showAndWait();
     }
 }

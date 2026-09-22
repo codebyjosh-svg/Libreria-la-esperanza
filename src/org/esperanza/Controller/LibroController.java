@@ -3,170 +3,497 @@ package org.esperanza.controller;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
+
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
+import javafx.stage.Window;
+
 import org.esperanza.dao.LibroDAO;
 import org.esperanza.dao.impl.LibroDAOImpl;
 import org.esperanza.model.Libro;
+import org.esperanza.service.NavegacionRol;
+import org.esperanza.service.SesionUsuario;
 
 public class LibroController {
 
-    @FXML private TextField txtIsbn, txtTitulo, txtPrecio, txtIdCategoria, txtNitEditorial, txtIdProveedor, txtStockActual, txtStockMinimo;
+    @FXML private TextField txtIsbn;
+    @FXML private TextField txtTitulo;
+    @FXML private TextField txtPrecio;
+    @FXML private TextField txtIdCategoria;
+    @FXML private TextField txtNitEditorial;
+    @FXML private TextField txtIdProveedor;
+    @FXML private TextField txtStockActual;
+    @FXML private TextField txtStockMinimo;
+
     @FXML private DatePicker dpFecha;
+
+    @FXML private Button btnGuardar;
+    @FXML private Button btnLimpiar;
+    @FXML private Button btnDesactivar;
+
     @FXML private TableView<Libro> tbLibros;
-    @FXML private TableColumn<Libro, String> colIsbn, colTitulo;
+
+    @FXML private TableColumn<Libro, String> colIsbn;
+    @FXML private TableColumn<Libro, String> colTitulo;
     @FXML private TableColumn<Libro, Double> colPrecio;
     @FXML private TableColumn<Libro, Integer> colStock;
     @FXML private TableColumn<Libro, Boolean> colActivo;
-    
-    private LibroDAO libroDao = new LibroDAOImpl();
+
+    private final LibroDAO libroDao = new LibroDAOImpl();
+
     private boolean modoEdicion = false;
 
     @FXML
     public void initialize() {
-        colIsbn.setCellValueFactory(new PropertyValueFactory<>("isbn"));
-        colTitulo.setCellValueFactory(new PropertyValueFactory<>("titulo"));
-        colPrecio.setCellValueFactory(new PropertyValueFactory<>("precio"));
-        colStock.setCellValueFactory(new PropertyValueFactory<>("stockActual"));
-        colActivo.setCellValueFactory(new PropertyValueFactory<>("activo"));
+        SesionUsuario sesion = SesionUsuario.getInstancia();
+
+        if (!sesion.esAdmin() && !sesion.esBodega()) {
+            throw new SecurityException(
+                    "No tienes permiso para administrar libros."
+            );
+        }
+
+        btnDesactivar.setVisible(sesion.esAdmin());
+        btnDesactivar.setManaged(sesion.esAdmin());
+        btnDesactivar.setDisable(true);
+
+        configurarTabla();
+        limpiarFormulario();
         cargarTabla();
+
+        Platform.runLater(this::configurarCierre);
+    }
+
+    private void configurarTabla() {
+        colIsbn.setCellValueFactory(
+                new PropertyValueFactory<>("isbn")
+        );
+
+        colTitulo.setCellValueFactory(
+                new PropertyValueFactory<>("titulo")
+        );
+
+        colPrecio.setCellValueFactory(
+                new PropertyValueFactory<>("precio")
+        );
+
+        colStock.setCellValueFactory(
+                new PropertyValueFactory<>("stockActual")
+        );
+
+        colActivo.setCellValueFactory(
+                new PropertyValueFactory<>("activo")
+        );
+
+        colPrecio.setCellFactory(columna -> new TableCell<>() {
+
+            @Override
+            protected void updateItem(Double precio, boolean vacio) {
+                super.updateItem(precio, vacio);
+
+                if (vacio || precio == null) {
+                    setText(null);
+                } else {
+                    setText(
+                            String.format(Locale.US, "Q%.2f", precio)
+                    );
+                }
+            }
+        });
+
+        colActivo.setCellFactory(columna -> new TableCell<>() {
+
+            @Override
+            protected void updateItem(Boolean activo, boolean vacio) {
+                super.updateItem(activo, vacio);
+
+                if (vacio || activo == null) {
+                    setText(null);
+                } else {
+                    setText(activo ? "Activo" : "Inactivo");
+                }
+            }
+        });
     }
 
     private void cargarTabla() {
-        List<Libro> lista = libroDao.listarTodos();
-        ObservableList<Libro> obsLibros = FXCollections.observableArrayList(lista);
-        tbLibros.setItems(obsLibros);
+        List<Libro> libros = libroDao.listarTodos();
+
+        tbLibros.setItems(
+                FXCollections.observableArrayList(libros)
+        );
     }
 
     @FXML
-    void guardarLibro(ActionEvent event) {
-        // T3.4.15, 16, 17: Validaciones
-        if (txtIsbn.getText().isEmpty() || txtTitulo.getText().isEmpty() || txtPrecio.getText().isEmpty()) {
-            mostrarAlerta("Error", "Los campos ISBN, Título y Precio son obligatorios.");
+    private void guardarLibro(ActionEvent event) {
+        SesionUsuario sesion = SesionUsuario.getInstancia();
+
+        if (!sesion.esAdmin() && !sesion.esBodega()) {
+            mostrarAlerta(
+                    Alert.AlertType.ERROR,
+                    "Acceso denegado",
+                    "No tienes permiso para guardar libros."
+            );
+            return;
+        }
+
+        if (txtIsbn.getText().isBlank()
+                || txtTitulo.getText().isBlank()
+                || txtPrecio.getText().isBlank()
+                || txtIdCategoria.getText().isBlank()
+                || txtNitEditorial.getText().isBlank()
+                || txtIdProveedor.getText().isBlank()) {
+
+            mostrarAlerta(
+                    Alert.AlertType.WARNING,
+                    "Datos incompletos",
+                    "Completa ISBN, título, precio, categoría, "
+                    + "NIT de editorial y proveedor."
+            );
             return;
         }
 
         try {
-            double precio = Double.parseDouble(txtPrecio.getText());
-            if (precio <= 0) {
-                mostrarAlerta("Error", "El precio debe ser mayor a 0.");
+            double precio = Double.parseDouble(
+                    txtPrecio.getText().trim()
+            );
+
+            if (!Double.isFinite(precio) || precio <= 0) {
+                mostrarAlerta(
+                        Alert.AlertType.WARNING,
+                        "Precio inválido",
+                        "El precio debe ser mayor que cero."
+                );
                 return;
             }
 
-            int stockAct = txtStockActual.getText().isEmpty() ? 0 : Integer.parseInt(txtStockActual.getText());
-            int stockMin = txtStockMinimo.getText().isEmpty() ? 0 : Integer.parseInt(txtStockMinimo.getText());
-            if (stockMin < 0 || stockAct < 0) {
-                mostrarAlerta("Error", "El stock no puede ser negativo.");
+            int idCategoria = Integer.parseInt(
+                    txtIdCategoria.getText().trim()
+            );
+
+            int idProveedor = Integer.parseInt(
+                    txtIdProveedor.getText().trim()
+            );
+
+            if (idCategoria <= 0 || idProveedor <= 0) {
+                mostrarAlerta(
+                        Alert.AlertType.WARNING,
+                        "Datos inválidos",
+                        "Los ID de categoría y proveedor "
+                        + "deben ser mayores que cero."
+                );
                 return;
+            }
+
+            int stockActual = leerStock(txtStockActual);
+            int stockMinimo = leerStock(txtStockMinimo);
+
+            if (stockActual < 0 || stockMinimo < 0) {
+                mostrarAlerta(
+                        Alert.AlertType.WARNING,
+                        "Stock inválido",
+                        "El stock no puede ser negativo."
+                );
+                return;
+            }
+
+            LocalDate fecha = dpFecha.getValue();
+
+            if (fecha == null) {
+                fecha = LocalDate.now();
             }
 
             Libro libro = new Libro();
-            libro.setIsbn(txtIsbn.getText());
-            libro.setTitulo(txtTitulo.getText());
+
+            libro.setIsbn(txtIsbn.getText().trim());
+            libro.setTitulo(txtTitulo.getText().trim());
             libro.setPrecio(precio);
-            
-            if (dpFecha.getValue() != null) {
-                libro.setFechaPublicacion(Date.valueOf(dpFecha.getValue()));
-            } else {
-                libro.setFechaPublicacion(Date.valueOf(LocalDate.now())); 
-            }
+            libro.setFechaPublicacion(Date.valueOf(fecha));
+            libro.setIdCategoria(idCategoria);
+            libro.setNitEditorial(txtNitEditorial.getText().trim());
+            libro.setIdProveedor(idProveedor);
+            libro.setStockActual(stockActual);
+            libro.setStockMinimo(stockMinimo);
 
-            libro.setIdCategoria(txtIdCategoria.getText().isEmpty() ? 1 : Integer.parseInt(txtIdCategoria.getText()));
-            libro.setNitEditorial(txtNitEditorial.getText().isEmpty() ? "1001-A" : txtNitEditorial.getText());
-            libro.setIdProveedor(txtIdProveedor.getText().isEmpty() ? 1 : Integer.parseInt(txtIdProveedor.getText()));
-            libro.setStockActual(stockAct);
-            libro.setStockMinimo(stockMin);
+            boolean guardado;
 
-         
-            boolean exito;
             if (modoEdicion) {
-                exito = libroDao.actualizar(libro);
+                guardado = libroDao.actualizar(libro);
             } else {
-                exito = libroDao.insertar(libro);
+                guardado = libroDao.insertar(libro);
             }
 
-            if (exito) {
-                mostrarAlerta("Éxito", "Libro guardado correctamente.");
-                limpiarFormulario();
-                cargarTabla();
-            } else {
-                mostrarAlerta("Error", "No se pudo guardar en la base de datos.");
+            if (!guardado) {
+                mostrarAlerta(
+                        Alert.AlertType.ERROR,
+                        "No se pudo guardar",
+                        "Revisa que el ISBN no esté duplicado "
+                        + "y que la categoría, editorial y proveedor "
+                        + "existan en la base de datos."
+                );
+                return;
             }
 
-        } catch (NumberFormatException e) {
-            mostrarAlerta("Error", "El precio, stocks y campos ID deben ser valores numéricos válidos.");
-        }
-    }
+            mostrarAlerta(
+                    Alert.AlertType.INFORMATION,
+                    "Libros",
+                    modoEdicion
+                            ? "Libro actualizado correctamente."
+                            : "Libro registrado correctamente."
+            );
 
-    @FXML
-    void seleccionarLibro(MouseEvent event) {
-        Libro seleccionado = tbLibros.getSelectionModel().getSelectedItem();
-        if (seleccionado != null) {
-            modoEdicion = true;
-            txtIsbn.setText(seleccionado.getIsbn());
-            txtIsbn.setDisable(true);
-            txtTitulo.setText(seleccionado.getTitulo());
-            txtPrecio.setText(String.valueOf(seleccionado.getPrecio()));
-            txtIdCategoria.setText(String.valueOf(seleccionado.getIdCategoria()));
-            txtNitEditorial.setText(seleccionado.getNitEditorial());
-            txtIdProveedor.setText(String.valueOf(seleccionado.getIdProveedor()));
-            txtStockActual.setText(String.valueOf(seleccionado.getStockActual()));
-            txtStockMinimo.setText(String.valueOf(seleccionado.getStockMinimo()));
-            
-            if (seleccionado.getFechaPublicacion() != null) {
-                dpFecha.setValue(seleccionado.getFechaPublicacion().toLocalDate());
-            }
-        }
-    }
-
-    @FXML
-    void desactivarLibro(ActionEvent event) {
-        
-        if (txtIsbn.getText().isEmpty()) {
-            mostrarAlerta("Atención", "Seleccione un libro de la tabla para desactivar.");
-            return;
-        }
-        
-        boolean exito = libroDao.eliminar(txtIsbn.getText());
-        if (exito) {
-            mostrarAlerta("Éxito", "El libro se ha desactivado (baja lógica).");
             limpiarFormulario();
             cargarTabla();
+
+        } catch (NumberFormatException ex) {
+            mostrarAlerta(
+                    Alert.AlertType.WARNING,
+                    "Valores inválidos",
+                    "Escribe un precio numérico y números enteros "
+                    + "en categoría, proveedor y stock."
+            );
+        }
+    }
+
+    private int leerStock(TextField campo) {
+        String texto = campo.getText().trim();
+
+        if (texto.isEmpty()) {
+            return 0;
+        }
+
+        return Integer.parseInt(texto);
+    }
+
+    @FXML
+    private void seleccionarLibro(MouseEvent event) {
+        Libro seleccionado = tbLibros
+                .getSelectionModel()
+                .getSelectedItem();
+
+        if (seleccionado == null) {
+            return;
+        }
+
+        modoEdicion = true;
+
+        txtIsbn.setText(seleccionado.getIsbn());
+        txtIsbn.setDisable(true);
+
+        txtTitulo.setText(seleccionado.getTitulo());
+
+        txtPrecio.setText(
+                String.valueOf(seleccionado.getPrecio())
+        );
+
+        txtIdCategoria.setText(
+                String.valueOf(seleccionado.getIdCategoria())
+        );
+
+        txtNitEditorial.setText(
+                seleccionado.getNitEditorial()
+        );
+
+        txtIdProveedor.setText(
+                String.valueOf(seleccionado.getIdProveedor())
+        );
+
+        txtStockActual.setText(
+                String.valueOf(seleccionado.getStockActual())
+        );
+
+        // El stock existente se cambia desde inventario.
+        txtStockActual.setDisable(true);
+
+        txtStockMinimo.setText(
+                String.valueOf(seleccionado.getStockMinimo())
+        );
+
+        if (seleccionado.getFechaPublicacion() != null) {
+            dpFecha.setValue(
+                    seleccionado.getFechaPublicacion().toLocalDate()
+            );
         } else {
-            mostrarAlerta("Error", "No se pudo desactivar el libro.");
+            dpFecha.setValue(null);
+        }
+
+        btnGuardar.setText("Guardar cambios");
+
+        btnDesactivar.setDisable(
+                !SesionUsuario.getInstancia().esAdmin()
+                || !seleccionado.isActivo()
+        );
+    }
+
+    @FXML
+    private void desactivarLibro(ActionEvent event) {
+        if (!SesionUsuario.getInstancia().esAdmin()) {
+            mostrarAlerta(
+                    Alert.AlertType.ERROR,
+                    "Acceso denegado",
+                    "Solo el administrador puede desactivar libros."
+            );
+            return;
+        }
+
+        Libro seleccionado = tbLibros
+                .getSelectionModel()
+                .getSelectedItem();
+
+        if (!modoEdicion || seleccionado == null) {
+            mostrarAlerta(
+                    Alert.AlertType.WARNING,
+                    "Selecciona un libro",
+                    "Selecciona el libro que deseas desactivar."
+            );
+            return;
+        }
+
+        if (!seleccionado.isActivo()) {
+            mostrarAlerta(
+                    Alert.AlertType.INFORMATION,
+                    "Libros",
+                    "Este libro ya está inactivo."
+            );
+            return;
+        }
+
+        boolean desactivado = libroDao.eliminar(
+                seleccionado.getIsbn()
+        );
+
+        if (desactivado) {
+            mostrarAlerta(
+                    Alert.AlertType.INFORMATION,
+                    "Libros",
+                    "Libro desactivado correctamente."
+            );
+
+            limpiarFormulario();
+            cargarTabla();
+
+        } else {
+            mostrarAlerta(
+                    Alert.AlertType.ERROR,
+                    "Error",
+                    "No se pudo desactivar el libro."
+            );
         }
     }
 
     @FXML
-    void limpiarFormulario() {
+    private void limpiarFormulario() {
         modoEdicion = false;
+
+        tbLibros.getSelectionModel().clearSelection();
+
         txtIsbn.setDisable(false);
+        txtStockActual.setDisable(false);
+
         txtIsbn.clear();
         txtTitulo.clear();
         txtPrecio.clear();
-        dpFecha.setValue(null);
         txtIdCategoria.clear();
         txtNitEditorial.clear();
         txtIdProveedor.clear();
-        txtStockActual.clear();
-        txtStockMinimo.clear();
+
+        txtStockActual.setText("0");
+        txtStockMinimo.setText("0");
+
+        dpFecha.setValue(null);
+
+        btnGuardar.setText("Guardar");
+        btnDesactivar.setDisable(true);
     }
 
-    private void mostrarAlerta(String titulo, String contenido) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(titulo);
-        alert.setHeaderText(null);
-        alert.setContentText(contenido);
-        alert.showAndWait();
+    @FXML
+    private void onVolverDashboard() {
+        if (tbLibros.getScene() == null
+                || tbLibros.getScene().getWindow() == null) {
+            return;
+        }
+
+        Stage ventana = (Stage) tbLibros
+                .getScene()
+                .getWindow();
+
+        // Retira el evento de cierre de la pantalla Libros.
+        ventana.setOnCloseRequest(null);
+
+        Window propietario = ventana.getOwner();
+
+        if (propietario != null) {
+            // Si es una ventana secundaria, solo se cierra.
+            // El dashboard del propietario ya está abierto.
+            ventana.close();
+
+            if (propietario instanceof Stage) {
+                Stage principal = (Stage) propietario;
+
+                principal.toFront();
+                principal.requestFocus();
+            }
+
+            return;
+        }
+
+        if (!SesionUsuario.getInstancia().haySesionActiva()) {
+            ventana.close();
+            return;
+        }
+
+        // Si es la ventana principal, se reutiliza.
+        NavegacionRol.abrirDashboardSegunRol(ventana);
+    }
+
+    private void configurarCierre() {
+        if (tbLibros.getScene() == null
+                || tbLibros.getScene().getWindow() == null) {
+            return;
+        }
+
+        Stage ventana = (Stage) tbLibros
+                .getScene()
+                .getWindow();
+
+        ventana.setOnCloseRequest(event -> {
+            event.consume();
+            onVolverDashboard();
+        });
+    }
+
+    private void mostrarAlerta(
+            Alert.AlertType tipo,
+            String titulo,
+            String mensaje) {
+
+        Alert alerta = new Alert(tipo);
+
+        alerta.setTitle(titulo);
+        alerta.setHeaderText(null);
+        alerta.setContentText(mensaje);
+
+        if (tbLibros.getScene() != null
+                && tbLibros.getScene().getWindow() != null) {
+
+            alerta.initOwner(
+                    tbLibros.getScene().getWindow()
+            );
+        }
+
+        alerta.showAndWait();
     }
 }

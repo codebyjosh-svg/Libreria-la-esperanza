@@ -17,17 +17,10 @@
         styleClass="fondo">
 
     <top>
-
-        <VBox
-                spacing="6"
-                styleClass="encabezado">
+        <VBox spacing="6" styleClass="encabezado">
 
             <padding>
-                <Insets
-                        top="22"
-                        right="24"
-                        bottom="16"
-                        left="24"/>
+                <Insets top="22" right="24" bottom="16" left="24"/>
             </padding>
 
             <Label
@@ -35,23 +28,16 @@
                     styleClass="titulo"/>
 
             <Label
-                    text="Listado, alta y desactivación de usuarios"
+                    text="Crear, editar, activar y desactivar usuarios"
                     styleClass="subtitulo"/>
-
         </VBox>
-
     </top>
 
     <center>
-
         <VBox spacing="12">
 
             <padding>
-                <Insets
-                        top="18"
-                        right="24"
-                        bottom="18"
-                        left="24"/>
+                <Insets top="18" right="24" bottom="18" left="24"/>
             </padding>
 
             <TableView
@@ -59,7 +45,6 @@
                     VBox.vgrow="ALWAYS">
 
                 <columns>
-
                     <TableColumn
                             fx:id="colId"
                             text="ID"
@@ -99,18 +84,14 @@
                             fx:id="colAccion"
                             text="Acción"
                             prefWidth="105"/>
-
                 </columns>
-
             </TableView>
 
-            <HBox
-                    spacing="10"
-                    alignment="CENTER_RIGHT">
+            <Label
+                    fx:id="lblMensaje"
+                    wrapText="true"/>
 
-                <Label
-                        fx:id="lblMensaje"
-                        HBox.hgrow="ALWAYS"/>
+            <HBox spacing="10" alignment="CENTER_RIGHT">
 
                 <Button
                         text="Regresar"
@@ -123,14 +104,18 @@
                         styleClass="btn-secundario"/>
 
                 <Button
+                        fx:id="btnEditar"
+                        text="Editar seleccionado"
+                        onAction="#onEditarUsuario"
+                        disable="true"
+                        styleClass="btn-secundario"/>
+
+                <Button
                         text="+ Nuevo usuario"
                         onAction="#onNuevoUsuario"
                         styleClass="btn-principal"/>
-
             </HBox>
-
         </VBox>
-
     </center>
 
 </BorderPane>

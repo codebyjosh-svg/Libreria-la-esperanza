@@ -1,20 +1,26 @@
 package org.esperanza.controller;
 
 import java.io.IOException;
+import java.util.Objects;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.GridPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import org.esperanza.dao.CajeroDao;
+import org.esperanza.dao.UsuarioDao;
 import org.esperanza.model.Usuario;
 import org.esperanza.service.SesionUsuario;
-import org.esperanza.dao.UsuarioDao;
 
 public class UsuariosController {
 
@@ -27,38 +33,85 @@ public class UsuariosController {
     @FXML private TableColumn<Usuario, String> colCorreo;
     @FXML private TableColumn<Usuario, Boolean> colActivo;
     @FXML private TableColumn<Usuario, Void> colAccion;
+
     @FXML private Label lblMensaje;
+    @FXML private Button btnEditar;
 
     private final UsuarioDao usuarioDao = new UsuarioDao();
-    private final ObservableList<Usuario> datos = FXCollections.observableArrayList();
-    private Usuario usuarioActual;
+    private final CajeroDao edicionDao = new CajeroDao();
+
+    private final ObservableList<Usuario> datos =
+            FXCollections.observableArrayList();
 
     @FXML
     private void initialize() {
-        usuarioActual = SesionUsuario.getInstancia().getUsuarioActual();
+        if (!esAdminActual()) {
+            throw new SecurityException(
+                    "Solo un administrador puede gestionar usuarios."
+            );
+        }
 
-        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
-        colUsuario.setCellValueFactory(new PropertyValueFactory<>("usrname"));
-        colNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
-        colApellido.setCellValueFactory(new PropertyValueFactory<>("apellido"));
-        colRol.setCellValueFactory(new PropertyValueFactory<>("rol"));
-        colCorreo.setCellValueFactory(new PropertyValueFactory<>("correo"));
-        colActivo.setCellValueFactory(new PropertyValueFactory<>("activo"));
+        colId.setCellValueFactory(
+                new PropertyValueFactory<>("id")
+        );
+        colUsuario.setCellValueFactory(
+                new PropertyValueFactory<>("usrname")
+        );
+        colNombre.setCellValueFactory(
+                new PropertyValueFactory<>("nombre")
+        );
+        colApellido.setCellValueFactory(
+                new PropertyValueFactory<>("apellido")
+        );
+        colRol.setCellValueFactory(
+                new PropertyValueFactory<>("rol")
+        );
+        colCorreo.setCellValueFactory(
+                new PropertyValueFactory<>("correo")
+        );
+        colActivo.setCellValueFactory(
+                new PropertyValueFactory<>("activo")
+        );
+
+        tablaUsuarios.setItems(datos);
+
+        btnEditar.disableProperty().bind(
+                tablaUsuarios.getSelectionModel()
+                        .selectedItemProperty()
+                        .isNull()
+        );
 
         configurarEstado();
         configurarAccion();
         cargarUsuarios();
     }
 
+    private boolean esAdminActual() {
+        return SesionUsuario.getInstancia().esAdmin();
+    }
+
+    private boolean puedeGestionar(Usuario usuario) {
+        Usuario actual =
+                SesionUsuario.getInstancia().getUsuarioActual();
+
+        return esAdminActual()
+                && actual != null
+                && usuario != null
+                && usuario.getId() != actual.getId();
+    }
+
     private void configurarEstado() {
         colActivo.setCellFactory(col -> new TableCell<>() {
+
             @Override
             protected void updateItem(Boolean activo, boolean empty) {
                 super.updateItem(activo, empty);
+
                 if (empty || activo == null) {
                     setText(null);
                     return;
                 }
+
                 setText(activo ? "Activo" : "Inactivo");
             }
         });
@@ -71,8 +124,11 @@ public class UsuariosController {
 
             {
                 btn.setOnAction(e -> {
-                    Usuario usuario = getTableView().getItems().get(getIndex());
-                    cambiarEstado(usuario);
+                    Usuario usuario = getTableRow().getItem();
+
+                    if (usuario != null) {
+                        cambiarEstado(usuario);
+                    }
                 });
             }
 
@@ -80,43 +136,165 @@ public class UsuariosController {
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
 
-                if (empty || getIndex() < 0 || getIndex() >= getTableView().getItems().size()) {
+                if (empty
+                        || getIndex() < 0
+                        || getIndex() >= getTableView().getItems().size()) {
                     setGraphic(null);
                     return;
                 }
 
-                Usuario usuario = getTableView().getItems().get(getIndex());
+                Usuario usuario =
+                        getTableView().getItems().get(getIndex());
 
                 if (!puedeGestionar(usuario)) {
                     setGraphic(null);
                     return;
                 }
 
-                btn.setText(usuario.isActivo() ? "Desactivar" : "Activar");
-                btn.setStyle(usuario.isActivo()
-                        ? "-fx-background-color:#dc2626; -fx-text-fill:white;"
-                        : "-fx-background-color:#16a34a; -fx-text-fill:white;");
+                btn.setText(
+                        usuario.isActivo() ? "Desactivar" : "Activar"
+                );
+
+                btn.setStyle(
+                        usuario.isActivo()
+                                ? "-fx-background-color:#dc2626;"
+                                  + "-fx-text-fill:white;"
+                                : "-fx-background-color:#16a34a;"
+                                  + "-fx-text-fill:white;"
+                );
 
                 setGraphic(btn);
             }
         });
     }
 
-    private boolean esAdminActual() {
-        return usuarioActual != null
-                && usuarioActual.getRol() != null
-                && usuarioActual.getRol().equalsIgnoreCase("admin");
-    }
+    @FXML
+    private void onEditarUsuario(ActionEvent event) {
+        if (!esAdminActual()) {
+            mostrarError(
+                    "Solo un administrador puede editar usuarios."
+            );
+            return;
+        }
 
-    private boolean puedeGestionar(Usuario usuario) {
-        return esAdminActual()
-                && usuario != null
-                && usuario.getId() != usuarioActual.getId();
+        Usuario seleccionado =
+                tablaUsuarios.getSelectionModel().getSelectedItem();
+
+        if (seleccionado == null) {
+            mostrarError("Selecciona un usuario para editar.");
+            return;
+        }
+
+        Dialog<ButtonType> dialogo = new Dialog<>();
+        dialogo.initOwner(tablaUsuarios.getScene().getWindow());
+        dialogo.setTitle("Editar usuario");
+        dialogo.setHeaderText(
+                "Modificar datos de " + seleccionado.getUsrname()
+        );
+
+        TextField txtUsuario = new TextField(
+                Objects.toString(seleccionado.getUsrname(), "")
+        );
+
+        TextField txtNombre = new TextField(
+                Objects.toString(seleccionado.getNombre(), "")
+        );
+
+        TextField txtApellido = new TextField(
+                Objects.toString(seleccionado.getApellido(), "")
+        );
+
+        TextField txtCorreo = new TextField(
+                Objects.toString(seleccionado.getCorreo(), "")
+        );
+
+        txtUsuario.setPrefColumnCount(25);
+
+        GridPane formulario = new GridPane();
+        formulario.setPadding(new Insets(20));
+        formulario.setHgap(12);
+        formulario.setVgap(12);
+
+        formulario.addRow(0, new Label("Usuario:"), txtUsuario);
+        formulario.addRow(1, new Label("Nombre:"), txtNombre);
+        formulario.addRow(2, new Label("Apellido:"), txtApellido);
+        formulario.addRow(3, new Label("Correo:"), txtCorreo);
+
+        dialogo.getDialogPane().setContent(formulario);
+
+        ButtonType guardar = new ButtonType(
+                "Guardar cambios",
+                ButtonBar.ButtonData.OK_DONE
+        );
+
+        ButtonType cancelar = new ButtonType(
+                "Cancelar",
+                ButtonBar.ButtonData.CANCEL_CLOSE
+        );
+
+        dialogo.getDialogPane().getButtonTypes().addAll(
+                guardar, cancelar
+        );
+
+        dialogo.getDialogPane()
+                .lookupButton(guardar)
+                .addEventFilter(ActionEvent.ACTION, e -> {
+                    try {
+                        if (!esAdminActual()) {
+                            throw new SecurityException(
+                                    "Solo Admin puede editar usuarios."
+                            );
+                        }
+
+                        edicionDao.editarUsuario(
+                                seleccionado.getId(),
+                                txtUsuario.getText().trim(),
+                                txtNombre.getText().trim(),
+                                txtApellido.getText().trim(),
+                                txtCorreo.getText().trim()
+                        );
+
+                    } catch (Exception ex) {
+                        // Mantiene abierto el formulario si hay un error.
+                        e.consume();
+
+                        Alert alerta = new Alert(Alert.AlertType.ERROR);
+                        alerta.initOwner(
+                                dialogo.getDialogPane()
+                                        .getScene()
+                                        .getWindow()
+                        );
+                        alerta.setTitle("Editar usuario");
+                        alerta.setHeaderText(null);
+                        alerta.setContentText(ex.getMessage());
+                        alerta.showAndWait();
+                    }
+                });
+
+        if (dialogo.showAndWait().orElse(cancelar) == guardar) {
+            cargarUsuarios();
+
+            // Vuelve a seleccionar al usuario editado.
+            for (Usuario usuario : datos) {
+                if (usuario.getId() == seleccionado.getId()) {
+                    tablaUsuarios.getSelectionModel().select(usuario);
+                    tablaUsuarios.scrollTo(usuario);
+                    break;
+                }
+            }
+
+            lblMensaje.setStyle("-fx-text-fill:#166534;");
+            lblMensaje.setText(
+                    "Usuario actualizado correctamente."
+            );
+        }
     }
 
     private void cambiarEstado(Usuario usuario) {
         if (!puedeGestionar(usuario)) {
-            mostrarError("No puedes cambiar el estado de este usuario.");
+            mostrarError(
+                    "No puedes cambiar el estado de este usuario."
+            );
             return;
         }
 
@@ -125,73 +303,115 @@ public class UsuariosController {
 
         Alert alerta = new Alert(
                 Alert.AlertType.CONFIRMATION,
-                "¿Deseas " + accion + " al usuario " + usuario.getUsrname() + "?",
+                "¿Deseas " + accion + " al usuario "
+                        + usuario.getUsrname() + "?",
                 ButtonType.YES,
                 ButtonType.NO
         );
 
+        alerta.initOwner(tablaUsuarios.getScene().getWindow());
         alerta.setHeaderText(null);
-        alerta.setTitle(nuevoEstado ? "Activar usuario" : "Desactivar usuario");
+        alerta.setTitle(
+                nuevoEstado ? "Activar usuario" : "Desactivar usuario"
+        );
 
-        if (alerta.showAndWait().orElse(ButtonType.NO) != ButtonType.YES) return;
+        if (alerta.showAndWait().orElse(ButtonType.NO)
+                != ButtonType.YES) {
+            return;
+        }
 
-        if (usuarioDao.cambiarEstadoUsuario(usuario.getId(), nuevoEstado)) {
+        if (!puedeGestionar(usuario)) {
+            mostrarError(
+                    "No puedes cambiar el estado de este usuario."
+            );
+            return;
+        }
+
+        if (usuarioDao.cambiarEstadoUsuario(
+                usuario.getId(), nuevoEstado)) {
+
             cargarUsuarios();
+
             lblMensaje.setStyle("-fx-text-fill:#166534;");
             lblMensaje.setText(
                     "Usuario " + usuario.getUsrname()
-                    + (nuevoEstado ? " activado." : " desactivado.")
+                            + (nuevoEstado
+                                    ? " activado."
+                                    : " desactivado.")
             );
+
         } else {
-            mostrarError("No se pudo cambiar el estado del usuario.");
+            mostrarError(
+                    "No se pudo cambiar el estado del usuario."
+            );
         }
     }
 
     @FXML
     private void onNuevoUsuario(ActionEvent event) {
         if (!esAdminActual()) {
-            mostrarError("Solo un administrador puede gestionar usuarios.");
+            mostrarError(
+                    "Solo un administrador puede gestionar usuarios."
+            );
             return;
         }
 
         try {
             FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/org/esperanza/view/UsuarioAlta.fxml")
+                    getClass().getResource(
+                            "/org/esperanza/view/UsuarioAlta.fxml"
+                    )
             );
 
             Parent root = loader.load();
             Stage stage = new Stage();
 
-            stage.setTitle("Alta de usuario - Librería La Esperanza");
+            stage.initOwner(tablaUsuarios.getScene().getWindow());
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.setTitle(
+                    "Alta de usuario - Librería La Esperanza"
+            );
             stage.setScene(new Scene(root, 520, 610));
             stage.setResizable(false);
             stage.setOnHidden(e -> cargarUsuarios());
             stage.show();
 
         } catch (IOException e) {
-            mostrarError("No se pudo abrir el formulario: " + e.getMessage());
+            mostrarError(
+                    "No se pudo abrir el formulario: " + e.getMessage()
+            );
         }
     }
 
     @FXML
     private void onActualizar(ActionEvent event) {
-        usuarioActual = SesionUsuario.getInstancia().getUsuarioActual();
         cargarUsuarios();
     }
 
-@FXML
-private void onVolverDashboard() {
-    Stage stage = (Stage) tablaUsuarios.getScene().getWindow();
-    stage.close();
-}
+    @FXML
+    private void onVolverDashboard() {
+        Stage stage =
+                (Stage) tablaUsuarios.getScene().getWindow();
+
+        stage.close();
+    }
 
     private void cargarUsuarios() {
+        if (!esAdminActual()) {
+            datos.clear();
+            mostrarError(
+                    "Solo un administrador puede consultar usuarios."
+            );
+            return;
+        }
+
         datos.setAll(usuarioDao.listarUsuarios());
-        tablaUsuarios.setItems(datos);
         tablaUsuarios.refresh();
 
         lblMensaje.setStyle("-fx-text-fill:#374151;");
-        lblMensaje.setText("Usuarios encontrados: " + datos.size());
+        lblMensaje.setText(
+                "Usuarios encontrados: " + datos.size()
+        );
     }
 
     private void mostrarError(String mensaje) {
@@ -202,6 +422,11 @@ private void onVolverDashboard() {
         alert.setTitle("Gestión de Usuarios");
         alert.setHeaderText(null);
         alert.setContentText(mensaje);
+
+        if (tablaUsuarios.getScene() != null) {
+            alert.initOwner(tablaUsuarios.getScene().getWindow());
+        }
+
         alert.showAndWait();
     }
 }
