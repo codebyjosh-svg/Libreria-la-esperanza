@@ -9,6 +9,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 
 import javafx.scene.control.Label;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
@@ -105,6 +106,52 @@ public class DashboardCajeroController {
 private void onEditarClientes() {
     EdicionClientes.mostrar(ventana());
 }
+
+    @FXML
+    private void onCambiarContrasena() {
+        if (SesionUsuario.getInstancia().getUsuarioActual() == null) {
+            Pantallas.error(
+                    "No se pudo identificar al usuario que inició sesión."
+            );
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource(
+                            "/org/esperanza/view/CambioContrasenaDashboard.fxml"
+                    )
+            );
+
+            Parent root = loader.load();
+
+            CambioContrasenaController controller =
+                    loader.getController();
+
+            controller.setIdUsuarioActual(
+                    SesionUsuario.getInstancia()
+                            .getUsuarioActual()
+                            .getId()
+            );
+
+            Stage ventana = new Stage();
+            ventana.setTitle("Cambiar Contraseña");
+            ventana.setScene(new Scene(root));
+
+            ventana.initOwner(lblBienvenida.getScene().getWindow());
+            ventana.initModality(Modality.WINDOW_MODAL);
+
+            ventana.setResizable(false);
+            ventana.centerOnScreen();
+            ventana.showAndWait();
+
+        } catch (Exception ex) {
+            Pantallas.error(
+                    "No se pudo abrir la pantalla de Cambio de Contraseña.\n"
+                    + ex.getMessage()
+            );
+        }
+    }
 
     @FXML
     private void onCerrarSesion() {

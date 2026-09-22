@@ -86,6 +86,12 @@
                         maxWidth="Infinity"
                         styleClass="sidebar-button"/>
 
+                <Button
+                        text="Cambiar contraseña"
+                        onAction="#onCambiarContrasena"
+                        maxWidth="Infinity"
+                        styleClass="sidebar-button"/>
+
             </VBox>
         </ScrollPane>
     </left>
@@ -157,6 +163,14 @@
                     <Button
                             text="Stock crítico"
                             onAction="#onVerLibrosCriticos"
+                            prefWidth="185"
+                            prefHeight="60"
+                            wrapText="true"
+                            styleClass="quick-button"/>
+
+                    <Button
+                            text="Cambiar contraseña"
+                            onAction="#onCambiarContrasena"
                             prefWidth="185"
                             prefHeight="60"
                             wrapText="true"

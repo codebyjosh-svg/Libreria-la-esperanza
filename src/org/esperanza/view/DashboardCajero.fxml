@@ -78,6 +78,11 @@
                     onAction="#onEditarClientes"
                     maxWidth="Infinity"/>
 
+            <Button
+                    text="Cambiar contraseña"
+                    onAction="#onCambiarContrasena"
+                    maxWidth="Infinity"/>
+
         </VBox>
     </left>
 
@@ -123,6 +128,12 @@
                 <Button
                         text="Editar clientes"
                         onAction="#onEditarClientes"
+                        prefWidth="180"
+                        prefHeight="65"/>
+
+                <Button
+                        text="Cambiar contraseña"
+                        onAction="#onCambiarContrasena"
                         prefWidth="180"
                         prefHeight="65"/>
 
