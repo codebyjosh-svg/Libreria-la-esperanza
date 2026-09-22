@@ -284,15 +284,6 @@ public class VentaDao {
 
                 throw e;
 
-            } finally {
-
-                try {
-
-                    conexion.setAutoCommit(true);
-
-                } catch (SQLException ignored) {
-
-                }
             }
         }
 

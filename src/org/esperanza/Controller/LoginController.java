@@ -167,6 +167,13 @@ public class LoginController {
                 );
             }
 
+            case ERROR_BASE_DATOS -> {
+                mostrarAdvertencia(
+                        "Error de conexión",
+                        "No se pudo consultar la base de datos. Inténtalo de nuevo."
+                );
+            }
+
             default -> {
 
                 mostrarAdvertencia(

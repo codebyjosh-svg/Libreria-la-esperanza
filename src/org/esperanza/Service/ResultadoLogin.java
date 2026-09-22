@@ -9,7 +9,8 @@ public class ResultadoLogin {
         CAMPOS_VACIOS,
         USUARIO_NO_ENCONTRADO,
         CONTRASENA_INCORRECTA,
-        USUARIO_INACTIVO
+        USUARIO_INACTIVO,
+        ERROR_BASE_DATOS
     }
 
     private final Estado estado;

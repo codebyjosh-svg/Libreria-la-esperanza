@@ -3,16 +3,27 @@ package org.esperanza.dao;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import org.esperanza.Model.Usuario;
 import org.esperanza.util.Conexion;
 import org.esperanza.util.PasswordUtil;
 
 public class UsuarioDao {
 
-    public Usuario iniciarSesion(String username, String passwordHash) {
+    private final ProveedorConexion conexiones;
+
+    public UsuarioDao() {
+        this(() -> Conexion.getInstancia().conectar());
+    }
+
+    public UsuarioDao(ProveedorConexion conexiones) {
+        this.conexiones = Objects.requireNonNull(conexiones, "conexiones");
+    }
+
+    public Usuario iniciarSesion(String username, String passwordHash) throws SQLException {
         String sql = "{call sp_iniciar_sesion(?, ?)}";
 
-        try (Connection con = Conexion.getInstancia().conectar();
+        try (Connection con = conexiones.conectar();
              CallableStatement cs = con.prepareCall(sql)) {
 
             cs.setString(1, username);
@@ -22,16 +33,13 @@ public class UsuarioDao {
                 return rs.next() ? mapearUsuario(rs) : null;
             }
 
-        } catch (SQLException e) {
-            System.err.println("Error al iniciar sesión: " + e.getMessage());
-            return null;
         }
     }
 
-    public Usuario buscarPorUsername(String username) {
+    public Usuario buscarPorUsername(String username) throws SQLException {
         String sql = "{call sp_buscar_usuario(?)}";
 
-        try (Connection con = Conexion.getInstancia().conectar();
+        try (Connection con = conexiones.conectar();
              CallableStatement cs = con.prepareCall(sql)) {
 
             cs.setString(1, username);
@@ -40,9 +48,6 @@ public class UsuarioDao {
                 return rs.next() ? mapearUsuario(rs) : null;
             }
 
-        } catch (SQLException e) {
-            System.err.println("Error al buscar usuario: " + e.getMessage());
-            return null;
         }
     }
 
@@ -190,11 +195,9 @@ public class UsuarioDao {
         } catch (SQLException ignored) {
         }
 
-        try {
-            usuario.setActivo(rs.getBoolean("activo"));
-        } catch (SQLException ignored) {
-            usuario.setActivo(true);
-        }
+        // El procedimiento de login debe devolver activo: sin este campo
+        // no se puede autorizar la sesión con seguridad.
+        usuario.setActivo(rs.getBoolean("activo"));
 
         return usuario;
     }
