@@ -3,7 +3,6 @@ package org.esperanza.view;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -11,26 +10,45 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import org.esperanza.controller.TicketVentaController;
+import org.esperanza.dao.CajeroDao;
 import org.esperanza.dao.DatosVentaDao;
 import org.esperanza.model.DetalleVenta;
 import org.esperanza.model.Venta;
+import org.esperanza.service.SesionUsuario;
 
-public class ComprobanteVenta {
+public final class ComprobanteVenta {
 
-    public static void mostrar(
+    private ComprobanteVenta() {
+    }
+
+    public static TicketVentaController mostrar(
             Venta venta,
             List<DetalleVenta> detalles,
-            Stage stage
-    ) throws IOException, SQLException {
+            Stage ventana) throws IOException, SQLException {
 
-        DatosVentaDao datosDao = new DatosVentaDao();
+        SesionUsuario sesion = SesionUsuario.getInstancia();
 
-        String cliente = datosDao.obtenerNombreCliente(
+        if (!sesion.esAdmin()
+                && !(sesion.esCajero()
+                && sesion.getUsuarioActual().getId()
+                        == venta.getIdUsuario())) {
+
+            throw new SecurityException(
+                    "No puedes abrir esta factura."
+            );
+        }
+
+        DatosVentaDao datos = new DatosVentaDao();
+
+        String cliente = datos.obtenerNombreCliente(
                 venta.getCuiCliente()
         );
 
-        Map<String, String> titulos =
-                datosDao.obtenerTitulos(detalles);
+        String cajero = new CajeroDao().nombreCajero(
+                venta.getIdUsuario()
+        );
+
+        var titulos = datos.obtenerTitulos(detalles);
 
         FXMLLoader loader = new FXMLLoader(
                 ComprobanteVenta.class.getResource(
@@ -40,8 +58,7 @@ public class ComprobanteVenta {
 
         Parent root = loader.load();
 
-        TicketVentaController controller =
-                loader.getController();
+        TicketVentaController controller = loader.getController();
 
         controller.setDatosVenta(
                 venta.getIdVenta(),
@@ -58,19 +75,27 @@ public class ComprobanteVenta {
                 venta.getCuiCliente()
         );
 
-        controller.setDetalles(
-                detalles,
-                titulos
+        controller.setNombreCajero(
+                cajero,
+                venta.getIdUsuario()
         );
 
-        stage.setScene(new Scene(root));
-        stage.setTitle(
-                "Comprobante de venta #" + venta.getIdVenta()
+        controller.setDetalles(detalles, titulos);
+
+        ventana.setScene(new Scene(root));
+
+        ventana.setTitle(
+                "Factura #" + venta.getIdVenta()
         );
 
-        stage.centerOnScreen();
-    }
+        ventana.setOnCloseRequest(event -> {
+            event.consume();
+            controller.volver();
+        });
 
-    private ComprobanteVenta() {
+        ventana.sizeToScene();
+        ventana.centerOnScreen();
+
+        return controller;
     }
 }

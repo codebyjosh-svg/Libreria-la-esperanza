@@ -1,28 +1,29 @@
 package org.esperanza.controller;
 
 import java.sql.SQLException;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
+
 import org.esperanza.dao.MovimientoInventarioDAO;
 import org.esperanza.dao.MovimientoInventarioDAO.LibroDisponible;
+import org.esperanza.service.Pantallas;
+import org.esperanza.service.SesionUsuario;
 
 public class IngresoInventarioController {
 
-    @FXML
-    private ComboBox<LibroDisponible> cmbLibro;
-    @FXML
-    private Label lblIsbn;
-    @FXML
-    private Label lblStockActual;
-    @FXML
-    private TextField txtCantidad;
-    @FXML
-    private TextArea txtObservacion;
+    @FXML private ComboBox<LibroDisponible> cmbLibro;
+    @FXML private Label lblIsbn;
+    @FXML private Label lblStockActual;
+    @FXML private TextField txtCantidad;
+    @FXML private TextArea txtObservacion;
+    @FXML private Button btnCancelar;
 
     private final MovimientoInventarioDAO movimientoDAO =
             new MovimientoInventarioDAO();
@@ -31,16 +32,18 @@ public class IngresoInventarioController {
 
     @FXML
     public void initialize() {
-
         txtCantidad.setTextFormatter(
                 new TextFormatter<String>(cambio ->
                         cambio.getControlNewText().matches("\\d*")
-                                ? cambio
-                                : null
+                                ? cambio : null
                 )
         );
 
         cmbLibro.setOnAction(event -> mostrarDatosLibro());
+
+        btnCancelar.setText("Volver al Dashboard");
+        btnCancelar.setPrefWidth(160);
+        btnCancelar.setOnAction(event -> onCancelar());
 
         cargarLibros();
     }
@@ -50,24 +53,19 @@ public class IngresoInventarioController {
     }
 
     private void cargarLibros() {
-
         try {
-
             cmbLibro.getItems().setAll(
                     movimientoDAO.listarLibrosDisponibles()
             );
-
-        } catch (SQLException e) {
-
+        } catch (SQLException ex) {
             mostrarError(
                     "No se pudieron cargar los libros.\n"
-                    + e.getMessage()
+                    + ex.getMessage()
             );
         }
     }
 
     private void mostrarDatosLibro() {
-
         LibroDisponible libro = cmbLibro.getValue();
 
         if (libro == null) {
@@ -77,14 +75,12 @@ public class IngresoInventarioController {
         }
 
         lblIsbn.setText(libro.getIsbn());
-
         lblStockActual.setText(
                 String.valueOf(libro.getStockActual())
         );
     }
 
     public int obtenerCantidadIngresada() {
-
         String texto = txtCantidad.getText();
 
         if (texto == null || texto.isBlank()) {
@@ -97,7 +93,7 @@ public class IngresoInventarioController {
 
         try {
             cantidad = Integer.parseInt(texto);
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException ex) {
             throw new IllegalArgumentException(
                     "La cantidad ingresada no es válida."
             );
@@ -114,8 +110,15 @@ public class IngresoInventarioController {
 
     @FXML
     private void onRegistrarClick() {
-
         try {
+            SesionUsuario sesion = SesionUsuario.getInstancia();
+
+            if (!sesion.tienePermiso("ENTRADAS_SALIDAS")) {
+                mostrarError(
+                        "No tienes permiso para registrar ingresos."
+                );
+                return;
+            }
 
             LibroDisponible libro = cmbLibro.getValue();
 
@@ -125,7 +128,9 @@ public class IngresoInventarioController {
                 );
             }
 
-            if (idUsuarioActual <= 0) {
+            if (sesion.getUsuarioActual() == null
+                    || idUsuarioActual <= 0
+                    || sesion.getUsuarioActual().getId() != idUsuarioActual) {
                 throw new IllegalArgumentException(
                         "No se pudo identificar al usuario."
                 );
@@ -133,10 +138,8 @@ public class IngresoInventarioController {
 
             int cantidad = obtenerCantidadIngresada();
 
-            String observacion =
-                    txtObservacion.getText() == null
-                            ? ""
-                            : txtObservacion.getText().trim();
+            String observacion = txtObservacion.getText() == null
+                    ? "" : txtObservacion.getText().trim();
 
             boolean registrado =
                     movimientoDAO.registrarIngresoInventario(
@@ -147,7 +150,6 @@ public class IngresoInventarioController {
                     );
 
             if (registrado) {
-
                 mostrarConfirmacion(
                         "Ingreso registrado correctamente.\n"
                         + "Libro: " + libro.getTitulo()
@@ -156,23 +158,27 @@ public class IngresoInventarioController {
 
                 limpiarFormulario();
                 cargarLibros();
+            } else {
+                mostrarError("No se pudo registrar el ingreso.");
             }
 
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ex) {
+            mostrarError(ex.getMessage());
 
-            mostrarError(e.getMessage());
-
-        } catch (SQLException e) {
-
+        } catch (SQLException ex) {
             mostrarError(
                     "No se pudo registrar el ingreso.\n"
-                    + e.getMessage()
+                    + ex.getMessage()
             );
         }
     }
 
-    private void limpiarFormulario() {
+    @FXML
+    private void onCancelar() {
+        Pantallas.volver(cmbLibro);
+    }
 
+    private void limpiarFormulario() {
         cmbLibro.getSelectionModel().clearSelection();
         txtCantidad.clear();
         txtObservacion.clear();
@@ -181,26 +187,24 @@ public class IngresoInventarioController {
     }
 
     private void mostrarConfirmacion(String mensaje) {
-
-        Alert alert = new Alert(
-                Alert.AlertType.INFORMATION
-        );
-
-        alert.setTitle("Ingreso de Inventario");
-        alert.setHeaderText("Operación exitosa");
-        alert.setContentText(mensaje);
-        alert.showAndWait();
+        Alert alerta = new Alert(Alert.AlertType.INFORMATION);
+        alerta.initOwner(cmbLibro.getScene().getWindow());
+        alerta.setTitle("Ingreso de Inventario");
+        alerta.setHeaderText("Operación exitosa");
+        alerta.setContentText(mensaje);
+        alerta.showAndWait();
     }
 
     private void mostrarError(String mensaje) {
+        Alert alerta = new Alert(Alert.AlertType.ERROR);
 
-        Alert alert = new Alert(
-                Alert.AlertType.ERROR
-        );
+        if (cmbLibro.getScene() != null) {
+            alerta.initOwner(cmbLibro.getScene().getWindow());
+        }
 
-        alert.setTitle("Ingreso de Inventario");
-        alert.setHeaderText("No se pudo completar la operación");
-        alert.setContentText(mensaje);
-        alert.showAndWait();
+        alerta.setTitle("Ingreso de Inventario");
+        alerta.setHeaderText("No se pudo completar la operación");
+        alerta.setContentText(mensaje);
+        alerta.showAndWait();
     }
 }

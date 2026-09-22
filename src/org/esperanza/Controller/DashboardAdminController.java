@@ -16,6 +16,7 @@ import org.esperanza.model.Rol;
 import org.esperanza.model.Usuario;
 import org.esperanza.service.NavegacionRol;
 import org.esperanza.service.SesionUsuario;
+import org.esperanza.service.Pantallas;
 
 public class DashboardAdminController {
 
@@ -31,10 +32,7 @@ public class DashboardAdminController {
             return;
         }
 
-        usuarioActual = SesionUsuario
-                .getInstancia()
-                .getUsuarioActual();
-
+        usuarioActual = SesionUsuario.getInstancia().getUsuarioActual();
         actualizarUsuario();
     }
 
@@ -49,32 +47,40 @@ public class DashboardAdminController {
         actualizarUsuario();
     }
 
-@FXML
-private void onUsuariosClick() {
-    if (!NavegacionRol.validarPermiso("GESTION_USUARIOS")) {
-        return;
+    @FXML
+    private void onUsuariosClick() {
+        if (!NavegacionRol.validarPermiso("GESTION_USUARIOS")) {
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource(
+                            "/org/esperanza/view/Usuarios.fxml"
+                    )
+            );
+
+            Parent root = loader.load();
+
+            Stage ventana = new Stage();
+            ventana.initOwner(lblUsuario.getScene().getWindow());
+            ventana.initModality(Modality.WINDOW_MODAL);
+            ventana.setScene(new Scene(root));
+
+            ventana.setTitle(
+                    "Gestión de Usuarios - Librería La Esperanza"
+            );
+
+            ventana.centerOnScreen();
+            ventana.showAndWait();
+
+        } catch (IOException ex) {
+            mostrarError(
+                    "No se pudo abrir Gestión de Usuarios.\n"
+                    + ex.getMessage()
+            );
+        }
     }
-
-    try {
-        FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/org/esperanza/view/Usuarios.fxml")
-        );
-
-        Parent root = loader.load();
-
-        Stage ventana = new Stage();
-        ventana.initOwner(lblUsuario.getScene().getWindow());
-        ventana.initModality(Modality.WINDOW_MODAL);
-        ventana.setScene(new Scene(root));
-        ventana.setTitle("Gestión de Usuarios - Librería La Esperanza");
-        ventana.centerOnScreen();
-        ventana.showAndWait();
-
-    } catch (IOException e) {
-        e.printStackTrace();
-        mostrarError("No se pudo abrir Gestión de Usuarios.\n" + e.getMessage());
-    }
-}
 
     @FXML
     private void onCambiarContrasenaClick() {
@@ -97,60 +103,57 @@ private void onUsuariosClick() {
             CambioContrasenaController controller =
                     loader.getController();
 
-            controller.setIdUsuarioActual(
-                    usuarioActual.getId()
-            );
+            controller.setIdUsuarioActual(usuarioActual.getId());
 
             Stage ventana = new Stage();
             ventana.setTitle("Cambiar Contraseña");
             ventana.setScene(new Scene(root));
 
-            ventana.initOwner(
-                    lblUsuario
-                            .getScene()
-                            .getWindow()
-            );
-
-            ventana.initModality(
-                    Modality.WINDOW_MODAL
-            );
+            ventana.initOwner(lblUsuario.getScene().getWindow());
+            ventana.initModality(Modality.WINDOW_MODAL);
 
             ventana.setResizable(false);
             ventana.centerOnScreen();
             ventana.showAndWait();
 
-        } catch (IOException e) {
-            e.printStackTrace();
-
+        } catch (IOException ex) {
             mostrarError(
                     "No se pudo abrir la pantalla de Cambio de Contraseña.\n"
-                    + e.getMessage()
+                    + ex.getMessage()
             );
         }
     }
 
-@FXML
-private void onLibrosClick() {
-    try {
-        FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/org/esperanza/view/Libros.fxml")
-        );
+    @FXML
+    private void onLibrosClick() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource(
+                            "/org/esperanza/view/Libros.fxml"
+                    )
+            );
 
-        Parent root = loader.load();
+            Parent root = loader.load();
 
-        Stage ventana = new Stage();
-        ventana.initOwner(lblUsuario.getScene().getWindow());
-        ventana.initModality(Modality.WINDOW_MODAL);
-        ventana.setScene(new Scene(root));
-        ventana.setTitle("Gestión de Libros - Librería La Esperanza");
-        ventana.centerOnScreen();
-        ventana.showAndWait();
+            Stage ventana =
+                    (Stage) lblUsuario.getScene().getWindow();
 
-    } catch (IOException e) {
-        e.printStackTrace();
-        mostrarError("No se pudo abrir el módulo de libros.\n" + e.getMessage());
+            ventana.setOnCloseRequest(null);
+            ventana.setScene(new Scene(root));
+
+            ventana.setTitle(
+                    "Gestión de Libros - Librería La Esperanza"
+            );
+
+            ventana.sizeToScene();
+            ventana.centerOnScreen();
+
+        } catch (IOException ex) {
+            mostrarError(
+                    "No se pudo abrir Libros.\n" + ex.getMessage()
+            );
+        }
     }
-}
 
     @FXML
     private void onAutoresClick() {
@@ -159,12 +162,23 @@ private void onLibrosClick() {
 
     @FXML
     private void onCategoriasClick() {
-        mostrarEnConstruccion("Categorías");
+        Pantallas.catalogo(
+                lblUsuario, "categorias", "Categorías"
+        );
+    }
+
+    @FXML
+    private void onProveedoresClick() {
+        Pantallas.catalogo(
+                lblUsuario, "proveedores", "Proveedores"
+        );
     }
 
     @FXML
     private void onEditorialesClick() {
-        mostrarEnConstruccion("Editoriales");
+        Pantallas.catalogo(
+                lblUsuario, "editoriales", "Editoriales"
+        );
     }
 
     @FXML
@@ -180,7 +194,9 @@ private void onLibrosClick() {
 
         try {
             FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/org/esperanza/view/CarritoVenta.fxml")
+                    getClass().getResource(
+                            "/org/esperanza/view/CarritoVenta.fxml"
+                    )
             );
 
             Parent root = loader.load();
@@ -188,19 +204,16 @@ private void onLibrosClick() {
             CarritoVentaController controller = loader.getController();
             controller.setIdUsuario(usuarioActual.getId());
 
-            Stage stage = (Stage) lblUsuario
-                    .getScene()
-                    .getWindow();
+            Stage stage = (Stage) lblUsuario.getScene().getWindow();
 
             stage.setScene(new Scene(root));
             stage.setTitle("Registrar Venta - Librería La Esperanza");
             stage.centerOnScreen();
 
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ex) {
             mostrarError(
                     "No se pudo abrir el carrito de venta.\n"
-                    + e.getMessage()
+                    + ex.getMessage()
             );
         }
     }
@@ -212,45 +225,26 @@ private void onLibrosClick() {
 
     @FXML
     private void onDetalleVentasClick() {
-        if (!NavegacionRol.validarPermiso("VENTAS")) {
+        if (!NavegacionRol.validarRol(Rol.ADMIN)) {
             return;
         }
 
-        try {
-            FXMLLoader loader =
-                    new FXMLLoader(
-                            getClass().getResource(
-                                    "/org/esperanza/view/DashboardVentasDia.fxml"
-                            )
-                    );
+        DetalleVentasAdmin.mostrar(
+                (Stage) lblUsuario.getScene().getWindow()
+        );
+    }
 
-            Parent root = loader.load();
-
-            Stage stage =
-                    (Stage) lblUsuario
-                            .getScene()
-                            .getWindow();
-
-            stage.setOnCloseRequest(null);
-
-            stage.setScene(
-                    new Scene(root)
-            );
-
-            stage.setTitle(
-                    "Ventas del Día - Librería La Esperanza"
-            );
-
-            stage.centerOnScreen();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-
-            mostrarError(
-                    "No se pudo abrir el resumen de ventas.\n"
-                    + e.getMessage()
-            );
+    @FXML
+    private void onVentasDiaClick() {
+        if (!NavegacionRol.validarRol(Rol.ADMIN)) {
+            return;
         }
+
+        Pantallas.abrir(
+                lblUsuario,
+                "DashboardVentasDia",
+                "Ventas del Día"
+        );
     }
 
     @FXML
@@ -260,10 +254,7 @@ private void onLibrosClick() {
 
     @FXML
     private void onCerrarSesionClick() {
-        SesionUsuario
-                .getInstancia()
-                .cerrarSesion();
-
+        SesionUsuario.getInstancia().cerrarSesion();
         usuarioActual = null;
 
         try {
@@ -275,26 +266,15 @@ private void onLibrosClick() {
 
             Parent root = loader.load();
 
-            Stage stage = (Stage) lblUsuario
-                    .getScene()
-                    .getWindow();
+            Stage stage = (Stage) lblUsuario.getScene().getWindow();
 
-            stage.setScene(
-                    new Scene(root)
-            );
-
-            stage.setTitle(
-                    "Librería La Esperanza"
-            );
-
+            stage.setScene(new Scene(root));
+            stage.setTitle("Librería La Esperanza");
             stage.centerOnScreen();
 
-        } catch (IOException e) {
-            e.printStackTrace();
-
+        } catch (IOException ex) {
             mostrarError(
-                    "No se pudo cerrar la sesión.\n"
-                    + e.getMessage()
+                    "No se pudo cerrar la sesión.\n" + ex.getMessage()
             );
         }
     }
@@ -306,44 +286,29 @@ private void onLibrosClick() {
             return;
         }
 
-        Stage stage = (Stage) lblUsuario
-                .getScene()
-                .getWindow();
+        Stage stage = (Stage) lblUsuario.getScene().getWindow();
 
-        if (SesionUsuario
-                .getInstancia()
-                .haySesionActiva()) {
-
-            NavegacionRol
-                    .abrirDashboardSegunRol(stage);
-
+        if (SesionUsuario.getInstancia().haySesionActiva()) {
+            NavegacionRol.abrirDashboardSegunRol(stage);
         } else {
             stage.close();
         }
     }
 
     private void mostrarEnConstruccion(String modulo) {
-        Alert alert = new Alert(
-                Alert.AlertType.INFORMATION
-        );
-
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(modulo);
         alert.setHeaderText(null);
 
         alert.setContentText(
-                "El módulo "
-                + modulo
-                + " se encuentra en construcción."
+                "El módulo " + modulo + " se encuentra en construcción."
         );
 
         alert.showAndWait();
     }
 
     private void mostrarError(String mensaje) {
-        Alert alert = new Alert(
-                Alert.AlertType.ERROR
-        );
-
+        Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
         alert.setHeaderText(null);
         alert.setContentText(mensaje);

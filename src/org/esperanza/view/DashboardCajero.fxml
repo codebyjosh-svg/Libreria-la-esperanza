@@ -1,39 +1,134 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-            fx:controller="org.esperanza.controller.DashboardCajeroController"
-            stylesheets="@style/dashboard.css" styleClass="root-dashboard">
+<BorderPane
+        xmlns:fx="http://javafx.com/fxml/1"
+        fx:controller="org.esperanza.controller.DashboardCajeroController"
+        prefWidth="950"
+        prefHeight="620"
+        stylesheets="@style/dashboard.css">
+
     <top>
-        <HBox alignment="CENTER_LEFT" spacing="20" styleClass="header-bar header-cajero">
+        <HBox spacing="12" alignment="CENTER_LEFT">
+
             <padding>
-                <Insets top="15" right="20" bottom="15" left="20"/>
+                <Insets top="15" right="15" bottom="15" left="15"/>
             </padding>
-            <Label text="📚 Librería La Esperanza" styleClass="header-title"/>
-            <HBox HBox.hgrow="ALWAYS"/>
-            <Label fx:id="lblBienvenida" styleClass="header-user"/>
-            <Button fx:id="btnCerrarSesion" text="Cerrar aplicación" onAction="#onCerrarSesion" styleClass="btn-logout"/>
+
+            <Label
+                    text="Panel de Control"
+                    style="-fx-font-size:16px; -fx-font-weight:bold;"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <Label fx:id="lblBienvenida"/>
+
+            <Button
+                    text="Cerrar Sesión"
+                    onAction="#onCerrarSesion"/>
+
         </HBox>
     </top>
-    <center>
-        <VBox alignment="CENTER" spacing="25" styleClass="content-area">
+
+    <left>
+        <VBox prefWidth="200" spacing="10">
+
             <padding>
-                <Insets top="40" right="40" bottom="40" left="40"/>
+                <Insets top="15" right="10" bottom="15" left="10"/>
             </padding>
-            <Label text="Dashboard Cajero" styleClass="dash-title"/>
-            <Label fx:id="lblRol" styleClass="dash-subtitle"/>
-            <Label fx:id="lblPermisos" styleClass="dash-permisos" wrapText="true"/>
-            <HBox alignment="CENTER" spacing="20">
-                <Button text="Nueva Venta" onAction="#onNuevaVenta" styleClass="btn-accion" prefWidth="200" prefHeight="50"/>
-                <Button text="Consultar Productos" onAction="#onConsultarProductos" styleClass="btn-accion" prefWidth="220" prefHeight="50"/>
-            </HBox>
-            <Label text="Panel destinado al personal de caja (rol CAJERO)." styleClass="dash-info"/>
+
+            <Label
+                    text="Librería La Esperanza"
+                    style="-fx-font-weight:bold;"/>
+
+            <Label fx:id="lblRol"/>
+
+            <Label
+                    fx:id="lblPermisos"
+                    visible="false"
+                    managed="false"/>
+
+            <Separator/>
+
+            <Button
+                    text="Nueva venta"
+                    onAction="#onNuevaVenta"
+                    maxWidth="Infinity"/>
+
+            <Button
+                    text="Clientes"
+                    onAction="#onClientes"
+                    maxWidth="Infinity"/>
+
+            <Button
+                    text="Consultar stock"
+                    onAction="#onConsultarProductos"
+                    maxWidth="Infinity"/>
+
+            <Button
+                    text="Mis ventas y facturas"
+                    onAction="#onMisVentas"
+                    maxWidth="Infinity"/>
+
+            <Button
+                    text="Editar clientes"
+                    onAction="#onEditarClientes"
+                    maxWidth="Infinity"/>
+
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="20">
+
+            <padding>
+                <Insets top="25" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <Label
+                    text="Bienvenido"
+                    style="-fx-font-size:18px; -fx-font-weight:bold;"/>
+
+            <Label text="Accesos rápidos a las funciones de caja"/>
+
+            <FlowPane hgap="15" vgap="15">
+
+                <Button
+                        text="Nueva venta"
+                        onAction="#onNuevaVenta"
+                        prefWidth="180"
+                        prefHeight="65"/>
+
+                <Button
+                        text="Clientes"
+                        onAction="#onClientes"
+                        prefWidth="180"
+                        prefHeight="65"/>
+
+                <Button
+                        text="Consultar stock"
+                        onAction="#onConsultarProductos"
+                        prefWidth="180"
+                        prefHeight="65"/>
+
+                <Button
+                        text="Mis ventas y facturas"
+                        onAction="#onMisVentas"
+                        prefWidth="180"
+                        prefHeight="65"/>
+
+                <Button
+                        text="Editar clientes"
+                        onAction="#onEditarClientes"
+                        prefWidth="180"
+                        prefHeight="65"/>
+
+            </FlowPane>
+
         </VBox>
     </center>
+
 </BorderPane>
