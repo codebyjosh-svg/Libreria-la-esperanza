@@ -13,8 +13,10 @@
     xmlns="http://javafx.com/javafx"
     xmlns:fx="http://javafx.com/fxml"
     fx:controller="org.esperanza.controller.DashboardAdminController"
-    prefWidth="900"
-    prefHeight="600">
+    stylesheets="@style/dashboard.css"
+    styleClass="root-dashboard"
+    prefWidth="960"
+    prefHeight="620">
 
     <left>
 
@@ -144,6 +146,30 @@
 
             <Label
                 text="Accesos rápidos a las funciones principales del sistema"/>
+
+            <HBox alignment="CENTER_LEFT" spacing="12">
+                <Label text="Indicadores generales" styleClass="kpi-section-title"/>
+                <HBox HBox.hgrow="ALWAYS"/>
+                <Button fx:id="btnActualizarIndicadores" text="Actualizar"
+                        onAction="#onActualizarIndicadoresClick"/>
+            </HBox>
+
+            <HBox alignment="CENTER_LEFT" spacing="12">
+                <VBox spacing="8" prefWidth="210" HBox.hgrow="ALWAYS" styleClass="kpi-card">
+                    <Label text="Ventas totales" styleClass="kpi-label"/>
+                    <Label fx:id="lblVentasTotales" text="—" styleClass="kpi-value"/>
+                </VBox>
+                <VBox spacing="8" prefWidth="210" HBox.hgrow="ALWAYS" styleClass="kpi-card">
+                    <Label text="Libros activos" styleClass="kpi-label"/>
+                    <Label fx:id="lblCantidadLibros" text="—" styleClass="kpi-value"/>
+                </VBox>
+                <VBox spacing="8" prefWidth="210" HBox.hgrow="ALWAYS" styleClass="kpi-card">
+                    <Label text="Usuarios activos" styleClass="kpi-label"/>
+                    <Label fx:id="lblUsuariosActivos" text="—" styleClass="kpi-value"/>
+                </VBox>
+            </HBox>
+            <Label fx:id="lblEstadoIndicadores" text="Cargando indicadores..."
+                   wrapText="true" styleClass="kpi-status"/>
 
             <HBox spacing="10">
 

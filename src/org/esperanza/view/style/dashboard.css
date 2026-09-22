@@ -81,3 +81,37 @@
 .btn-accion:disabled {
     -fx-background-color: #94a3b8;
 }
+
+.kpi-section-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e3a5f;
+}
+
+.kpi-card {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-border-color: #dbe4ef;
+    -fx-border-radius: 10;
+    -fx-padding: 16;
+}
+
+.kpi-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #475569;
+}
+
+.kpi-value {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e3a5f;
+}
+
+.kpi-status {
+    -fx-font-size: 12px;
+    -fx-text-fill: #64748b;
+}
+
+.kpi-status-error {
+    -fx-text-fill: #b91c1c;
+}
