@@ -27,6 +27,12 @@ public class PruebaVentas {
         int insertados;
         int actualizacionesStock;
         int stockDisponible = 100;
+        boolean usuarioAdmin = true;
+        boolean usuarioActivo = true;
+        int autorizaciones;
+        BigDecimal subtotalRegistrado;
+        BigDecimal descuentoRegistrado;
+        BigDecimal totalRegistrado;
 
         @SuppressWarnings("unchecked")
         static <T> T proxy(Class<T> tipo, InvocationHandler handler) {
@@ -66,9 +72,22 @@ public class PruebaVentas {
             return proxy(PreparedStatement.class, (obj, metodo, args) -> {
                 String nombre = metodo.getName();
 
+                if (nombre.equals("setBigDecimal") && sql.contains("INSERT INTO ventas")) {
+                    switch ((int) args[0]) {
+                        case 1 -> subtotalRegistrado = (BigDecimal) args[1];
+                        case 2 -> descuentoRegistrado = (BigDecimal) args[1];
+                        case 3 -> totalRegistrado = (BigDecimal) args[1];
+                        default -> throw new AssertionError("Parámetro inesperado");
+                    }
+                    return null;
+                }
                 if (nombre.startsWith("set") || nombre.equals("close")) return null;
 
                 if (nombre.equals("executeQuery")) {
+                    if (sql.contains("FROM usuarios")) {
+                        autorizaciones++;
+                        return crearResultadoUsuario();
+                    }
                     return crearResultadoStock();
                 }
 
@@ -118,6 +137,25 @@ public class PruebaVentas {
                     default -> throw new UnsupportedOperationException(
                             "Metodo ResultSet no simulado: " + metodo.getName()
                     );
+                };
+            });
+        }
+
+        private ResultSet crearResultadoUsuario() {
+            boolean[] leido = {false};
+            return proxy(ResultSet.class, (obj, metodo, args) -> {
+                return switch (metodo.getName()) {
+                    case "next" -> {
+                        if (!leido[0]) {
+                            leido[0] = true;
+                            yield true;
+                        }
+                        yield false;
+                    }
+                    case "getBoolean" -> usuarioActivo;
+                    case "getString" -> usuarioAdmin ? "ADMIN" : "CAJERO";
+                    case "close" -> null;
+                    default -> throw new UnsupportedOperationException(metodo.getName());
                 };
             });
         }

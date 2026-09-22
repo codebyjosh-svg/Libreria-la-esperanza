@@ -74,7 +74,7 @@ public class TicketVentaController {
         }
  
         if (lblDescuento != null) {
-            lblDescuento.setText("Descuento: Q0.00");
+            lblDescuento.setText("Descuento aplicado: -Q0.00");
         }
  
         if (lblTotal != null) {
@@ -141,7 +141,7 @@ public class TicketVentaController {
         if (lblDescuento != null) {
  
             lblDescuento.setText(
-                    "Descuento: Q"
+                    "Descuento aplicado: -Q"
                     + dinero(descuento)
             );
         }

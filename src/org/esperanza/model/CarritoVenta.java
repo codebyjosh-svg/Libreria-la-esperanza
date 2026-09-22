@@ -159,8 +159,16 @@ public class CarritoVenta {
     public Venta confirmarVenta(
             long cuiCliente,
             int idUsuario,
-            VentaDao ventaDao)
-            throws SQLException {
+            VentaDao ventaDao) throws SQLException {
+        return confirmarVenta(cuiCliente, idUsuario, ventaDao,
+                DescuentoVenta.sinDescuento());
+    }
+
+    public Venta confirmarVenta(
+            long cuiCliente,
+            int idUsuario,
+            VentaDao ventaDao,
+            DescuentoVenta descuento) throws SQLException {
 
         Venta venta =
                 Objects.requireNonNull(
@@ -168,7 +176,8 @@ public class CarritoVenta {
                 ).registrar(
                         cuiCliente,
                         idUsuario,
-                        getDetalles()
+                        getDetalles(),
+                        Objects.requireNonNull(descuento, "descuento")
                 );
 
         vaciar();
