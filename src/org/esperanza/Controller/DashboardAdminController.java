@@ -100,8 +100,8 @@ public class DashboardAdminController {
 
             Parent root = loader.load();
 
-            CambioContrasenaController controller =
-                    loader.getController();
+            CambioContrasenaController controller
+                    = loader.getController();
 
             controller.setIdUsuarioActual(usuarioActual.getId());
 
@@ -135,8 +135,8 @@ public class DashboardAdminController {
 
             Parent root = loader.load();
 
-            Stage ventana =
-                    (Stage) lblUsuario.getScene().getWindow();
+            Stage ventana
+                    = (Stage) lblUsuario.getScene().getWindow();
 
             ventana.setOnCloseRequest(null);
             ventana.setScene(new Scene(root));
@@ -250,6 +250,54 @@ public class DashboardAdminController {
     @FXML
     private void onClientesClick() {
         mostrarEnConstruccion("Clientes");
+    }
+
+    @FXML
+    private void onReportesClick() {
+
+        if (!NavegacionRol.validarPermiso("VER_REPORTES")) {
+            return;
+        }
+
+        try {
+
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource(
+                            "/org/esperanza/view/ReporteInventario.fxml"
+                    )
+            );
+
+            Parent root = loader.load();
+
+            Stage ventana = new Stage();
+
+            ventana.initOwner(
+                    lblUsuario.getScene().getWindow()
+            );
+
+            ventana.initModality(
+                    Modality.WINDOW_MODAL
+            );
+
+            ventana.setScene(
+                    new Scene(root)
+            );
+
+            ventana.setTitle(
+                    "Reportes de Inventario - Librería La Esperanza"
+            );
+
+            ventana.setResizable(true);
+            ventana.centerOnScreen();
+            ventana.showAndWait();
+
+        } catch (IOException ex) {
+
+            mostrarError(
+                    "No se pudo abrir Reportes de Inventario.\n"
+                    + ex.getMessage()
+            );
+        }
     }
 
     @FXML

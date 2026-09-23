@@ -148,7 +148,7 @@
 
                 <Button
                         text="Reportes"
-                        onAction="#onClientesClick"
+                        onAction="#onReportesClick"
                         prefWidth="150"
                         prefHeight="60"/>
 
