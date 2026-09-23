@@ -1,4 +1,4 @@
-package org.esperanza.Model;
+package org.esperanza.model;
 
 import java.math.BigDecimal;
 

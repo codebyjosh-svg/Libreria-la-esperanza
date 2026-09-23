@@ -9,8 +9,8 @@ import java.util.List;
 import java.sql.Date;
 import java.time.LocalDate;
 
-import org.esperanza.Model.LibroMasVendido;
-import org.esperanza.Model.StockValorizado;
+import org.esperanza.model.LibroMasVendido;
+import org.esperanza.model.StockValorizado;
 import org.esperanza.util.Conexion;
 
 public class ReporteInventarioDao {

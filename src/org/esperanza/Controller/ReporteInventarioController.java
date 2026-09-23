@@ -19,8 +19,8 @@ import java.time.LocalDate;
 import javafx.scene.control.DatePicker;
 
 import org.esperanza.dao.ReporteInventarioDao;
-import org.esperanza.Model.LibroMasVendido;
-import org.esperanza.Model.StockValorizado;
+import org.esperanza.model.LibroMasVendido;
+import org.esperanza.model.StockValorizado;
 
 public class ReporteInventarioController implements Initializable {
 
