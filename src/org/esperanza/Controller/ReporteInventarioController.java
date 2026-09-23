@@ -11,12 +11,14 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import org.esperanza.dao.ReporteInventarioDao;
 import org.esperanza.Model.LibroMasVendido;
+import org.esperanza.Model.StockValorizado;
 
 public class ReporteInventarioController implements Initializable {
 
@@ -38,13 +40,41 @@ public class ReporteInventarioController implements Initializable {
     private final ObservableList<LibroMasVendido> ranking =
             FXCollections.observableArrayList();
 
+    @FXML
+    private TableView<StockValorizado> tablaStockValorizado;
+
+    @FXML
+    private TableColumn<StockValorizado, String> colStockIsbn;
+
+    @FXML
+    private TableColumn<StockValorizado, String> colStockTitulo;
+
+    @FXML
+    private TableColumn<StockValorizado, Integer> colStockActual;
+
+    @FXML
+    private TableColumn<StockValorizado, BigDecimal> colPrecio;
+
+    @FXML
+    private TableColumn<StockValorizado, BigDecimal> colValorInventario;
+
+    @FXML
+    private Label lblValorTotalInventario;
+
+    private final ObservableList<StockValorizado> stockValorizado =
+            FXCollections.observableArrayList();
+
     private final ReporteInventarioDao reporteDao =
             new ReporteInventarioDao();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+
         configurarTablaRanking();
+        configurarTablaStock();
+
         cargarRanking();
+        cargarStockValorizado();
     }
 
     private void configurarTablaRanking() {
@@ -66,6 +96,31 @@ public class ReporteInventarioController implements Initializable {
         );
 
         tablaLibrosMasVendidos.setItems(ranking);
+    }
+
+    private void configurarTablaStock() {
+
+        colStockIsbn.setCellValueFactory(
+                new PropertyValueFactory<>("isbn")
+        );
+
+        colStockTitulo.setCellValueFactory(
+                new PropertyValueFactory<>("titulo")
+        );
+
+        colStockActual.setCellValueFactory(
+                new PropertyValueFactory<>("stockActual")
+        );
+
+        colPrecio.setCellValueFactory(
+                new PropertyValueFactory<>("precio")
+        );
+
+        colValorInventario.setCellValueFactory(
+                new PropertyValueFactory<>("valorInventario")
+        );
+
+        tablaStockValorizado.setItems(stockValorizado);
     }
 
     private void cargarRanking() {
@@ -90,12 +145,62 @@ public class ReporteInventarioController implements Initializable {
         }
     }
 
+    private void cargarStockValorizado() {
+
+        try {
+
+            List<StockValorizado> libros =
+                    reporteDao.listarStockValorizado();
+
+            stockValorizado.clear();
+
+            if (libros != null) {
+                stockValorizado.addAll(libros);
+            }
+
+            actualizarValorTotal();
+
+        } catch (SQLException ex) {
+
+            mostrarError(
+                    "No se pudo cargar la valoración del inventario.\n"
+                    + ex.getMessage()
+            );
+        }
+    }
+
+    private void actualizarValorTotal() {
+
+        BigDecimal total = BigDecimal.ZERO;
+
+        for (StockValorizado libro : stockValorizado) {
+
+            if (libro.getValorInventario() != null) {
+                total = total.add(libro.getValorInventario());
+            }
+        }
+
+        lblValorTotalInventario.setText(
+                String.format(
+                        "Valor total: Q%.2f",
+                        total
+                )
+        );
+    }
+
     private void mostrarError(String mensaje) {
 
-        Alert alerta = new Alert(Alert.AlertType.ERROR);
+        Alert alerta =
+                new Alert(Alert.AlertType.ERROR);
 
-        alerta.setTitle("Reportes de Inventario");
-        alerta.setHeaderText("No se pudo cargar el reporte");
+        alerta.setTitle(
+                "Reportes de Inventario"
+        );
+
+        alerta.setHeaderText(
+                "No se pudo cargar el reporte"
+        );
+
         alerta.setContentText(mensaje);
 
         alerta.showAndWait();
