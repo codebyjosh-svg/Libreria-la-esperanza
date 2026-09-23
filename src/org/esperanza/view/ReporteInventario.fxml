@@ -50,8 +50,6 @@
                                 left="25"/>
                     </padding>
 
-                    <!-- Filtros -->
-
                     <VBox spacing="10"
                           styleClass="section-card">
 
@@ -73,16 +71,16 @@
 
                             <Button fx:id="btnFiltrar"
                                     text="Filtrar"
+                                    onAction="#onFiltrarClick" 
                                     styleClass="primary-button"/>
 
                             <Button fx:id="btnLimpiar"
-                                    text="Limpiar"/>
+                                    text="Limpiar"
+                                    onAction="#onLimpiarClick" />
 
                         </HBox>
 
                     </VBox>
-
-                    <!-- Ranking de libros -->
 
                     <VBox spacing="10"
                           styleClass="section-card">

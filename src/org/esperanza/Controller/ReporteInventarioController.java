@@ -15,6 +15,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import java.time.LocalDate;
+import javafx.scene.control.DatePicker;
 
 import org.esperanza.dao.ReporteInventarioDao;
 import org.esperanza.Model.LibroMasVendido;
@@ -37,8 +39,8 @@ public class ReporteInventarioController implements Initializable {
     @FXML
     private TableColumn<LibroMasVendido, BigDecimal> colTotalVendido;
 
-    private final ObservableList<LibroMasVendido> ranking =
-            FXCollections.observableArrayList();
+    private final ObservableList<LibroMasVendido> ranking
+            = FXCollections.observableArrayList();
 
     @FXML
     private TableView<StockValorizado> tablaStockValorizado;
@@ -61,11 +63,17 @@ public class ReporteInventarioController implements Initializable {
     @FXML
     private Label lblValorTotalInventario;
 
-    private final ObservableList<StockValorizado> stockValorizado =
-            FXCollections.observableArrayList();
+    @FXML
+    private DatePicker dpFechaInicio;
 
-    private final ReporteInventarioDao reporteDao =
-            new ReporteInventarioDao();
+    @FXML
+    private DatePicker dpFechaFin;
+
+    private final ObservableList<StockValorizado> stockValorizado
+            = FXCollections.observableArrayList();
+
+    private final ReporteInventarioDao reporteDao
+            = new ReporteInventarioDao();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -127,8 +135,8 @@ public class ReporteInventarioController implements Initializable {
 
         try {
 
-            List<LibroMasVendido> libros =
-                    reporteDao.listarLibrosMasVendidos();
+            List<LibroMasVendido> libros
+                    = reporteDao.listarLibrosMasVendidos();
 
             ranking.clear();
 
@@ -149,8 +157,8 @@ public class ReporteInventarioController implements Initializable {
 
         try {
 
-            List<StockValorizado> libros =
-                    reporteDao.listarStockValorizado();
+            List<StockValorizado> libros
+                    = reporteDao.listarStockValorizado();
 
             stockValorizado.clear();
 
@@ -190,8 +198,8 @@ public class ReporteInventarioController implements Initializable {
 
     private void mostrarError(String mensaje) {
 
-        Alert alerta =
-                new Alert(Alert.AlertType.ERROR);
+        Alert alerta
+                = new Alert(Alert.AlertType.ERROR);
 
         alerta.setTitle(
                 "Reportes de Inventario"
@@ -204,5 +212,60 @@ public class ReporteInventarioController implements Initializable {
         alerta.setContentText(mensaje);
 
         alerta.showAndWait();
+    }
+
+    @FXML
+    private void onFiltrarClick() {
+
+        LocalDate fechaInicio = dpFechaInicio.getValue();
+        LocalDate fechaFin = dpFechaFin.getValue();
+
+        if (fechaInicio == null || fechaFin == null) {
+            mostrarError("Debes seleccionar una fecha de inicio y una fecha final.");
+            return;
+        }
+
+        if (fechaInicio.isAfter(fechaFin)) {
+            mostrarError("La fecha de inicio no puede ser mayor que la fecha final.");
+            return;
+        }
+
+        if (fechaInicio.isAfter(LocalDate.now())) {
+            mostrarError("La fecha inicial no puede ser mayor a la fecha actual.");
+            return;
+        }
+
+        if (fechaFin.isAfter(LocalDate.now())) {
+            mostrarError("La fecha final no puede ser mayor a la fecha actual.");
+            return;
+        }
+
+        try {
+
+            List<LibroMasVendido> libros
+                    = reporteDao.listarLibrosMasVendidos(
+                            fechaInicio,
+                            fechaFin
+                    );
+
+            ranking.clear();
+            ranking.addAll(libros);
+
+        } catch (SQLException ex) {
+
+            mostrarError(
+                    "No se pudo aplicar el filtro.\n"
+                    + ex.getMessage()
+            );
+        }
+    }
+
+    @FXML
+    private void onLimpiarClick() {
+
+        dpFechaInicio.setValue(null);
+        dpFechaFin.setValue(null);
+
+        cargarRanking();
     }
 }
