@@ -13,6 +13,7 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/21.0.11"
             xmlns:fx="http://javafx.com/fxml/1"
+             fx:controller="org.esperanza.controller.ReporteInventarioController"
             prefWidth="1000"
             prefHeight="650"
             stylesheets="@style/dashboard.css"
