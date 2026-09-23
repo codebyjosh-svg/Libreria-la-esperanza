@@ -1,9 +1,9 @@
 package org.esperanza.test;
 
 import java.sql.SQLException;
-import org.esperanza.Model.Usuario;
-import org.esperanza.Service.AutenticacionService;
-import org.esperanza.Service.ResultadoLogin;
+import org.esperanza.model.Usuario;
+import org.esperanza.service.AutenticacionService;
+import org.esperanza.service.ResultadoLogin;
 import org.esperanza.dao.UsuarioDao;
 import org.esperanza.util.PasswordUtil;
 

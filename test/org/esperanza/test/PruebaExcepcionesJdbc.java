@@ -4,8 +4,8 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.esperanza.Service.AutenticacionService;
-import org.esperanza.Service.ResultadoLogin;
+import org.esperanza.service.AutenticacionService;
+import org.esperanza.service.ResultadoLogin;
 import org.esperanza.dao.UsuarioDao;
 
 /** Recorre el DAO real con conexiones JDBC simuladas. */

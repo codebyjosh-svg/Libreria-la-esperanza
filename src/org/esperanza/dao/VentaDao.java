@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.esperanza.Model.Rol;
-import org.esperanza.Model.Usuario;
-import org.esperanza.Service.SesionUsuario;
+import org.esperanza.model.Rol;
+import org.esperanza.model.Usuario;
+import org.esperanza.service.SesionUsuario;
 import org.esperanza.model.DescuentoVenta;
 import org.esperanza.model.DetalleVenta;
 import org.esperanza.model.Venta;

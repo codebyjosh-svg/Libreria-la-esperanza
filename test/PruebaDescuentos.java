@@ -1,7 +1,7 @@
 import java.math.BigDecimal;
 import java.sql.SQLException;
-import org.esperanza.Model.Usuario;
-import org.esperanza.Service.SesionUsuario;
+import org.esperanza.model.Usuario;
+import org.esperanza.service.SesionUsuario;
 import org.esperanza.dao.VentaDao;
 import org.esperanza.model.CarritoVenta;
 import org.esperanza.model.DescuentoVenta;
