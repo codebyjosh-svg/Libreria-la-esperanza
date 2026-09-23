@@ -9,66 +9,171 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.esperanza.Controller.CategoriasController" stylesheets="@style/dashboard.css" styleClass="root-dashboard">
+<BorderPane
+        xmlns="http://javafx.com/javafx/21"
+        xmlns:fx="http://javafx.com/fxml/1"
+        fx:controller="org.esperanza.Controller.CategoriasController"
+        stylesheets="@style/dashboard.css"
+        styleClass="root-dashboard">
+
     <top>
-        <HBox alignment="CENTER_LEFT" spacing="20" styleClass="header-bar header-admin">
+
+        <HBox
+                alignment="CENTER_LEFT"
+                spacing="20"
+                styleClass="header-bar">
+
             <padding>
-                <Insets top="15" right="20" bottom="15" left="20"/>
+                <Insets
+                        top="15"
+                        right="20"
+                        bottom="15"
+                        left="20"/>
             </padding>
-            <Label text="Librería La Esperanza - Gestión de Categorías" styleClass="header-title"/>
-            <HBox HBox.hgrow="ALWAYS"/>
-            <Button text="Volver al Inicio" onAction="#onVolver" styleClass="btn-logout"/>
+
+            <Label
+                    text="Librería La Esperanza - Gestión de Categorías"
+                    styleClass="header-title"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <Button
+                    text="Volver al Inicio"
+                    onAction="#onVolver"
+                    styleClass="btn-logout"/>
+
         </HBox>
+
     </top>
+
     <center>
-        <HBox spacing="20" styleClass="content-area">
+
+        <HBox
+                spacing="20"
+                styleClass="content-area">
+
             <padding>
-                <Insets top="20" right="20" bottom="20" left="20"/>
+                <Insets
+                        top="20"
+                        right="20"
+                        bottom="20"
+                        left="20"/>
             </padding>
-            
-            <!-- Panel Izquierdo: Formulario -->
-            <VBox spacing="15" prefWidth="350" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 8;">
-                <Label text="Datos de Categoría" styleClass="dash-subtitle"/>
-                
+
+            <VBox
+                    spacing="15"
+                    prefWidth="350"
+                    style="-fx-background-color: white;
+                           -fx-padding: 20;
+                           -fx-background-radius: 8;">
+
+                <Label
+                        text="Datos de Categoría"
+                        styleClass="dash-subtitle"/>
+
                 <VBox spacing="5">
-                    <Label text="ID Categoría (Automático):"/>
-                    <TextField fx:id="txtIdCategoria" disable="true" promptText="Generado al guardar"/>
+
+                    <Label
+                            text="ID Categoría:"/>
+
+                    <TextField
+                            fx:id="txtIdCategoria"
+                            editable="false"
+                            promptText="Generado automáticamente"/>
+
                 </VBox>
-                
+
                 <VBox spacing="5">
-                    <Label text="Nombre de la Categoría:"/>
-                    <TextField fx:id="txtNombre" promptText="Ej. Ficción, Escolar..."/>
+
+                    <Label
+                            text="Nombre de la Categoría:"/>
+
+                    <TextField
+                            fx:id="txtNombre"
+                            promptText="Ej. Ficción, Escolar..."/>
+
                 </VBox>
-                
+
                 <VBox spacing="5">
-                    <Label text="Descripción:"/>
-                    <TextArea fx:id="txtDescripcion" promptText="Descripción detallada de los libros que pertenecen a esta categoría..." prefRowCount="5" wrapText="true"/>
+
+                    <Label
+                            text="Descripción:"/>
+
+                    <TextArea
+                            fx:id="txtDescripcion"
+                            promptText="Descripción de la categoría..."
+                            prefRowCount="5"
+                            wrapText="true"/>
+
                 </VBox>
-                
-                <HBox spacing="15" alignment="CENTER" VBox.vgrow="ALWAYS">
-                    <VBox alignment="BOTTOM_CENTER" HBox.hgrow="ALWAYS">
-                        <HBox spacing="10" alignment="CENTER">
-                            <Button text="Guardar" onAction="#onGuardar" styleClass="btn-accion" prefWidth="120"/>
-                            <Button text="Limpiar" onAction="#onLimpiar" styleClass="btn-logout" style="-fx-background-color: #95a5a6;" prefWidth="100"/>
-                        </HBox>
-                    </VBox>
+
+                <HBox
+                        alignment="CENTER"
+                        spacing="10">
+
+                    <Button
+                            text="Guardar"
+                            onAction="#onGuardar"
+                            styleClass="btn-accion"
+                            prefWidth="120"/>
+
+                    <Button
+                            text="Limpiar"
+                            onAction="#onLimpiar"
+                            prefWidth="100"/>
+
                 </HBox>
+
             </VBox>
-            
-            <!-- Panel Derecho: Tabla de Registros -->
-            <VBox spacing="15" HBox.hgrow="ALWAYS" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 8;">
-                <Label text="Listado de Categorías" styleClass="dash-subtitle"/>
-                
-                <TableView fx:id="tablaCategorias" VBox.vgrow="ALWAYS" onMouseClicked="#onSeleccionarCategoria">
+
+            <VBox
+                    spacing="15"
+                    HBox.hgrow="ALWAYS"
+                    style="-fx-background-color: white;
+                           -fx-padding: 20;
+                           -fx-background-radius: 8;">
+
+                <Label
+                        text="Listado de Categorías"
+                        styleClass="dash-subtitle"/>
+
+                <TableView
+                        fx:id="tablaCategorias"
+                        VBox.vgrow="ALWAYS"
+                        onMouseClicked="#onSeleccionarCategoria">
+
+                    <placeholder>
+                        <Label text="No hay categorías registradas"/>
+                    </placeholder>
+
                     <columns>
-                        <TableColumn fx:id="colId" prefWidth="80" text="ID" />
-                        <TableColumn fx:id="colNombre" prefWidth="200" text="Nombre" />
-                        <TableColumn fx:id="colDescripcion" prefWidth="350" text="Descripción" />
+
+                        <TableColumn
+                                fx:id="colId"
+                                prefWidth="80"
+                                text="ID"/>
+
+                        <TableColumn
+                                fx:id="colNombre"
+                                prefWidth="200"
+                                text="Nombre"/>
+
+                        <TableColumn
+                                fx:id="colDescripcion"
+                                prefWidth="350"
+                                text="Descripción"/>
+
                     </columns>
+
                 </TableView>
+
             </VBox>
+
         </HBox>
+
     </center>
+
 </BorderPane>
