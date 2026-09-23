@@ -21,6 +21,7 @@ import org.esperanza.model.Usuario;
 import org.esperanza.service.SesionUsuario;
 import org.esperanza.model.DescuentoVenta;
 import org.esperanza.model.DetalleVenta;
+import org.esperanza.model.EstadoVenta;
 import org.esperanza.model.Venta;
 import org.esperanza.util.Conexion;
 
@@ -317,7 +318,8 @@ public class VentaDao {
                     descuento,
                     total,
                     cui_cliente,
-                    id_usuario
+                    id_usuario,
+                    estado
                 FROM ventas
                 WHERE id_venta = ?
                 """;
@@ -364,7 +366,8 @@ public class VentaDao {
                     descuento,
                     total,
                     cui_cliente,
-                    id_usuario
+                    id_usuario,
+                    estado
                 FROM ventas
                 ORDER BY id_venta DESC
                 """;
@@ -395,7 +398,7 @@ public class VentaDao {
             ResultSet rs)
             throws SQLException {
 
-        return new Venta(
+        Venta venta = new Venta(
                 rs.getInt(
                         "id_venta"
                 ),
@@ -418,5 +421,7 @@ public class VentaDao {
                         "id_usuario"
                 )
         );
+        venta.setEstado(EstadoVenta.desdeBaseDatos(rs.getString("estado")));
+        return venta;
     }
 }

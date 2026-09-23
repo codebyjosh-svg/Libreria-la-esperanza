@@ -1,61 +1,94 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
 
 <BorderPane
         xmlns:fx="http://javafx.com/fxml/1"
         fx:controller="org.esperanza.controller.DashboardCajeroController"
         prefWidth="950"
         prefHeight="620"
+        styleClass="root-dashboard"
         stylesheets="@style/dashboard.css">
 
     <top>
-        <HBox spacing="12" alignment="CENTER_LEFT">
+
+        <HBox
+                spacing="12"
+                alignment="CENTER_LEFT">
 
             <padding>
-                <Insets top="15" right="15" bottom="15" left="15"/>
+
+                <Insets
+                        top="15"
+                        right="15"
+                        bottom="15"
+                        left="15"/>
+
             </padding>
 
             <Label
                     text="Panel de Control"
                     style="-fx-font-size:16px; -fx-font-weight:bold;"/>
 
-            <Region HBox.hgrow="ALWAYS"/>
+            <Region
+                    HBox.hgrow="ALWAYS"/>
 
-            <Label fx:id="lblBienvenida"/>
+            <Label
+                    fx:id="lblBienvenida"/>
 
             <Button
                     text="Cerrar Sesión"
                     onAction="#onCerrarSesion"/>
 
         </HBox>
+
     </top>
 
     <left>
-        <VBox prefWidth="200" spacing="10">
+
+        <VBox
+                prefWidth="220"
+                spacing="10">
 
             <padding>
-                <Insets top="15" right="10" bottom="15" left="10"/>
+
+                <Insets
+                        top="15"
+                        right="10"
+                        bottom="15"
+                        left="10"/>
+
             </padding>
 
             <Label
                     text="Librería La Esperanza"
                     style="-fx-font-weight:bold;"/>
 
-            <Label fx:id="lblRol"/>
+            <Label
+                    fx:id="lblRol"/>
 
             <Label
                     fx:id="lblPermisos"
-                    visible="false"
-                    managed="false"/>
+                    wrapText="true"/>
 
             <Separator/>
 
             <Button
                     text="Nueva venta"
                     onAction="#onNuevaVenta"
+                    maxWidth="Infinity"/>
+
+            <Button
+                    text="Devoluciones"
+                    onAction="#onDevoluciones"
                     maxWidth="Infinity"/>
 
             <Button
@@ -84,26 +117,44 @@
                     maxWidth="Infinity"/>
 
         </VBox>
+
     </left>
 
     <center>
-        <VBox spacing="20">
+
+        <VBox
+                spacing="20">
 
             <padding>
-                <Insets top="25" right="20" bottom="20" left="20"/>
+
+                <Insets
+                        top="25"
+                        right="20"
+                        bottom="20"
+                        left="20"/>
+
             </padding>
 
             <Label
                     text="Bienvenido"
                     style="-fx-font-size:18px; -fx-font-weight:bold;"/>
 
-            <Label text="Accesos rápidos a las funciones de caja"/>
+            <Label
+                    text="Accesos rápidos a las funciones de caja"/>
 
-            <FlowPane hgap="15" vgap="15">
+            <FlowPane
+                    hgap="15"
+                    vgap="15">
 
                 <Button
                         text="Nueva venta"
                         onAction="#onNuevaVenta"
+                        prefWidth="180"
+                        prefHeight="65"/>
+
+                <Button
+                        text="Devoluciones"
+                        onAction="#onDevoluciones"
                         prefWidth="180"
                         prefHeight="65"/>
 
@@ -140,6 +191,7 @@
             </FlowPane>
 
         </VBox>
+
     </center>
 
 </BorderPane>

@@ -94,7 +94,6 @@ public class DashboardAdminController {
                 || lblCantidadLibros == null
                 || lblUsuariosActivos == null
                 || lblEstadoIndicadores == null) {
-
             return;
         }
 
@@ -128,7 +127,6 @@ public class DashboardAdminController {
             if (!SesionUsuario
                     .getInstancia()
                     .esAdmin()) {
-
                 return;
             }
 
@@ -240,7 +238,6 @@ public class DashboardAdminController {
 
         if (!NavegacionRol.validarPermiso(
                 "GESTION_USUARIOS")) {
-
             return;
         }
 
@@ -355,6 +352,11 @@ public class DashboardAdminController {
     @FXML
     private void onLibrosClick() {
 
+        if (!NavegacionRol.validarPermiso(
+                "GESTION_INVENTARIO")) {
+            return;
+        }
+
         try {
 
             FXMLLoader loader =
@@ -409,16 +411,6 @@ public class DashboardAdminController {
     }
 
     @FXML
-    private void onProveedoresClick() {
-
-        Pantallas.catalogo(
-                lblUsuario,
-                "proveedores",
-                "Proveedores"
-        );
-    }
-
-    @FXML
     private void onEditorialesClick() {
 
         Pantallas.catalogo(
@@ -429,11 +421,109 @@ public class DashboardAdminController {
     }
 
     @FXML
+    private void onProveedoresClick() {
+
+        abrirModuloGestion(
+                "GESTION_PROVEEDORES",
+                "Proveedores",
+                "Gestión de proveedores"
+        );
+    }
+
+    @FXML
+    private void onDevolucionesClick() {
+
+        abrirModuloGestion(
+                "DEVOLUCIONES",
+                "Devoluciones",
+                "Devoluciones de ventas"
+        );
+    }
+
+    private void abrirModuloGestion(
+            String permiso,
+            String vista,
+            String titulo) {
+
+        if (!NavegacionRol.validarPermiso(
+                permiso)) {
+            return;
+        }
+
+        try {
+
+            FXMLLoader loader =
+                    new FXMLLoader(
+                            getClass().getResource(
+                                    "/org/esperanza/view/"
+                                    + vista
+                                    + ".fxml"
+                            )
+                    );
+
+            Parent root = loader.load();
+
+            Stage ventana = new Stage();
+
+            ventana.initOwner(
+                    lblUsuario
+                            .getScene()
+                            .getWindow()
+            );
+
+            ventana.initModality(
+                    Modality.WINDOW_MODAL
+            );
+
+            ventana.setScene(
+                    new Scene(root)
+            );
+
+            ventana.setOnCloseRequest(event -> {
+
+                Object controller =
+                        loader.getController();
+
+                boolean ocupado =
+                        controller instanceof ProveedoresController proveedor
+                        && proveedor.estaOcupado();
+
+                ocupado =
+                        ocupado
+                        || controller instanceof DevolucionesController devolucion
+                        && devolucion.estaOcupado();
+
+                if (ocupado) {
+                    event.consume();
+                }
+            });
+
+            ventana.setTitle(
+                    titulo
+                    + " - Librería La Esperanza"
+            );
+
+            ventana.centerOnScreen();
+            ventana.showAndWait();
+
+            actualizarIndicadores();
+
+        } catch (IOException ex) {
+
+            mostrarError(
+                    "No se pudo abrir "
+                    + titulo
+                    + ".\n"
+                    + ex.getMessage()
+            );
+        }
+    }
+
+    @FXML
     private void onVentasClick() {
 
         if (!NavegacionRol.validarPermiso(
                 "VENTAS")) {
-
             return;
         }
 
@@ -498,7 +588,6 @@ public class DashboardAdminController {
 
         if (!NavegacionRol.validarRol(
                 Rol.ADMIN)) {
-
             return;
         }
 
@@ -514,7 +603,6 @@ public class DashboardAdminController {
 
         if (!NavegacionRol.validarRol(
                 Rol.ADMIN)) {
-
             return;
         }
 
@@ -535,7 +623,6 @@ public class DashboardAdminController {
 
         if (!NavegacionRol.validarPermiso(
                 "VER_REPORTES")) {
-
             return;
         }
 
@@ -706,7 +793,6 @@ public class DashboardAdminController {
                 || lblUsuario
                         .getScene()
                         .getWindow() == null) {
-
             return;
         }
 
@@ -725,11 +811,10 @@ public class DashboardAdminController {
                     );
 
         } else {
-
             stage.close();
         }
     }
-    
+
     private void mostrarEnConstruccion(
             String modulo) {
 

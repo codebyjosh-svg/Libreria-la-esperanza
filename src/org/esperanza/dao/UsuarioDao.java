@@ -9,7 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.esperanza.model.Rol;
 import org.esperanza.model.Usuario;
+import org.esperanza.service.SesionUsuario;
 import org.esperanza.util.Conexion;
 import org.esperanza.util.PasswordUtil;
 
@@ -28,6 +30,36 @@ public class UsuarioDao {
         );
     }
 
+    private boolean esAdministrador() {
+
+        SesionUsuario sesion =
+                SesionUsuario.getInstancia();
+
+        Usuario actual =
+                sesion.getUsuarioActual();
+
+        return sesion.haySesionActiva()
+                && actual != null
+                && actual.isActivo()
+                && sesion.esAdmin();
+    }
+
+    private boolean esUsuarioActual(
+            int idUsuario) {
+
+        SesionUsuario sesion =
+                SesionUsuario.getInstancia();
+
+        Usuario actual =
+                sesion.getUsuarioActual();
+
+        return idUsuario > 0
+                && sesion.haySesionActiva()
+                && actual != null
+                && actual.isActivo()
+                && actual.getId() == idUsuario;
+    }
+
     public Usuario iniciarSesion(
             String username,
             String passwordHash)
@@ -37,11 +69,11 @@ public class UsuarioDao {
                 "{call sp_iniciar_sesion(?, ?)}";
 
         try (
-            Connection con =
-                    conexiones.conectar();
+                Connection con =
+                        conexiones.conectar();
 
-            CallableStatement cs =
-                    con.prepareCall(sql)
+                CallableStatement cs =
+                        con.prepareCall(sql)
         ) {
 
             cs.setString(
@@ -55,12 +87,15 @@ public class UsuarioDao {
             );
 
             try (
-                ResultSet rs =
-                        cs.executeQuery()
+                    ResultSet rs =
+                            cs.executeQuery()
             ) {
 
                 if (rs.next()) {
-                    return mapearUsuario(rs);
+
+                    return mapearUsuario(
+                            rs
+                    );
                 }
 
                 return null;
@@ -76,11 +111,11 @@ public class UsuarioDao {
                 "{call sp_buscar_usuario(?)}";
 
         try (
-            Connection con =
-                    conexiones.conectar();
+                Connection con =
+                        conexiones.conectar();
 
-            CallableStatement cs =
-                    con.prepareCall(sql)
+                CallableStatement cs =
+                        con.prepareCall(sql)
         ) {
 
             cs.setString(
@@ -89,12 +124,15 @@ public class UsuarioDao {
             );
 
             try (
-                ResultSet rs =
-                        cs.executeQuery()
+                    ResultSet rs =
+                            cs.executeQuery()
             ) {
 
                 if (rs.next()) {
-                    return mapearUsuario(rs);
+
+                    return mapearUsuario(
+                            rs
+                    );
                 }
 
                 return null;
@@ -106,6 +144,10 @@ public class UsuarioDao {
 
         List<Usuario> usuarios =
                 new ArrayList<>();
+
+        if (!esAdministrador()) {
+            return usuarios;
+        }
 
         String sql = """
                 SELECT
@@ -121,14 +163,14 @@ public class UsuarioDao {
                 """;
 
         try (
-            Connection con =
-                    conexiones.conectar();
+                Connection con =
+                        conexiones.conectar();
 
-            PreparedStatement ps =
-                    con.prepareStatement(sql);
+                PreparedStatement ps =
+                        con.prepareStatement(sql);
 
-            ResultSet rs =
-                    ps.executeQuery()
+                ResultSet rs =
+                        ps.executeQuery()
         ) {
 
             while (rs.next()) {
@@ -157,20 +199,33 @@ public class UsuarioDao {
             String apellido,
             String correo) {
 
+        if (!esAdministrador()
+                || !datosAltaValidos(
+                        username,
+                        passwordHash,
+                        rol,
+                        nombre,
+                        apellido,
+                        correo
+                )) {
+
+            return false;
+        }
+
         String sql =
                 "{call sp_registrar_usuario(?, ?, ?, ?, ?, ?)}";
 
         try (
-            Connection con =
-                    conexiones.conectar();
+                Connection con =
+                        conexiones.conectar();
 
-            CallableStatement cs =
-                    con.prepareCall(sql)
+                CallableStatement cs =
+                        con.prepareCall(sql)
         ) {
 
             cs.setString(
                     1,
-                    username
+                    username.trim()
             );
 
             cs.setString(
@@ -180,22 +235,22 @@ public class UsuarioDao {
 
             cs.setString(
                     3,
-                    rol
+                    Rol.fromString(rol).name()
             );
 
             cs.setString(
                     4,
-                    nombre
+                    nombre.trim()
             );
 
             cs.setString(
                     5,
-                    apellido
+                    apellido.trim()
             );
 
             cs.setString(
                     6,
-                    correo
+                    correo.trim()
             );
 
             cs.execute();
@@ -217,17 +272,24 @@ public class UsuarioDao {
             int id,
             boolean activo) {
 
+        if (!esAdministrador()
+                || id <= 0
+                || esUsuarioActual(id)) {
+
+            return false;
+        }
+
         String sql =
                 "UPDATE usuarios "
                 + "SET activo = ? "
                 + "WHERE id = ?";
 
         try (
-            Connection con =
-                    conexiones.conectar();
+                Connection con =
+                        conexiones.conectar();
 
-            PreparedStatement ps =
-                    con.prepareStatement(sql)
+                PreparedStatement ps =
+                        con.prepareStatement(sql)
         ) {
 
             ps.setBoolean(
@@ -274,6 +336,13 @@ public class UsuarioDao {
     public boolean existeUsername(
             String username) {
 
+        if (!esAdministrador()
+                || username == null
+                || username.isBlank()) {
+
+            return false;
+        }
+
         String sql =
                 "SELECT 1 "
                 + "FROM usuarios "
@@ -281,11 +350,11 @@ public class UsuarioDao {
                 + "LIMIT 1";
 
         try (
-            Connection con =
-                    conexiones.conectar();
+                Connection con =
+                        conexiones.conectar();
 
-            PreparedStatement ps =
-                    con.prepareStatement(sql)
+                PreparedStatement ps =
+                        con.prepareStatement(sql)
         ) {
 
             ps.setString(
@@ -294,8 +363,8 @@ public class UsuarioDao {
             );
 
             try (
-                ResultSet rs =
-                        ps.executeQuery()
+                    ResultSet rs =
+                            ps.executeQuery()
             ) {
 
                 return rs.next();
@@ -316,6 +385,13 @@ public class UsuarioDao {
             int idUsuario,
             String password) {
 
+        if (!esUsuarioActual(idUsuario)
+                || password == null
+                || password.isEmpty()) {
+
+            return false;
+        }
+
         String sql =
                 "SELECT password_hash "
                 + "FROM usuarios "
@@ -327,11 +403,11 @@ public class UsuarioDao {
                 );
 
         try (
-            Connection con =
-                    conexiones.conectar();
+                Connection con =
+                        conexiones.conectar();
 
-            PreparedStatement ps =
-                    con.prepareStatement(sql)
+                PreparedStatement ps =
+                        con.prepareStatement(sql)
         ) {
 
             ps.setInt(
@@ -340,8 +416,8 @@ public class UsuarioDao {
             );
 
             try (
-                ResultSet rs =
-                        ps.executeQuery()
+                    ResultSet rs =
+                            ps.executeQuery()
             ) {
 
                 return rs.next()
@@ -367,17 +443,25 @@ public class UsuarioDao {
             int idUsuario,
             String nuevaPassword) {
 
+        if (!esUsuarioActual(idUsuario)
+                || nuevaPassword == null
+                || nuevaPassword.isBlank()
+                || nuevaPassword.length() < 6) {
+
+            return false;
+        }
+
         String sql =
                 "UPDATE usuarios "
                 + "SET password_hash = ? "
                 + "WHERE id = ?";
 
         try (
-            Connection con =
-                    conexiones.conectar();
+                Connection con =
+                        conexiones.conectar();
 
-            PreparedStatement ps =
-                    con.prepareStatement(sql)
+                PreparedStatement ps =
+                        con.prepareStatement(sql)
         ) {
 
             ps.setString(
@@ -405,6 +489,57 @@ public class UsuarioDao {
         }
     }
 
+    private boolean datosAltaValidos(
+            String username,
+            String passwordHash,
+            String rol,
+            String nombre,
+            String apellido,
+            String correo) {
+
+        return username != null
+                && username
+                        .trim()
+                        .matches(
+                                "[A-Za-z0-9._-]{4,20}"
+                        )
+
+                && passwordHash != null
+                && passwordHash.matches(
+                        "[0-9a-fA-F]{64}"
+                )
+
+                && rol != null
+                && Rol.fromString(rol) != null
+
+                && nombre != null
+                && nombre
+                        .trim()
+                        .matches(
+                                "[\\p{L} ]{2,40}"
+                        )
+
+                && apellido != null
+                && apellido
+                        .trim()
+                        .matches(
+                                "[\\p{L} ]{2,40}"
+                        )
+
+                && correo != null
+                && correo
+                        .trim()
+                        .length() <= 120
+
+                && correo
+                        .trim()
+                        .matches(
+                                "^[A-Za-z0-9._%+-]+"
+                                + "@[A-Za-z0-9.-]+"
+                                + "\\.[A-Za-z]{2,}$"
+                        );
+    }
+
     private Usuario mapearUsuario(
             ResultSet rs)
             throws SQLException {
@@ -413,37 +548,50 @@ public class UsuarioDao {
                 new Usuario();
 
         usuario.setId(
-                rs.getInt("id")
+                rs.getInt(
+                        "id"
+                )
         );
 
         usuario.setUsrname(
-                rs.getString("username")
+                rs.getString(
+                        "username"
+                )
         );
 
         usuario.setRol(
-                rs.getString("rol")
+                rs.getString(
+                        "rol"
+                )
         );
 
         usuario.setNombre(
-                rs.getString("nombre")
+                rs.getString(
+                        "nombre"
+                )
         );
 
         usuario.setApellido(
-                rs.getString("apellido")
+                rs.getString(
+                        "apellido"
+                )
         );
 
         try {
 
             usuario.setCorreo(
-                    rs.getString("correo")
+                    rs.getString(
+                            "correo"
+                    )
             );
 
         } catch (SQLException ignored) {
         }
 
-       
         usuario.setActivo(
-                rs.getBoolean("activo")
+                rs.getBoolean(
+                        "activo"
+                )
         );
 
         return usuario;

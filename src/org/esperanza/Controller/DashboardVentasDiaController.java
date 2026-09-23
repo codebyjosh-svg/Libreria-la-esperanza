@@ -68,6 +68,7 @@ public class DashboardVentasDiaController {
 
     @FXML
     private void initialize() {
+        if (!org.esperanza.service.NavegacionRol.validarPermiso("VENTAS")) return;
 
         configurarTabla();
         cargarDatos();
@@ -143,6 +144,7 @@ public class DashboardVentasDiaController {
 
     @FXML
     private void actualizar() {
+        if (!org.esperanza.service.NavegacionRol.validarPermiso("VENTAS")) return;
 
         cargarDatos();
     }

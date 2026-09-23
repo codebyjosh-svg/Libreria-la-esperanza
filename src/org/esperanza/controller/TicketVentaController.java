@@ -78,7 +78,9 @@ public class TicketVentaController {
         }
 
         if (lblDescuento != null) {
-            lblDescuento.setText("Descuento aplicado: -Q0.00");
+            lblDescuento.setText(
+                    "Descuento aplicado: -Q0.00"
+            );
         }
 
         if (lblTotal != null) {
@@ -100,10 +102,13 @@ public class TicketVentaController {
             BigDecimal total) {
 
         if (lblVenta != null) {
-            lblVenta.setText("Factura No. " + idVenta);
+            lblVenta.setText(
+                    "Factura No. " + idVenta
+            );
         }
 
         if (lblFecha != null) {
+
             lblFecha.setText(
                     "Fecha: "
                     + (fecha == null
@@ -113,24 +118,29 @@ public class TicketVentaController {
         }
 
         if (lblCliente != null) {
+
             lblCliente.setText(
                     "Cliente: " + cuiCliente
             );
         }
 
         if (lblCajero != null) {
+
             lblCajero.setText(
                     "Cajero: " + idUsuario
             );
         }
 
         if (lblSubtotal != null) {
+
             lblSubtotal.setText(
-                    "Subtotal: Q" + dinero(subtotal)
+                    "Subtotal: Q"
+                    + dinero(subtotal)
             );
         }
 
         if (lblDescuento != null) {
+
             lblDescuento.setText(
                     "Descuento aplicado: -Q"
                     + dinero(descuento)
@@ -138,8 +148,10 @@ public class TicketVentaController {
         }
 
         if (lblTotal != null) {
+
             lblTotal.setText(
-                    "TOTAL: Q" + dinero(total)
+                    "TOTAL: Q"
+                    + dinero(total)
             );
         }
     }
@@ -190,7 +202,8 @@ public class TicketVentaController {
         }
 
         lblCajero.setText(
-                "Cajero: " + nombre.trim()
+                "Cajero: "
+                + nombre.trim()
         );
     }
 
@@ -260,37 +273,41 @@ public class TicketVentaController {
                 titulo = isbn;
             }
 
-            Label producto = celda(
-                    titulo + "\n" + isbn,
-                    180,
-                    Pos.CENTER_LEFT
-            );
+            Label producto =
+                    celda(
+                            titulo + "\n" + isbn,
+                            180,
+                            Pos.CENTER_LEFT
+                    );
 
-            Label cantidad = celda(
-                    String.valueOf(
-                            detalle.getCantidad()
-                    ),
-                    50,
-                    Pos.CENTER
-            );
+            Label cantidad =
+                    celda(
+                            String.valueOf(
+                                    detalle.getCantidad()
+                            ),
+                            50,
+                            Pos.CENTER
+                    );
 
-            Label precio = celda(
-                    "Q"
-                    + dinero(
-                            detalle.getPrecioUnitario()
-                    ),
-                    80,
-                    Pos.CENTER_RIGHT
-            );
+            Label precio =
+                    celda(
+                            "Q"
+                            + dinero(
+                                    detalle.getPrecioUnitario()
+                            ),
+                            80,
+                            Pos.CENTER_RIGHT
+                    );
 
-            Label subtotal = celda(
-                    "Q"
-                    + dinero(
-                            detalle.getSubtotal()
-                    ),
-                    100,
-                    Pos.CENTER_RIGHT
-            );
+            Label subtotal =
+                    celda(
+                            "Q"
+                            + dinero(
+                                    detalle.getSubtotal()
+                            ),
+                            100,
+                            Pos.CENTER_RIGHT
+                    );
 
             HBox fila =
                     new HBox(

@@ -1,0 +1,17 @@
+Verificacion final - 2026-09-18 - JDK21 / MySQL8.0.46
+PASS PruebaStockCritico
+PASS PruebaSalidaInventario
+PASS PruebaVentas
+PASS PruebaAdministracion
+PASS PruebaProveedores
+PASS PruebaDevoluciones
+PASS PruebaIntegracionMySql (base temporal)
+OK MySQL - devolución total, libro inactivo, auditoría, duplicada y consulta de 30 días
+OK MySQL - rollback real por trigger y reintento íntegro
+OK MySQL - dos conexiones concurrentes, una devolución y stock sin duplicar
+OK MySQL - proveedores CRUD, NIT único, baja/reactivación y permisos de tres roles
+TODAS LAS PRUEBAS DE INTEGRACIÓN MYSQL PASARON.
+
+PASS PruebaVistas: 7 FXML y restriccion de BODEGA. Ejecucion anterior con capturas en docs/capturas.
+PASS compilacion: 72 archivos Java (60 aplicacion, 12 pruebas).
+PASS sintaxis PowerShell. No se migraron datos personales.

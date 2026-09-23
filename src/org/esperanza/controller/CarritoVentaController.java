@@ -100,6 +100,7 @@ public class CarritoVentaController {
 
     @FXML
     public void initialize() {
+        if (!org.esperanza.service.NavegacionRol.validarPermiso("VENTAS")) return;
         configurarTablaClientes();
         configurarTablaDisponibles();
         configurarTablaCarrito();
@@ -494,6 +495,7 @@ public class CarritoVentaController {
 
     @FXML
     private void guardarNuevoCliente() {
+        if (!org.esperanza.service.NavegacionRol.validarPermiso("VENTAS")) return;
         try {
             String cuiTexto =
                     txtNuevoCui
@@ -983,6 +985,8 @@ public class CarritoVentaController {
 
     @FXML
     private void confirmarVenta() {
+        if (!org.esperanza.service.NavegacionRol.validarPermiso("VENTAS")) return;
+        idUsuario = org.esperanza.service.SesionUsuario.getInstancia().getUsuarioActual().getId();
         try {
             if (idUsuario <= 0) {
                 throw new IllegalArgumentException(

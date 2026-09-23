@@ -1,43 +1,60 @@
 package org.esperanza.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
-
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-
 import javafx.scene.control.Label;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
+import org.esperanza.service.NavegacionRol;
 import org.esperanza.service.Pantallas;
 import org.esperanza.service.SesionUsuario;
 
 public class DashboardCajeroController {
 
-    @FXML private Label lblBienvenida;
-    @FXML private Label lblRol;
-    @FXML private Label lblPermisos;
+    @FXML
+    private Label lblBienvenida;
+
+    @FXML
+    private Label lblRol;
+
+    @FXML
+    private Label lblPermisos;
 
     @FXML
     private void initialize() {
-        SesionUsuario sesion = SesionUsuario.getInstancia();
+
+        SesionUsuario sesion =
+                SesionUsuario.getInstancia();
 
         if (!sesion.esCajero()) {
+
             throw new SecurityException(
                     "Este panel es para Cajero."
             );
         }
 
-        lblBienvenida.setText(sesion.getNombreCompleto());
-        lblRol.setText("Cajero");
-        lblPermisos.setText("");
+        lblBienvenida.setText(
+                sesion.getNombreCompleto()
+        );
+
+        lblRol.setText(
+                "Cajero"
+        );
+
+        lblPermisos.setText(
+                "Ventas | Devoluciones | Consultar productos"
+        );
     }
 
     private Stage ventana() {
+
         return (Stage) lblBienvenida
                 .getScene()
                 .getWindow();
@@ -45,23 +62,30 @@ public class DashboardCajeroController {
 
     @FXML
     private void onNuevaVenta() {
-        if (!SesionUsuario.getInstancia().esCajero()) {
+
+        if (!SesionUsuario
+                .getInstancia()
+                .esCajero()) {
             return;
         }
 
         try {
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource(
-                            "/org/esperanza/view/CarritoVenta.fxml"
-                    )
-            );
+
+            FXMLLoader loader =
+                    new FXMLLoader(
+                            getClass().getResource(
+                                    "/org/esperanza/view/CarritoVenta.fxml"
+                            )
+                    );
 
             Parent root = loader.load();
 
-            CarritoVentaController controller = loader.getController();
+            CarritoVentaController controller =
+                    loader.getController();
 
             controller.setIdUsuario(
-                    SesionUsuario.getInstancia()
+                    SesionUsuario
+                            .getInstancia()
                             .getUsuarioActual()
                             .getId()
             );
@@ -69,7 +93,10 @@ public class DashboardCajeroController {
             Stage stage = ventana();
 
             stage.setOnCloseRequest(null);
-            stage.setScene(new Scene(root));
+
+            stage.setScene(
+                    new Scene(root)
+            );
 
             stage.setTitle(
                     "Nueva venta - Librería La Esperanza"
@@ -79,12 +106,16 @@ public class DashboardCajeroController {
             stage.centerOnScreen();
 
         } catch (Exception ex) {
-            Pantallas.error(ex.getMessage());
+
+            Pantallas.error(
+                    ex.getMessage()
+            );
         }
     }
 
     @FXML
     private void onClientes() {
+
         Pantallas.catalogo(
                 lblBienvenida,
                 "clientes",
@@ -93,35 +124,114 @@ public class DashboardCajeroController {
     }
 
     @FXML
-    private void onConsultarProductos() {
-        ModulosCajero.stock(ventana());
-    }
+    private void onDevoluciones() {
 
-    @FXML
-    private void onMisVentas() {
-        ModulosCajero.ventas(ventana());
-    }
-
-  @FXML
-private void onEditarClientes() {
-    EdicionClientes.mostrar(ventana());
-}
-
-    @FXML
-    private void onCambiarContrasena() {
-        if (SesionUsuario.getInstancia().getUsuarioActual() == null) {
-            Pantallas.error(
-                    "No se pudo identificar al usuario que inició sesión."
-            );
+        if (!NavegacionRol.validarPermiso(
+                "DEVOLUCIONES")) {
             return;
         }
 
         try {
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource(
-                            "/org/esperanza/view/CambioContrasenaDashboard.fxml"
-                    )
+
+            FXMLLoader loader =
+                    new FXMLLoader(
+                            getClass().getResource(
+                                    "/org/esperanza/view/Devoluciones.fxml"
+                            )
+                    );
+
+            Parent root = loader.load();
+
+            Stage modal = new Stage();
+
+            modal.initOwner(
+                    lblBienvenida
+                            .getScene()
+                            .getWindow()
             );
+
+            modal.initModality(
+                    Modality.WINDOW_MODAL
+            );
+
+            modal.setScene(
+                    new Scene(root)
+            );
+
+            DevolucionesController controller =
+                    loader.getController();
+
+            modal.setOnCloseRequest(event -> {
+
+                if (controller != null
+                        && controller.estaOcupado()) {
+
+                    event.consume();
+                }
+            });
+
+            modal.setTitle(
+                    "Devoluciones de ventas - Librería La Esperanza"
+            );
+
+            modal.centerOnScreen();
+            modal.showAndWait();
+
+        } catch (IOException ex) {
+
+            Pantallas.error(
+                    "No se pudo abrir Devoluciones.\n"
+                    + ex.getMessage()
+            );
+        }
+    }
+
+    @FXML
+    private void onConsultarProductos() {
+
+        ModulosCajero.stock(
+                ventana()
+        );
+    }
+
+    @FXML
+    private void onMisVentas() {
+
+        ModulosCajero.ventas(
+                ventana()
+        );
+    }
+
+    @FXML
+    private void onEditarClientes() {
+
+        EdicionClientes.mostrar(
+                ventana()
+        );
+    }
+
+    @FXML
+    private void onCambiarContrasena() {
+
+        if (SesionUsuario
+                .getInstancia()
+                .getUsuarioActual() == null) {
+
+            Pantallas.error(
+                    "No se pudo identificar al usuario que inició sesión."
+            );
+
+            return;
+        }
+
+        try {
+
+            FXMLLoader loader =
+                    new FXMLLoader(
+                            getClass().getResource(
+                                    "/org/esperanza/view/CambioContrasenaDashboard.fxml"
+                            )
+                    );
 
             Parent root = loader.load();
 
@@ -129,23 +239,38 @@ private void onEditarClientes() {
                     loader.getController();
 
             controller.setIdUsuarioActual(
-                    SesionUsuario.getInstancia()
+                    SesionUsuario
+                            .getInstancia()
                             .getUsuarioActual()
                             .getId()
             );
 
-            Stage ventana = new Stage();
-            ventana.setTitle("Cambiar Contraseña");
-            ventana.setScene(new Scene(root));
+            Stage modal = new Stage();
 
-            ventana.initOwner(lblBienvenida.getScene().getWindow());
-            ventana.initModality(Modality.WINDOW_MODAL);
+            modal.setTitle(
+                    "Cambiar Contraseña"
+            );
 
-            ventana.setResizable(false);
-            ventana.centerOnScreen();
-            ventana.showAndWait();
+            modal.setScene(
+                    new Scene(root)
+            );
+
+            modal.initOwner(
+                    lblBienvenida
+                            .getScene()
+                            .getWindow()
+            );
+
+            modal.initModality(
+                    Modality.WINDOW_MODAL
+            );
+
+            modal.setResizable(false);
+            modal.centerOnScreen();
+            modal.showAndWait();
 
         } catch (Exception ex) {
+
             Pantallas.error(
                     "No se pudo abrir la pantalla de Cambio de Contraseña.\n"
                     + ex.getMessage()
@@ -155,43 +280,72 @@ private void onEditarClientes() {
 
     @FXML
     private void onCerrarSesion() {
+
         try {
-            Parent root = FXMLLoader.load(
-                    getClass().getResource(
-                            "/org/esperanza/view/Login.fxml"
-                    )
-            );
 
-            Stage principal = ventana();
+            Parent root =
+                    FXMLLoader.load(
+                            getClass().getResource(
+                                    "/org/esperanza/view/Login.fxml"
+                            )
+                    );
 
-            while (principal.getOwner() instanceof Stage) {
-                principal = (Stage) principal.getOwner();
+            Stage principal =
+                    ventana();
+
+            while (principal
+                    .getOwner()
+                    instanceof Stage) {
+
+                principal =
+                        (Stage) principal
+                                .getOwner();
             }
 
-            principal.setOnCloseRequest(null);
+            principal.setOnCloseRequest(
+                    null
+            );
 
-            SesionUsuario.getInstancia().cerrarSesion();
+            SesionUsuario
+                    .getInstancia()
+                    .cerrarSesion();
 
-            principal.setScene(new Scene(root));
+            principal.setScene(
+                    new Scene(root)
+            );
 
-            for (Window otra : new ArrayList<>(Window.getWindows())) {
+            for (Window otra
+                    : new ArrayList<>(
+                            Window.getWindows()
+                    )) {
+
                 if (otra != principal) {
-                    if (otra instanceof Stage) {
-                        ((Stage) otra).setOnCloseRequest(null);
+
+                    if (otra instanceof Stage stage) {
+
+                        stage.setOnCloseRequest(
+                                null
+                        );
                     }
 
                     otra.hide();
                 }
             }
 
-            principal.setTitle("Librería La Esperanza");
+            principal.setTitle(
+                    "Librería La Esperanza"
+            );
+
             principal.sizeToScene();
             principal.centerOnScreen();
             principal.show();
             principal.toFront();
 
         } catch (Exception ex) {
-            Pantallas.error(ex.getMessage());
+
+            Pantallas.error(
+                    ex.getMessage()
+            );
         }
     }
 }
