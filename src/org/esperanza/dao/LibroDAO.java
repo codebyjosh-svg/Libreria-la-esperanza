@@ -2,6 +2,7 @@ package org.esperanza.dao;
 
 import java.util.List;
 import org.esperanza.model.Libro;
+import java.math.BigDecimal;
 
 public interface LibroDAO {
 
@@ -22,4 +23,6 @@ public interface LibroDAO {
     boolean actualizar(Libro libro);
 
     boolean eliminar(String isbn);
+    
+    boolean actualizarPrecio(String isbn, BigDecimal nuevoPrecio);
 }
