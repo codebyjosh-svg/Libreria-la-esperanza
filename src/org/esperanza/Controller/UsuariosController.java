@@ -66,14 +66,14 @@ public class UsuariosController {
     @FXML
     private Button btnEditar;
 
-    private final UsuarioDao usuarioDao =
-            new UsuarioDao();
+    private final UsuarioDao usuarioDao
+            = new UsuarioDao();
 
-    private final CajeroDao edicionDao =
-            new CajeroDao();
+    private final CajeroDao edicionDao
+            = new CajeroDao();
 
-    private final ObservableList<Usuario> datos =
-            FXCollections.observableArrayList();
+    private final ObservableList<Usuario> datos
+            = FXCollections.observableArrayList();
 
     @FXML
     private void initialize() {
@@ -133,11 +133,11 @@ public class UsuariosController {
 
     private boolean esAdminActual() {
 
-        SesionUsuario sesion =
-                SesionUsuario.getInstancia();
+        SesionUsuario sesion
+                = SesionUsuario.getInstancia();
 
-        Usuario actual =
-                sesion.getUsuarioActual();
+        Usuario actual
+                = sesion.getUsuarioActual();
 
         return sesion.haySesionActiva()
                 && actual != null
@@ -148,8 +148,8 @@ public class UsuariosController {
     private boolean puedeGestionar(
             Usuario usuario) {
 
-        Usuario actual =
-                SesionUsuario
+        Usuario actual
+                = SesionUsuario
                         .getInstancia()
                         .getUsuarioActual();
 
@@ -157,7 +157,7 @@ public class UsuariosController {
                 && actual != null
                 && usuario != null
                 && usuario.getId()
-                        != actual.getId();
+                != actual.getId();
     }
 
     private void configurarEstado() {
@@ -196,16 +196,16 @@ public class UsuariosController {
         colAccion.setCellFactory(
                 col -> new TableCell<>() {
 
-            private final Button btn =
-                    new Button();
+            private final Button btn
+                    = new Button();
 
             {
                 btn.setOnAction(
                         e -> {
 
-                            Usuario usuario =
-                                    getTableRow()
-                                            .getItem();
+                            Usuario usuario
+                            = getTableRow()
+                                    .getItem();
 
                             if (usuario != null) {
 
@@ -230,16 +230,16 @@ public class UsuariosController {
                 if (empty
                         || getIndex() < 0
                         || getIndex()
-                                >= getTableView()
-                                        .getItems()
-                                        .size()) {
+                        >= getTableView()
+                                .getItems()
+                                .size()) {
 
                     setGraphic(null);
                     return;
                 }
 
-                Usuario usuario =
-                        getTableView()
+                Usuario usuario
+                        = getTableView()
                                 .getItems()
                                 .get(
                                         getIndex()
@@ -254,16 +254,16 @@ public class UsuariosController {
 
                 btn.setText(
                         usuario.isActivo()
-                                ? "Desactivar"
-                                : "Activar"
+                        ? "Desactivar"
+                        : "Activar"
                 );
 
                 btn.setStyle(
                         usuario.isActivo()
-                                ? "-fx-background-color:#dc2626;"
-                                  + "-fx-text-fill:white;"
-                                : "-fx-background-color:#16a34a;"
-                                  + "-fx-text-fill:white;"
+                        ? "-fx-background-color:#dc2626;"
+                        + "-fx-text-fill:white;"
+                        : "-fx-background-color:#16a34a;"
+                        + "-fx-text-fill:white;"
                 );
 
                 setGraphic(btn);
@@ -284,8 +284,8 @@ public class UsuariosController {
             return;
         }
 
-        Usuario seleccionado =
-                tablaUsuarios
+        Usuario seleccionado
+                = tablaUsuarios
                         .getSelectionModel()
                         .getSelectedItem();
 
@@ -298,8 +298,8 @@ public class UsuariosController {
             return;
         }
 
-        Dialog<ButtonType> dialogo =
-                new Dialog<>();
+        Dialog<ButtonType> dialogo
+                = new Dialog<>();
 
         dialogo.initOwner(
                 tablaUsuarios
@@ -316,32 +316,32 @@ public class UsuariosController {
                 + seleccionado.getUsrname()
         );
 
-        TextField txtUsuario =
-                new TextField(
+        TextField txtUsuario
+                = new TextField(
                         Objects.toString(
                                 seleccionado.getUsrname(),
                                 ""
                         )
                 );
 
-        TextField txtNombre =
-                new TextField(
+        TextField txtNombre
+                = new TextField(
                         Objects.toString(
                                 seleccionado.getNombre(),
                                 ""
                         )
                 );
 
-        TextField txtApellido =
-                new TextField(
+        TextField txtApellido
+                = new TextField(
                         Objects.toString(
                                 seleccionado.getApellido(),
                                 ""
                         )
                 );
 
-        TextField txtCorreo =
-                new TextField(
+        TextField txtCorreo
+                = new TextField(
                         Objects.toString(
                                 seleccionado.getCorreo(),
                                 ""
@@ -352,8 +352,8 @@ public class UsuariosController {
                 25
         );
 
-        GridPane formulario =
-                new GridPane();
+        GridPane formulario
+                = new GridPane();
 
         formulario.setPadding(
                 new Insets(20)
@@ -392,14 +392,14 @@ public class UsuariosController {
                         formulario
                 );
 
-        ButtonType guardar =
-                new ButtonType(
+        ButtonType guardar
+                = new ButtonType(
                         "Guardar cambios",
                         ButtonBar.ButtonData.OK_DONE
                 );
 
-        ButtonType cancelar =
-                new ButtonType(
+        ButtonType cancelar
+                = new ButtonType(
                         "Cancelar",
                         ButtonBar.ButtonData.CANCEL_CLOSE
                 );
@@ -450,10 +450,10 @@ public class UsuariosController {
 
                                 e.consume();
 
-                                Alert alerta =
-                                        new Alert(
-                                                Alert.AlertType.ERROR
-                                        );
+                                Alert alerta
+                                = new Alert(
+                                        Alert.AlertType.ERROR
+                                );
 
                                 alerta.initOwner(
                                         dialogo
@@ -525,16 +525,16 @@ public class UsuariosController {
             return;
         }
 
-        boolean nuevoEstado =
-                !usuario.isActivo();
+        boolean nuevoEstado
+                = !usuario.isActivo();
 
-        String accion =
-                nuevoEstado
+        String accion
+                = nuevoEstado
                         ? "activar"
                         : "desactivar";
 
-        Alert alerta =
-                new Alert(
+        Alert alerta
+                = new Alert(
                         Alert.AlertType.CONFIRMATION,
                         "¿Deseas "
                         + accion
@@ -622,19 +622,19 @@ public class UsuariosController {
 
         try {
 
-            FXMLLoader loader =
-                    new FXMLLoader(
+            FXMLLoader loader
+                    = new FXMLLoader(
                             getClass()
                                     .getResource(
                                             "/org/esperanza/view/UsuarioAlta.fxml"
                                     )
                     );
 
-            Parent root =
-                    loader.load();
+            Parent root
+                    = loader.load();
 
-            Stage stage =
-                    new Stage();
+            Stage stage
+                    = new Stage();
 
             stage.initOwner(
                     tablaUsuarios
@@ -687,12 +687,37 @@ public class UsuariosController {
     @FXML
     private void onVolverDashboard() {
 
-        Stage stage =
-                (Stage) tablaUsuarios
-                        .getScene()
-                        .getWindow();
+        try {
 
-        stage.close();
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource(
+                            "/org/esperanza/view/DashboardAdmin.fxml"
+                    )
+            );
+
+            Parent root = loader.load();
+
+            Stage stage = (Stage) tablaUsuarios
+                    .getScene()
+                    .getWindow();
+
+            stage.setScene(new Scene(root));
+
+            stage.setTitle(
+                    "Panel Administrador - Librería La Esperanza"
+            );
+
+            stage.sizeToScene();
+            stage.centerOnScreen();
+            stage.show();
+
+        } catch (IOException e) {
+
+            mostrarError(
+                    "No se pudo regresar al Dashboard Admin.\n"
+                    + e.getMessage()
+            );
+        }
     }
 
     private void cargarUsuarios() {
@@ -743,8 +768,8 @@ public class UsuariosController {
                 mensaje
         );
 
-        Alert alert =
-                new Alert(
+        Alert alert
+                = new Alert(
                         Alert.AlertType.ERROR
                 );
 

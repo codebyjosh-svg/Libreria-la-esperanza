@@ -18,6 +18,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import org.esperanza.dao.LibroDAO;
 import org.esperanza.dao.impl.LibroDAOImpl;
 import org.esperanza.model.Libro;
+import org.esperanza.service.Pantallas;
 
 public class ActualizarPrecioController implements Initializable {
 
@@ -229,6 +230,11 @@ public class ActualizarPrecioController implements Initializable {
         mostrarInformacion(
                 "Precio actualizado correctamente."
         );
+    }
+
+    @FXML
+    private void onVolverClick() {
+        Pantallas.volver(tablaLibros);
     }
 
     private void mostrarAdvertencia(

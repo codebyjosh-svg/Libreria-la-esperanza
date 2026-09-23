@@ -69,8 +69,8 @@ public class DashboardAdminController {
             return;
         }
 
-        usuarioActual =
-                SesionUsuario
+        usuarioActual
+                = SesionUsuario
                         .getInstancia()
                         .getUsuarioActual();
 
@@ -111,8 +111,8 @@ public class DashboardAdminController {
                 "Actualizando indicadores..."
         );
 
-        Task<IndicadoresDashboardAdmin> tarea =
-                new Task<>() {
+        Task<IndicadoresDashboardAdmin> tarea
+                = new Task<>() {
 
             @Override
             protected IndicadoresDashboardAdmin call()
@@ -130,8 +130,8 @@ public class DashboardAdminController {
                 return;
             }
 
-            IndicadoresDashboardAdmin datos =
-                    tarea.getValue();
+            IndicadoresDashboardAdmin datos
+                    = tarea.getValue();
 
             if (datos == null) {
 
@@ -143,13 +143,13 @@ public class DashboardAdminController {
                 return;
             }
 
-            NumberFormat moneda =
-                    NumberFormat.getCurrencyInstance(
+            NumberFormat moneda
+                    = NumberFormat.getCurrencyInstance(
                             Locale.forLanguageTag("es-GT")
                     );
 
-            NumberFormat numero =
-                    NumberFormat.getIntegerInstance(
+            NumberFormat numero
+                    = NumberFormat.getIntegerInstance(
                             Locale.forLanguageTag("es-GT")
                     );
 
@@ -205,8 +205,8 @@ public class DashboardAdminController {
             btnActualizarIndicadores.setDisable(false);
         });
 
-        Thread hilo =
-                new Thread(
+        Thread hilo
+                = new Thread(
                         tarea,
                         "indicadores-dashboard-admin"
                 );
@@ -236,46 +236,33 @@ public class DashboardAdminController {
     @FXML
     private void onUsuariosClick() {
 
-        if (!NavegacionRol.validarPermiso(
-                "GESTION_USUARIOS")) {
+        if (!NavegacionRol.validarPermiso("GESTION_USUARIOS")) {
             return;
         }
 
         try {
 
-            FXMLLoader loader =
-                    new FXMLLoader(
-                            getClass().getResource(
-                                    "/org/esperanza/view/Usuarios.fxml"
-                            )
-                    );
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource(
+                            "/org/esperanza/view/Usuarios.fxml"
+                    )
+            );
 
             Parent root = loader.load();
 
-            Stage ventana = new Stage();
+            Stage stage = (Stage) lblUsuario
+                    .getScene()
+                    .getWindow();
 
-            ventana.initOwner(
-                    lblUsuario
-                            .getScene()
-                            .getWindow()
-            );
+            stage.setScene(new Scene(root));
 
-            ventana.initModality(
-                    Modality.WINDOW_MODAL
-            );
-
-            ventana.setScene(
-                    new Scene(root)
-            );
-
-            ventana.setTitle(
+            stage.setTitle(
                     "Gestión de Usuarios - Librería La Esperanza"
             );
 
-            ventana.centerOnScreen();
-            ventana.showAndWait();
-
-            actualizarIndicadores();
+            stage.sizeToScene();
+            stage.centerOnScreen();
+            stage.show();
 
         } catch (IOException ex) {
 
@@ -300,8 +287,8 @@ public class DashboardAdminController {
 
         try {
 
-            FXMLLoader loader =
-                    new FXMLLoader(
+            FXMLLoader loader
+                    = new FXMLLoader(
                             getClass().getResource(
                                     "/org/esperanza/view/CambioContrasenaDashboard.fxml"
                             )
@@ -309,8 +296,8 @@ public class DashboardAdminController {
 
             Parent root = loader.load();
 
-            CambioContrasenaController controller =
-                    loader.getController();
+            CambioContrasenaController controller
+                    = loader.getController();
 
             controller.setIdUsuarioActual(
                     usuarioActual.getId()
@@ -359,8 +346,8 @@ public class DashboardAdminController {
 
         try {
 
-            FXMLLoader loader =
-                    new FXMLLoader(
+            FXMLLoader loader
+                    = new FXMLLoader(
                             getClass().getResource(
                                     "/org/esperanza/view/Libros.fxml"
                             )
@@ -368,8 +355,8 @@ public class DashboardAdminController {
 
             Parent root = loader.load();
 
-            Stage ventana =
-                    (Stage) lblUsuario
+            Stage ventana
+                    = (Stage) lblUsuario
                             .getScene()
                             .getWindow();
 
@@ -452,8 +439,8 @@ public class DashboardAdminController {
 
         try {
 
-            FXMLLoader loader =
-                    new FXMLLoader(
+            FXMLLoader loader
+                    = new FXMLLoader(
                             getClass().getResource(
                                     "/org/esperanza/view/"
                                     + vista
@@ -463,50 +450,43 @@ public class DashboardAdminController {
 
             Parent root = loader.load();
 
-            Stage ventana = new Stage();
-
-            ventana.initOwner(
-                    lblUsuario
+            Stage ventana
+                    = (Stage) lblUsuario
                             .getScene()
-                            .getWindow()
-            );
+                            .getWindow();
 
-            ventana.initModality(
-                    Modality.WINDOW_MODAL
-            );
+            Object controller
+                    = loader.getController();
+
+            ventana.setOnCloseRequest(event -> {
+
+                boolean ocupado
+                        = controller instanceof ProveedoresController proveedor
+                        && proveedor.estaOcupado();
+
+                ocupado
+                        = ocupado
+                        || controller instanceof DevolucionesController devolucion
+                        && devolucion.estaOcupado();
+
+                event.consume();
+
+                if (!ocupado) {
+                    NavegacionRol.abrirDashboardSegunRol(ventana);
+                }
+            });
 
             ventana.setScene(
                     new Scene(root)
             );
-
-            ventana.setOnCloseRequest(event -> {
-
-                Object controller =
-                        loader.getController();
-
-                boolean ocupado =
-                        controller instanceof ProveedoresController proveedor
-                        && proveedor.estaOcupado();
-
-                ocupado =
-                        ocupado
-                        || controller instanceof DevolucionesController devolucion
-                        && devolucion.estaOcupado();
-
-                if (ocupado) {
-                    event.consume();
-                }
-            });
 
             ventana.setTitle(
                     titulo
                     + " - Librería La Esperanza"
             );
 
+            ventana.sizeToScene();
             ventana.centerOnScreen();
-            ventana.showAndWait();
-
-            actualizarIndicadores();
 
         } catch (IOException ex) {
 
@@ -538,8 +518,8 @@ public class DashboardAdminController {
 
         try {
 
-            FXMLLoader loader =
-                    new FXMLLoader(
+            FXMLLoader loader
+                    = new FXMLLoader(
                             getClass().getResource(
                                     "/org/esperanza/view/CarritoVenta.fxml"
                             )
@@ -547,15 +527,15 @@ public class DashboardAdminController {
 
             Parent root = loader.load();
 
-            CarritoVentaController controller =
-                    loader.getController();
+            CarritoVentaController controller
+                    = loader.getController();
 
             controller.setIdUsuario(
                     usuarioActual.getId()
             );
 
-            Stage stage =
-                    (Stage) lblUsuario
+            Stage stage
+                    = (Stage) lblUsuario
                             .getScene()
                             .getWindow();
 
@@ -628,8 +608,8 @@ public class DashboardAdminController {
 
         try {
 
-            FXMLLoader loader =
-                    new FXMLLoader(
+            FXMLLoader loader
+                    = new FXMLLoader(
                             getClass().getResource(
                                     "/org/esperanza/view/ReporteInventario.fxml"
                             )
@@ -637,10 +617,15 @@ public class DashboardAdminController {
 
             Parent root = loader.load();
 
-            Stage ventanaActual =
-                    (Stage) lblUsuario
+            Stage ventanaActual
+                    = (Stage) lblUsuario
                             .getScene()
                             .getWindow();
+
+            ventanaActual.setOnCloseRequest(event -> {
+                event.consume();
+                NavegacionRol.abrirDashboardSegunRol(ventanaActual);
+            });
 
             ventanaActual.setScene(
                     new Scene(root)
@@ -650,6 +635,7 @@ public class DashboardAdminController {
                     "Reportes de Inventario - Librería La Esperanza"
             );
 
+            ventanaActual.sizeToScene();
             ventanaActual.centerOnScreen();
 
         } catch (IOException ex) {
@@ -680,8 +666,8 @@ public class DashboardAdminController {
 
         try {
 
-            java.net.URL pantalla =
-                    getClass().getResource(
+            java.net.URL pantalla
+                    = getClass().getResource(
                             recurso
                     );
 
@@ -695,29 +681,20 @@ public class DashboardAdminController {
                 return;
             }
 
-            FXMLLoader loader =
-                    new FXMLLoader(pantalla);
+            FXMLLoader loader
+                    = new FXMLLoader(pantalla);
 
             Parent root = loader.load();
 
-            Stage ventana = new Stage();
-
-            if (lblUsuario != null
-                    && lblUsuario.getScene() != null
-                    && lblUsuario
+            Stage ventana
+                    = (Stage) lblUsuario
                             .getScene()
-                            .getWindow() != null) {
+                            .getWindow();
 
-                ventana.initOwner(
-                        lblUsuario
-                                .getScene()
-                                .getWindow()
-                );
-            }
-
-            ventana.initModality(
-                    Modality.WINDOW_MODAL
-            );
+            ventana.setOnCloseRequest(event -> {
+                event.consume();
+                NavegacionRol.abrirDashboardSegunRol(ventana);
+            });
 
             ventana.setScene(
                     new Scene(
@@ -729,9 +706,6 @@ public class DashboardAdminController {
 
             ventana.setTitle(titulo);
             ventana.centerOnScreen();
-            ventana.showAndWait();
-
-            actualizarIndicadores();
 
         } catch (IOException ex) {
 
@@ -753,8 +727,8 @@ public class DashboardAdminController {
 
         try {
 
-            FXMLLoader loader =
-                    new FXMLLoader(
+            FXMLLoader loader
+                    = new FXMLLoader(
                             getClass().getResource(
                                     "/org/esperanza/view/Login.fxml"
                             )
@@ -762,8 +736,8 @@ public class DashboardAdminController {
 
             Parent root = loader.load();
 
-            Stage stage =
-                    (Stage) lblUsuario
+            Stage stage
+                    = (Stage) lblUsuario
                             .getScene()
                             .getWindow();
 
@@ -796,8 +770,8 @@ public class DashboardAdminController {
             return;
         }
 
-        Stage stage =
-                (Stage) lblUsuario
+        Stage stage
+                = (Stage) lblUsuario
                         .getScene()
                         .getWindow();
 
@@ -818,8 +792,8 @@ public class DashboardAdminController {
     private void mostrarEnConstruccion(
             String modulo) {
 
-        Alert alert =
-                new Alert(
+        Alert alert
+                = new Alert(
                         Alert.AlertType.INFORMATION
                 );
 
@@ -838,8 +812,8 @@ public class DashboardAdminController {
     private void mostrarError(
             String mensaje) {
 
-        Alert alert =
-                new Alert(
+        Alert alert
+                = new Alert(
                         Alert.AlertType.ERROR
                 );
 

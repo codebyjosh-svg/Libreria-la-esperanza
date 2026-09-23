@@ -21,6 +21,7 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import org.esperanza.dao.ProveedorDAO;
 import org.esperanza.model.Proveedor;
+import org.esperanza.service.NavegacionRol;
 import org.esperanza.service.SesionUsuario;
 
 /** Formulario administrativo con consultas JDBC fuera del hilo de JavaFX. */
@@ -177,7 +178,11 @@ public final class ProveedoresController {
 
     @FXML
     private void onCerrar() {
-        if (ocupado) { mensaje("Espere a que termine la operación antes de cerrar.", true); return; }
-        ((Stage) tablaProveedores.getScene().getWindow()).close();
+        if (ocupado) {
+            mensaje("Espere a que termine la operación antes de cerrar.", true);
+            return;
+        }
+        Stage ventana = (Stage) tablaProveedores.getScene().getWindow();
+        NavegacionRol.abrirDashboardSegunRol(ventana);
     }
 }

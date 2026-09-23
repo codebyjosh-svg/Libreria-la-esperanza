@@ -142,40 +142,30 @@ public class DashboardCajeroController {
 
             Parent root = loader.load();
 
-            Stage modal = new Stage();
-
-            modal.initOwner(
-                    lblBienvenida
-                            .getScene()
-                            .getWindow()
-            );
-
-            modal.initModality(
-                    Modality.WINDOW_MODAL
-            );
-
-            modal.setScene(
-                    new Scene(root)
-            );
+            Stage stage = ventana();
 
             DevolucionesController controller =
                     loader.getController();
 
-            modal.setOnCloseRequest(event -> {
+            stage.setOnCloseRequest(event -> {
+                event.consume();
 
-                if (controller != null
-                        && controller.estaOcupado()) {
-
-                    event.consume();
+                if (controller == null
+                        || !controller.estaOcupado()) {
+                    NavegacionRol.abrirDashboardSegunRol(stage);
                 }
             });
 
-            modal.setTitle(
+            stage.setScene(
+                    new Scene(root)
+            );
+
+            stage.setTitle(
                     "Devoluciones de ventas - Librería La Esperanza"
             );
 
-            modal.centerOnScreen();
-            modal.showAndWait();
+            stage.sizeToScene();
+            stage.centerOnScreen();
 
         } catch (IOException ex) {
 

@@ -23,6 +23,7 @@ import org.esperanza.dao.DevolucionVentaDao;
 import org.esperanza.model.DetalleVenta;
 import org.esperanza.model.EstadoVenta;
 import org.esperanza.model.Venta;
+import org.esperanza.service.NavegacionRol;
 import org.esperanza.service.SesionUsuario;
 
 public class DevolucionesController {
@@ -182,7 +183,9 @@ public class DevolucionesController {
     public boolean estaOcupado() { return ocupado; }
 
     @FXML private void onCerrar() {
-        if (!ocupado) ((Stage) formulario.getScene().getWindow()).close();
+        if (ocupado) return;
+        Stage ventana = (Stage) formulario.getScene().getWindow();
+        NavegacionRol.abrirDashboardSegunRol(ventana);
     }
 
     private void mostrarError(String mensaje) {

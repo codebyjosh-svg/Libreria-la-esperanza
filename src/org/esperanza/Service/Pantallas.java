@@ -65,9 +65,13 @@ public final class Pantallas {
 
             Stage ventana = (Stage) origen.getScene().getWindow();
 
-            ventana.setOnCloseRequest(null);
+            ventana.setOnCloseRequest(event -> {
+                event.consume();
+                NavegacionRol.abrirDashboardSegunRol(ventana);
+            });
             ventana.setScene(new Scene(contenido));
             ventana.setTitle(titulo + " - Librería La Esperanza");
+            ventana.sizeToScene();
             ventana.centerOnScreen();
 
         } catch (Exception ex) {
