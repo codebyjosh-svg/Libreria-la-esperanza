@@ -8,21 +8,14 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.esperanza.dao.VentaDao;
 
 public class CarritoVenta {
 
-    // =====================================================
-    // PRODUCTOS DEL CARRITO
-    // =====================================================
-
     private final Map<String, DetalleVenta> productos =
             new LinkedHashMap<>();
-
-    // =====================================================
-    // AGREGAR PRODUCTO
-    // =====================================================
 
     public void agregarProducto(
             String isbn,
@@ -40,10 +33,6 @@ public class CarritoVenta {
         DetalleVenta actual =
                 productos.get(isbnLimpio);
 
-        /*
-         * Si el libro ya existe,
-         * aumentar su cantidad.
-         */
         if (actual != null) {
 
             if (actual
@@ -79,9 +68,6 @@ public class CarritoVenta {
             return;
         }
 
-        /*
-         * Si no existe, agregar uno nuevo.
-         */
         DetalleVenta nuevo =
                 new DetalleVenta(
                         0,
@@ -96,10 +82,6 @@ public class CarritoVenta {
                 nuevo
         );
     }
-
-    // =====================================================
-    // CAMBIAR CANTIDAD
-    // =====================================================
 
     public void cambiarCantidad(
             String isbn,
@@ -127,10 +109,6 @@ public class CarritoVenta {
         );
     }
 
-    // =====================================================
-    // QUITAR PRODUCTO
-    // =====================================================
-
     public boolean quitarProducto(
             String isbn) {
 
@@ -142,27 +120,15 @@ public class CarritoVenta {
         ) != null;
     }
 
-    // =====================================================
-    // COMPROBAR SI ESTÁ VACÍO
-    // =====================================================
-
     public boolean estaVacio() {
 
         return productos.isEmpty();
     }
 
-    // =====================================================
-    // VACIAR CARRITO
-    // =====================================================
-
     public void vaciar() {
 
         productos.clear();
     }
-
-    // =====================================================
-    // OBTENER DETALLES
-    // =====================================================
 
     public List<DetalleVenta> getDetalles() {
 
@@ -195,10 +161,6 @@ public class CarritoVenta {
         );
     }
 
-    // =====================================================
-    // OBTENER TOTAL
-    // =====================================================
-
     public BigDecimal getTotal() {
 
         BigDecimal total =
@@ -229,14 +191,25 @@ public class CarritoVenta {
         );
     }
 
-    // =====================================================
-    // CONFIRMAR VENTA
-    // =====================================================
-
     public Venta confirmarVenta(
             long cuiCliente,
             int idUsuario,
             VentaDao ventaDao)
+            throws SQLException {
+
+        return confirmarVenta(
+                cuiCliente,
+                idUsuario,
+                ventaDao,
+                DescuentoVenta.sinDescuento()
+        );
+    }
+
+    public Venta confirmarVenta(
+            long cuiCliente,
+            int idUsuario,
+            VentaDao ventaDao,
+            DescuentoVenta descuento)
             throws SQLException {
 
         if (estaVacio()) {
@@ -268,22 +241,25 @@ public class CarritoVenta {
         }
 
         /*
-         * Crear copia antes de guardar.
+         * Creamos la copia antes de guardar.
+         * Si falla la base de datos,
+         * el carrito conserva sus productos.
          */
         List<DetalleVenta> detalles =
                 getDetalles();
 
-        /*
-         * Registrar la venta.
-         *
-         * Si registrar() lanza SQLException,
-         * el carrito NO se vacía.
-         */
+        DescuentoVenta descuentoAplicado =
+                Objects.requireNonNull(
+                        descuento,
+                        "El descuento no puede ser nulo."
+                );
+
         Venta venta =
                 ventaDao.registrar(
                         cuiCliente,
                         idUsuario,
-                        detalles
+                        detalles,
+                        descuentoAplicado
                 );
 
         if (venta == null) {
@@ -294,17 +270,13 @@ public class CarritoVenta {
         }
 
         /*
-         * Solo vaciar cuando la venta
-         * se registró correctamente.
+         * El carrito solamente se vacía
+         * después de registrar correctamente.
          */
         vaciar();
 
         return venta;
     }
-
-    // =====================================================
-    // VALIDAR ISBN
-    // =====================================================
 
     private String validarIsbn(
             String isbn) {
@@ -320,10 +292,6 @@ public class CarritoVenta {
         return isbn.trim();
     }
 
-    // =====================================================
-    // VALIDAR CANTIDAD
-    // =====================================================
-
     private void validarCantidad(
             int cantidad) {
 
@@ -334,10 +302,6 @@ public class CarritoVenta {
             );
         }
     }
-
-    // =====================================================
-    // VALIDAR PRECIO
-    // =====================================================
 
     private BigDecimal validarPrecio(
             BigDecimal precioUnitario) {
@@ -358,9 +322,6 @@ public class CarritoVenta {
             );
         }
 
-        /*
-         * Máximo dos decimales.
-         */
         if (precioUnitario.scale() > 2) {
 
             throw new IllegalArgumentException(

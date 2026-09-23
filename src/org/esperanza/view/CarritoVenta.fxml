@@ -254,6 +254,27 @@
 
             </HBox>
 
+            <Separator/>
+
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <VBox spacing="5">
+                    <Label text="Tipo de descuento"/>
+                    <ComboBox fx:id="cmbTipoDescuento" prefWidth="190"/>
+                </VBox>
+                <VBox spacing="5">
+                    <Label text="Valor del descuento"/>
+                    <TextField fx:id="txtValorDescuento"
+                               promptText="Ej. 10 o 12.50"
+                               prefWidth="160"/>
+                </VBox>
+                <Label fx:id="lblAvisoDescuento" wrapText="true"/>
+            </HBox>
+
+            <HBox spacing="20">
+                <Label fx:id="lblSubtotalVenta" text="Subtotal: Q0.00"/>
+                <Label fx:id="lblDescuentoVenta" text="Descuento: -Q0.00"/>
+            </HBox>
+
             <Label fx:id="lblTotal"
                    text="Total: Q0.00"
                    style="-fx-font-size: 24px; -fx-font-weight: bold;"/>

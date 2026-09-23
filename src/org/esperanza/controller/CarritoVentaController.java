@@ -14,6 +14,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -22,6 +23,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import org.esperanza.service.NavegacionRol;
+import org.esperanza.service.SesionUsuario;
 import org.esperanza.dao.ClienteDao;
 import org.esperanza.dao.LibroDAO;
 import org.esperanza.dao.VentaDao;
@@ -29,6 +31,7 @@ import org.esperanza.dao.impl.LibroDAOImpl;
 import org.esperanza.model.CarritoVenta;
 import org.esperanza.model.Cliente;
 import org.esperanza.model.DetalleVenta;
+import org.esperanza.model.DescuentoVenta;
 import org.esperanza.model.Libro;
 import org.esperanza.model.Venta;
 import org.esperanza.view.ComprobanteVenta;
@@ -71,6 +74,11 @@ public class CarritoVentaController {
     @FXML private Button btnVaciar;
     @FXML private Button btnConfirmar;
 
+    @FXML private ComboBox<DescuentoVenta.Tipo> cmbTipoDescuento;
+    @FXML private TextField txtValorDescuento;
+    @FXML private Label lblSubtotalVenta;
+    @FXML private Label lblDescuentoVenta;
+    @FXML private Label lblAvisoDescuento;
     @FXML private Label lblTotal;
     @FXML private Label lblMensaje;
 
@@ -106,6 +114,8 @@ public class CarritoVentaController {
         txtCantidad.setText("1");
         txtNuevaCantidad.setText("1");
         lblTotal.setText("Total: Q0.00");
+        configurarDescuento();
+
         lblClienteSeleccionado.setText(
                 "Cliente seleccionado: ninguno"
         );
@@ -183,6 +193,157 @@ public class CarritoVentaController {
                             }
                         }
                 );
+    }
+
+    private void configurarDescuento() {
+        boolean admin = SesionUsuario.getInstancia().esAdmin();
+
+        cmbTipoDescuento
+                .getItems()
+                .setAll(
+                        DescuentoVenta.Tipo.values()
+                );
+
+        cmbTipoDescuento
+                .getSelectionModel()
+                .select(
+                        DescuentoVenta.Tipo.NINGUNO
+                );
+
+        cmbTipoDescuento.setDisable(!admin);
+        txtValorDescuento.setDisable(true);
+
+        cmbTipoDescuento
+                .valueProperty()
+                .addListener(
+                        (obs, anterior, nuevo) -> {
+
+                            txtValorDescuento.clear();
+
+                            txtValorDescuento.setDisable(
+                                    !admin
+                                    || nuevo
+                                    == DescuentoVenta.Tipo.NINGUNO
+                            );
+
+                            actualizarTotales();
+                        }
+                );
+
+        txtValorDescuento
+                .textProperty()
+                .addListener(
+                        (obs, anterior, nuevo)
+                        -> actualizarTotales()
+                );
+
+        actualizarTotales();
+    }
+
+    private DescuentoVenta leerDescuento() {
+
+        DescuentoVenta.Tipo tipo =
+                cmbTipoDescuento.getValue();
+
+        if (tipo == null
+                || tipo
+                == DescuentoVenta.Tipo.NINGUNO) {
+
+            return DescuentoVenta
+                    .sinDescuento();
+        }
+
+        if (!SesionUsuario
+                .getInstancia()
+                .esAdmin()) {
+
+            throw new SecurityException(
+                    "Solo un administrador puede aplicar descuentos."
+            );
+        }
+
+        String texto =
+                txtValorDescuento
+                        .getText()
+                        .trim();
+
+        if (!texto.matches(
+                "\\d+([.,]\\d{1,2})?")) {
+
+            throw new IllegalArgumentException(
+                    "Ingresa un descuento válido con hasta dos decimales."
+            );
+        }
+
+        BigDecimal valor =
+                new BigDecimal(
+                        texto.replace(
+                                ',',
+                                '.'
+                        )
+                );
+
+        return tipo
+                == DescuentoVenta.Tipo.PORCENTAJE
+                        ? DescuentoVenta
+                                .porcentaje(valor)
+                        : DescuentoVenta
+                                .monto(valor);
+    }
+
+    private void actualizarTotales() {
+
+        BigDecimal subtotal =
+                carrito.getTotal();
+
+        lblSubtotalVenta.setText(
+                "Subtotal: Q"
+                + subtotal.toPlainString()
+        );
+
+        try {
+
+            BigDecimal descuento =
+                    leerDescuento()
+                            .calcularMonto(
+                                    subtotal
+                            );
+
+            lblDescuentoVenta.setText(
+                    "Descuento: -Q"
+                    + descuento.toPlainString()
+            );
+
+            lblTotal.setText(
+                    "Total: Q"
+                    + subtotal
+                            .subtract(descuento)
+                            .toPlainString()
+            );
+
+            lblAvisoDescuento.setText(
+                    SesionUsuario
+                            .getInstancia()
+                            .esAdmin()
+                            ? "Descuento autorizado para administrador."
+                            : "Solo un administrador puede aplicar descuentos."
+            );
+
+        } catch (IllegalArgumentException
+                | SecurityException e) {
+
+            lblDescuentoVenta.setText(
+                    "Descuento: valor inválido"
+            );
+
+            lblTotal.setText(
+                    "Total: —"
+            );
+
+            lblAvisoDescuento.setText(
+                    e.getMessage()
+            );
+        }
     }
 
     private void configurarTablaClientes() {
@@ -851,11 +1012,15 @@ public class CarritoVentaController {
                             carrito.getDetalles()
                     );
 
+            DescuentoVenta descuento =
+                    leerDescuento();
+
             Venta venta =
                     carrito.confirmarVenta(
                             cliente.getCui(),
                             idUsuario,
-                            ventaDao
+                            ventaDao,
+                            descuento
                     );
 
             if (venta == null) {
@@ -874,6 +1039,14 @@ public class CarritoVentaController {
                     detalles,
                     stage
             );
+
+            cmbTipoDescuento
+                    .getSelectionModel()
+                    .select(
+                            DescuentoVenta.Tipo.NINGUNO
+                    );
+
+            txtValorDescuento.clear();
 
             refrescar(
                     null
@@ -900,7 +1073,9 @@ public class CarritoVentaController {
                     "1"
             );
 
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException
+                | SecurityException e) {
+
             mostrarError(
                     e.getMessage()
             );
@@ -935,12 +1110,7 @@ public class CarritoVentaController {
                 carrito.getDetalles()
         );
 
-        lblTotal.setText(
-                "Total: Q"
-                + carrito
-                        .getTotal()
-                        .toPlainString()
-        );
+        actualizarTotales();
 
         if (isbnSeleccionado == null) {
 
@@ -1066,17 +1236,12 @@ public class CarritoVentaController {
 
             if (tabla == null
                     || tabla.getScene() == null
-                    || tabla
-                            .getScene()
-                            .getWindow() == null) {
+                    || !(tabla.getScene()
+                            .getWindow()
+                            instanceof Stage stage)) {
 
                 return;
             }
-
-            Stage stage =
-                    (Stage) tabla
-                            .getScene()
-                            .getWindow();
 
             stage.setOnCloseRequest(
                     event -> {

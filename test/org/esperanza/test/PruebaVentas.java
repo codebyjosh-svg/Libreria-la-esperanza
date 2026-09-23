@@ -1,3 +1,5 @@
+package org.esperanza.test;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.math.BigDecimal;
@@ -23,10 +25,15 @@ public class PruebaVentas {
         boolean cerrada;
         boolean fallarDetalle;
         boolean fallarStock;
+        boolean fallarCommit;
+        boolean fallarRollback;
+        int fallarActualizacionNumero;
+        int intentosActualizacionStock;
 
         int insertados;
         int actualizacionesStock;
         int stockDisponible = 100;
+        int stockAntesTransaccion;
         boolean usuarioAdmin = true;
         boolean usuarioActivo = true;
         int autorizaciones;
@@ -46,13 +53,26 @@ public class PruebaVentas {
         Connection conectar() {
             return proxy(Connection.class, (obj, metodo, args) -> {
                 return switch (metodo.getName()) {
-                    case "setAutoCommit" -> null;
+                    case "setAutoCommit" -> {
+                        if ((boolean) args[0]) {
+                            throw new AssertionError("La conexión debe cerrarse sin reactivar auto-commit");
+                        }
+                        stockAntesTransaccion = stockDisponible;
+                        yield null;
+                    }
                     case "commit" -> {
+                        if (fallarCommit) {
+                            throw new SQLException("Fallo simulado al confirmar la venta");
+                        }
                         commit = true;
                         yield null;
                     }
                     case "rollback" -> {
                         rollback = true;
+                        if (fallarRollback) {
+                            throw new SQLException("Fallo simulado al revertir la venta");
+                        }
+                        stockDisponible = stockAntesTransaccion;
                         yield null;
                     }
                     case "close" -> {
@@ -69,6 +89,7 @@ public class PruebaVentas {
         }
 
         private PreparedStatement crearPreparedStatement(String sql) {
+            int[] cantidadStock = {0};
             return proxy(PreparedStatement.class, (obj, metodo, args) -> {
                 String nombre = metodo.getName();
 
@@ -80,6 +101,10 @@ public class PruebaVentas {
                         default -> throw new AssertionError("Parámetro inesperado");
                     }
                     return null;
+                }
+                if (nombre.equals("setInt") && sql.contains("UPDATE libros")
+                        && (int) args[0] == 1) {
+                    cantidadStock[0] = (int) args[1];
                 }
                 if (nombre.startsWith("set") || nombre.equals("close")) return null;
 
@@ -97,10 +122,15 @@ public class PruebaVentas {
                     }
 
                     if (sql.contains("UPDATE libros")) {
-                        if (fallarStock) {
+                        intentosActualizacionStock++;
+                        if (fallarStock || intentosActualizacionStock == fallarActualizacionNumero) {
                             throw new SQLException("Fallo simulado al actualizar stock");
                         }
 
+                        if (cantidadStock[0] <= 0 || stockDisponible < cantidadStock[0]) {
+                            return 0;
+                        }
+                        stockDisponible -= cantidadStock[0];
                         actualizacionesStock++;
                         return 1;
                     }

@@ -1,68 +1,149 @@
 package org.esperanza.dao;
 
-import java.sql.*;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
 import org.esperanza.model.Usuario;
 import org.esperanza.util.Conexion;
 import org.esperanza.util.PasswordUtil;
 
 public class UsuarioDao {
 
-    public Usuario iniciarSesion(String username, String passwordHash) {
-        String sql = "{call sp_iniciar_sesion(?, ?)}";
+    private final ProveedorConexion conexiones;
 
-        try (Connection con = Conexion.getInstancia().conectar();
-             CallableStatement cs = con.prepareCall(sql)) {
+    public UsuarioDao() {
+        this(() -> Conexion.getInstancia().conectar());
+    }
 
-            cs.setString(1, username);
-            cs.setString(2, passwordHash);
+    public UsuarioDao(ProveedorConexion conexiones) {
+        this.conexiones = Objects.requireNonNull(
+                conexiones,
+                "conexiones"
+        );
+    }
 
-            try (ResultSet rs = cs.executeQuery()) {
-                return rs.next() ? mapearUsuario(rs) : null;
+    public Usuario iniciarSesion(
+            String username,
+            String passwordHash)
+            throws SQLException {
+
+        String sql =
+                "{call sp_iniciar_sesion(?, ?)}";
+
+        try (
+            Connection con =
+                    conexiones.conectar();
+
+            CallableStatement cs =
+                    con.prepareCall(sql)
+        ) {
+
+            cs.setString(
+                    1,
+                    username
+            );
+
+            cs.setString(
+                    2,
+                    passwordHash
+            );
+
+            try (
+                ResultSet rs =
+                        cs.executeQuery()
+            ) {
+
+                if (rs.next()) {
+                    return mapearUsuario(rs);
+                }
+
+                return null;
             }
-
-        } catch (SQLException e) {
-            System.err.println("Error al iniciar sesión: " + e.getMessage());
-            return null;
         }
     }
 
-    public Usuario buscarPorUsername(String username) {
-        String sql = "{call sp_buscar_usuario(?)}";
+    public Usuario buscarPorUsername(
+            String username)
+            throws SQLException {
 
-        try (Connection con = Conexion.getInstancia().conectar();
-             CallableStatement cs = con.prepareCall(sql)) {
+        String sql =
+                "{call sp_buscar_usuario(?)}";
 
-            cs.setString(1, username);
+        try (
+            Connection con =
+                    conexiones.conectar();
 
-            try (ResultSet rs = cs.executeQuery()) {
-                return rs.next() ? mapearUsuario(rs) : null;
+            CallableStatement cs =
+                    con.prepareCall(sql)
+        ) {
+
+            cs.setString(
+                    1,
+                    username
+            );
+
+            try (
+                ResultSet rs =
+                        cs.executeQuery()
+            ) {
+
+                if (rs.next()) {
+                    return mapearUsuario(rs);
+                }
+
+                return null;
             }
-
-        } catch (SQLException e) {
-            System.err.println("Error al buscar usuario: " + e.getMessage());
-            return null;
         }
     }
 
     public List<Usuario> listarUsuarios() {
-        List<Usuario> usuarios = new ArrayList<>();
+
+        List<Usuario> usuarios =
+                new ArrayList<>();
 
         String sql = """
-                SELECT id, username, rol, nombre, apellido, correo, activo
+                SELECT
+                    id,
+                    username,
+                    rol,
+                    nombre,
+                    apellido,
+                    correo,
+                    activo
                 FROM usuarios
                 ORDER BY id
                 """;
 
-        try (Connection con = Conexion.getInstancia().conectar();
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (
+            Connection con =
+                    conexiones.conectar();
 
-            while (rs.next()) usuarios.add(mapearUsuario(rs));
+            PreparedStatement ps =
+                    con.prepareStatement(sql);
+
+            ResultSet rs =
+                    ps.executeQuery()
+        ) {
+
+            while (rs.next()) {
+
+                usuarios.add(
+                        mapearUsuario(rs)
+                );
+            }
 
         } catch (SQLException e) {
-            System.err.println("Error al listar usuarios: " + e.getMessage());
+
+            System.err.println(
+                    "Error al listar usuarios: "
+                    + e.getMessage()
+            );
         }
 
         return usuarios;
@@ -76,125 +157,294 @@ public class UsuarioDao {
             String apellido,
             String correo) {
 
-        String sql = "{call sp_registrar_usuario(?, ?, ?, ?, ?, ?)}";
+        String sql =
+                "{call sp_registrar_usuario(?, ?, ?, ?, ?, ?)}";
 
-        try (Connection con = Conexion.getInstancia().conectar();
-             CallableStatement cs = con.prepareCall(sql)) {
+        try (
+            Connection con =
+                    conexiones.conectar();
 
-            cs.setString(1, username);
-            cs.setString(2, passwordHash);
-            cs.setString(3, rol);
-            cs.setString(4, nombre);
-            cs.setString(5, apellido);
-            cs.setString(6, correo);
+            CallableStatement cs =
+                    con.prepareCall(sql)
+        ) {
+
+            cs.setString(
+                    1,
+                    username
+            );
+
+            cs.setString(
+                    2,
+                    passwordHash
+            );
+
+            cs.setString(
+                    3,
+                    rol
+            );
+
+            cs.setString(
+                    4,
+                    nombre
+            );
+
+            cs.setString(
+                    5,
+                    apellido
+            );
+
+            cs.setString(
+                    6,
+                    correo
+            );
+
             cs.execute();
 
             return true;
 
         } catch (SQLException e) {
-            System.err.println("Error al registrar usuario: " + e.getMessage());
+
+            System.err.println(
+                    "Error al registrar usuario: "
+                    + e.getMessage()
+            );
+
             return false;
         }
     }
 
-    public boolean cambiarEstadoUsuario(int id, boolean activo) {
-        String sql = "UPDATE usuarios SET activo = ? WHERE id = ?";
+    public boolean cambiarEstadoUsuario(
+            int id,
+            boolean activo) {
 
-        try (Connection con = Conexion.getInstancia().conectar();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+        String sql =
+                "UPDATE usuarios "
+                + "SET activo = ? "
+                + "WHERE id = ?";
 
-            ps.setBoolean(1, activo);
-            ps.setInt(2, id);
+        try (
+            Connection con =
+                    conexiones.conectar();
+
+            PreparedStatement ps =
+                    con.prepareStatement(sql)
+        ) {
+
+            ps.setBoolean(
+                    1,
+                    activo
+            );
+
+            ps.setInt(
+                    2,
+                    id
+            );
 
             return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            System.err.println("Error al cambiar estado: " + e.getMessage());
+
+            System.err.println(
+                    "Error al cambiar estado: "
+                    + e.getMessage()
+            );
+
             return false;
         }
     }
 
-    public boolean desactivarUsuario(int id) {
-        return cambiarEstadoUsuario(id, false);
+    public boolean desactivarUsuario(
+            int id) {
+
+        return cambiarEstadoUsuario(
+                id,
+                false
+        );
     }
 
-    public boolean activarUsuario(int id) {
-        return cambiarEstadoUsuario(id, true);
+    public boolean activarUsuario(
+            int id) {
+
+        return cambiarEstadoUsuario(
+                id,
+                true
+        );
     }
 
-    public boolean existeUsername(String username) {
-        String sql = "SELECT 1 FROM usuarios WHERE username = ? LIMIT 1";
+    public boolean existeUsername(
+            String username) {
 
-        try (Connection con = Conexion.getInstancia().conectar();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+        String sql =
+                "SELECT 1 "
+                + "FROM usuarios "
+                + "WHERE username = ? "
+                + "LIMIT 1";
 
-            ps.setString(1, username);
+        try (
+            Connection con =
+                    conexiones.conectar();
 
-            try (ResultSet rs = ps.executeQuery()) {
+            PreparedStatement ps =
+                    con.prepareStatement(sql)
+        ) {
+
+            ps.setString(
+                    1,
+                    username
+            );
+
+            try (
+                ResultSet rs =
+                        ps.executeQuery()
+            ) {
+
                 return rs.next();
             }
 
         } catch (SQLException e) {
-            System.err.println("Error al validar username: " + e.getMessage());
+
+            System.err.println(
+                    "Error al validar username: "
+                    + e.getMessage()
+            );
+
             return false;
         }
     }
 
-    public boolean validarPasswordActual(int idUsuario, String password) {
-        String sql = "SELECT password_hash FROM usuarios WHERE id = ?";
-        String hash = PasswordUtil.hashSHA256(password);
+    public boolean validarPasswordActual(
+            int idUsuario,
+            String password) {
 
-        try (Connection con = Conexion.getInstancia().conectar();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+        String sql =
+                "SELECT password_hash "
+                + "FROM usuarios "
+                + "WHERE id = ?";
 
-            ps.setInt(1, idUsuario);
+        String hash =
+                PasswordUtil.hashSHA256(
+                        password
+                );
 
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next() && hash.equals(rs.getString("password_hash"));
+        try (
+            Connection con =
+                    conexiones.conectar();
+
+            PreparedStatement ps =
+                    con.prepareStatement(sql)
+        ) {
+
+            ps.setInt(
+                    1,
+                    idUsuario
+            );
+
+            try (
+                ResultSet rs =
+                        ps.executeQuery()
+            ) {
+
+                return rs.next()
+                        && hash.equals(
+                                rs.getString(
+                                        "password_hash"
+                                )
+                        );
             }
 
         } catch (SQLException e) {
-            System.err.println("Error al validar contraseña: " + e.getMessage());
+
+            System.err.println(
+                    "Error al validar contraseña: "
+                    + e.getMessage()
+            );
+
             return false;
         }
     }
 
-    public boolean actualizarPassword(int idUsuario, String nuevaPassword) {
-        String sql = "UPDATE usuarios SET password_hash = ? WHERE id = ?";
+    public boolean actualizarPassword(
+            int idUsuario,
+            String nuevaPassword) {
 
-        try (Connection con = Conexion.getInstancia().conectar();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+        String sql =
+                "UPDATE usuarios "
+                + "SET password_hash = ? "
+                + "WHERE id = ?";
 
-            ps.setString(1, PasswordUtil.hashSHA256(nuevaPassword));
-            ps.setInt(2, idUsuario);
+        try (
+            Connection con =
+                    conexiones.conectar();
+
+            PreparedStatement ps =
+                    con.prepareStatement(sql)
+        ) {
+
+            ps.setString(
+                    1,
+                    PasswordUtil.hashSHA256(
+                            nuevaPassword
+                    )
+            );
+
+            ps.setInt(
+                    2,
+                    idUsuario
+            );
 
             return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            System.err.println("Error al actualizar contraseña: " + e.getMessage());
+
+            System.err.println(
+                    "Error al actualizar contraseña: "
+                    + e.getMessage()
+            );
+
             return false;
         }
     }
 
-    private Usuario mapearUsuario(ResultSet rs) throws SQLException {
-        Usuario usuario = new Usuario();
+    private Usuario mapearUsuario(
+            ResultSet rs)
+            throws SQLException {
 
-        usuario.setId(rs.getInt("id"));
-        usuario.setUsrname(rs.getString("username"));
-        usuario.setRol(rs.getString("rol"));
-        usuario.setNombre(rs.getString("nombre"));
-        usuario.setApellido(rs.getString("apellido"));
+        Usuario usuario =
+                new Usuario();
+
+        usuario.setId(
+                rs.getInt("id")
+        );
+
+        usuario.setUsrname(
+                rs.getString("username")
+        );
+
+        usuario.setRol(
+                rs.getString("rol")
+        );
+
+        usuario.setNombre(
+                rs.getString("nombre")
+        );
+
+        usuario.setApellido(
+                rs.getString("apellido")
+        );
 
         try {
-            usuario.setCorreo(rs.getString("correo"));
+
+            usuario.setCorreo(
+                    rs.getString("correo")
+            );
+
         } catch (SQLException ignored) {
         }
 
-        try {
-            usuario.setActivo(rs.getBoolean("activo"));
-        } catch (SQLException ignored) {
-            usuario.setActivo(true);
-        }
+       
+        usuario.setActivo(
+                rs.getBoolean("activo")
+        );
 
         return usuario;
     }

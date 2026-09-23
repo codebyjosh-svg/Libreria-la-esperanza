@@ -16,6 +16,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.esperanza.Model.Rol;
+import org.esperanza.Model.Usuario;
+import org.esperanza.Service.SesionUsuario;
+import org.esperanza.model.DescuentoVenta;
 import org.esperanza.model.DetalleVenta;
 import org.esperanza.model.Venta;
 import org.esperanza.util.Conexion;
@@ -54,8 +58,17 @@ public class VentaDao {
     public Venta registrar(
             long cuiCliente,
             int idUsuario,
-            List<DetalleVenta> detalles)
-            throws SQLException {
+            List<DetalleVenta> detalles) throws SQLException {
+        return registrar(cuiCliente, idUsuario, detalles,
+                DescuentoVenta.sinDescuento());
+    }
+
+    public Venta registrar(
+            long cuiCliente,
+            int idUsuario,
+            List<DetalleVenta> detalles,
+            DescuentoVenta descuentoSolicitado) throws SQLException {
+        Objects.requireNonNull(descuentoSolicitado, "descuentoSolicitado");
 
         if (cuiCliente <= 0) {
 
@@ -121,8 +134,16 @@ public class VentaDao {
                     );
         }
 
-        BigDecimal descuento =
-                BigDecimal.ZERO;
+        BigDecimal descuento = descuentoSolicitado.calcularMonto(subtotal);
+
+        if (descuento.signum() > 0) {
+            SesionUsuario sesion = SesionUsuario.getInstancia();
+            Usuario actual = sesion.getUsuarioActual();
+            if (!sesion.esAdmin() || actual == null || actual.getId() != idUsuario) {
+                throw new SecurityException(
+                        "Solo un administrador con sesión activa puede aplicar descuentos.");
+            }
+        }
 
         BigDecimal total =
                 subtotal.subtract(
@@ -147,6 +168,9 @@ public class VentaDao {
             conexion.setAutoCommit(false);
 
             try {
+                if (descuento.signum() > 0) {
+                    validarAdministrador(conexion, idUsuario);
+                }
 
                 for (DetalleVenta detalle : copia) {
 
@@ -260,19 +284,25 @@ public class VentaDao {
 
                 throw e;
 
-            } finally {
-
-                try {
-
-                    conexion.setAutoCommit(true);
-
-                } catch (SQLException ignored) {
-
-                }
             }
         }
 
         return venta;
+    }
+
+    private void validarAdministrador(Connection conexion, int idUsuario)
+            throws SQLException {
+        String sql = "SELECT rol, activo FROM usuarios WHERE id = ?";
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+            ps.setInt(1, idUsuario);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next() || !rs.getBoolean("activo")
+                        || Rol.fromString(rs.getString("rol")) != Rol.ADMIN) {
+                    throw new SecurityException(
+                            "El usuario no tiene autorización vigente para aplicar descuentos.");
+                }
+            }
+        }
     }
 
     public Optional<Venta> buscarPorId(
