@@ -77,6 +77,13 @@ public class DashboardAdminController {
 
         actualizarUsuario();
         actualizarIndicadores();
+
+        Platform.runLater(() -> {
+            Stage stage = obtenerStagePrincipal();
+            if (stage != null) {
+                stage.setOnCloseRequest(null);
+            }
+        });
     }
 
     @FXML
@@ -396,11 +403,47 @@ public class DashboardAdminController {
     @FXML
     private void onCategoriasClick() {
 
-        Pantallas.catalogo(
-                lblUsuario,
-                "categorias",
-                "Categorías"
-        );
+        try {
+
+            URL recurso = getClass().getResource(
+                    "/org/esperanza/view/Categorias.fxml"
+            );
+
+            if (recurso == null) {
+                mostrarError(
+                        "No se encontró Categorias.fxml."
+                );
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(recurso);
+            Parent root = loader.load();
+
+            Stage stage = obtenerStagePrincipal();
+
+            if (stage == null) {
+                return;
+            }
+
+            stage.setOnCloseRequest(event -> {
+                event.consume();
+                NavegacionRol.abrirDashboardSegunRol(stage);
+            });
+
+            stage.setScene(new Scene(root));
+            stage.setTitle(
+                    "Gestión de Categorías - Librería La Esperanza"
+            );
+            stage.sizeToScene();
+            stage.centerOnScreen();
+
+        } catch (IOException ex) {
+
+            mostrarError(
+                    "No se pudo abrir Gestión de Categorías.\n"
+                    + ex.getMessage()
+            );
+        }
     }
 
     @FXML
@@ -445,24 +488,31 @@ public class DashboardAdminController {
 
         try {
 
-            FXMLLoader loader =
-                    new FXMLLoader(
-                            getClass().getResource(
-                                    "/org/esperanza/view/"
-                                    + vista
-                                    + ".fxml"
-                            )
-                    );
+            URL recurso = getClass().getResource(
+                    "/org/esperanza/view/"
+                    + vista
+                    + ".fxml"
+            );
 
+            if (recurso == null) {
+                mostrarError(
+                        "No se encontró la pantalla: "
+                        + vista
+                        + ".fxml"
+                );
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(recurso);
             Parent root = loader.load();
 
-            Stage ventana =
-                    (Stage) lblUsuario
-                            .getScene()
-                            .getWindow();
+            Stage ventana = obtenerStagePrincipal();
 
-            Object controller =
-                    loader.getController();
+            if (ventana == null) {
+                return;
+            }
+
+            Object controller = loader.getController();
 
             ventana.setOnCloseRequest(event -> {
 
@@ -482,15 +532,11 @@ public class DashboardAdminController {
                 }
             });
 
-            ventana.setScene(
-                    new Scene(root)
-            );
-
+            ventana.setScene(new Scene(root));
             ventana.setTitle(
                     titulo
                     + " - Librería La Esperanza"
             );
-
             ventana.sizeToScene();
             ventana.centerOnScreen();
 
@@ -792,6 +838,7 @@ public class DashboardAdminController {
                     );
 
         } else {
+
             stage.close();
         }
     }
