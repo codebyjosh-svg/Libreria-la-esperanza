@@ -12,14 +12,15 @@ import org.esperanza.util.Conexion;
 
 public class CategoriaDao {
 
-    public List<Categoria> listarCategorias() throws SQLException {
+    public List<Categoria> listarCategorias()
+            throws SQLException {
 
         List<Categoria> lista = new ArrayList<>();
 
         String sql = """
-                SELECT id_categoria, nombre, descripcion
+                SELECT id_categoria, nombre_categoria
                 FROM categorias
-                ORDER BY nombre
+                ORDER BY nombre_categoria
                 """;
 
         try (
@@ -42,11 +43,7 @@ public class CategoriaDao {
                 );
 
                 categoria.setNombre(
-                        rs.getString("nombre")
-                );
-
-                categoria.setDescripcion(
-                        rs.getString("descripcion")
+                        rs.getString("nombre_categoria")
                 );
 
                 lista.add(categoria);
@@ -57,12 +54,13 @@ public class CategoriaDao {
     }
 
     public void insertarCategoria(
-            Categoria categoria) throws SQLException {
+            Categoria categoria)
+            throws SQLException {
 
         String sql = """
                 INSERT INTO categorias
-                (nombre, descripcion)
-                VALUES (?, ?)
+                (nombre_categoria)
+                VALUES (?)
                 """;
 
         try (
@@ -78,21 +76,17 @@ public class CategoriaDao {
                     categoria.getNombre()
             );
 
-            ps.setString(
-                    2,
-                    categoria.getDescripcion()
-            );
-
             ps.executeUpdate();
         }
     }
 
     public void actualizarCategoria(
-            Categoria categoria) throws SQLException {
+            Categoria categoria)
+            throws SQLException {
 
         String sql = """
                 UPDATE categorias
-                SET nombre = ?, descripcion = ?
+                SET nombre_categoria = ?
                 WHERE id_categoria = ?
                 """;
 
@@ -109,13 +103,8 @@ public class CategoriaDao {
                     categoria.getNombre()
             );
 
-            ps.setString(
-                    2,
-                    categoria.getDescripcion()
-            );
-
             ps.setInt(
-                    3,
+                    2,
                     categoria.getIdCategoria()
             );
 
@@ -125,7 +114,8 @@ public class CategoriaDao {
 
     public boolean existeNombre(
             String nombre,
-            Integer idCategoriaExcluir) throws SQLException {
+            Integer idCategoriaExcluir)
+            throws SQLException {
 
         String sql;
 
@@ -134,7 +124,7 @@ public class CategoriaDao {
             sql = """
                     SELECT COUNT(*)
                     FROM categorias
-                    WHERE LOWER(nombre) = LOWER(?)
+                    WHERE LOWER(nombre_categoria) = LOWER(?)
                     """;
 
         } else {
@@ -142,7 +132,7 @@ public class CategoriaDao {
             sql = """
                     SELECT COUNT(*)
                     FROM categorias
-                    WHERE LOWER(nombre) = LOWER(?)
+                    WHERE LOWER(nombre_categoria) = LOWER(?)
                     AND id_categoria <> ?
                     """;
         }
@@ -161,6 +151,7 @@ public class CategoriaDao {
             );
 
             if (idCategoriaExcluir != null) {
+
                 ps.setInt(
                         2,
                         idCategoriaExcluir

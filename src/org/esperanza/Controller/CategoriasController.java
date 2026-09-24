@@ -11,7 +11,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
@@ -28,9 +27,6 @@ public class CategoriasController {
     private TextField txtNombre;
 
     @FXML
-    private TextArea txtDescripcion;
-
-    @FXML
     private TableView<Categoria> tablaCategorias;
 
     @FXML
@@ -38,9 +34,6 @@ public class CategoriasController {
 
     @FXML
     private TableColumn<Categoria, String> colNombre;
-
-    @FXML
-    private TableColumn<Categoria, String> colDescripcion;
 
     private final CategoriaDao categoriaDao =
             new CategoriaDao();
@@ -54,10 +47,6 @@ public class CategoriasController {
 
         colNombre.setCellValueFactory(
                 new PropertyValueFactory<>("nombre")
-        );
-
-        colDescripcion.setCellValueFactory(
-                new PropertyValueFactory<>("descripcion")
         );
 
         txtIdCategoria.setEditable(false);
@@ -92,15 +81,21 @@ public class CategoriasController {
                 ? ""
                 : txtNombre.getText().trim();
 
-        String descripcion =
-                txtDescripcion.getText() == null
-                ? ""
-                : txtDescripcion.getText().trim();
-
         if (nombre.isEmpty()) {
 
             mostrarError(
                     "El nombre de la categoría es obligatorio."
+            );
+
+            txtNombre.requestFocus();
+            return;
+        }
+
+        if (nombre.length() > 100) {
+
+            mostrarError(
+                    "El nombre no puede superar "
+                    + "los 100 caracteres."
             );
 
             txtNombre.requestFocus();
@@ -129,7 +124,8 @@ public class CategoriasController {
                     idCategoria)) {
 
                 mostrarError(
-                        "Ya existe una categoría con ese nombre."
+                        "Ya existe una categoría "
+                        + "con ese nombre."
                 );
 
                 txtNombre.requestFocus();
@@ -140,7 +136,6 @@ public class CategoriasController {
                     new Categoria();
 
             categoria.setNombre(nombre);
-            categoria.setDescripcion(descripcion);
 
             if (idCategoria == null) {
 
@@ -208,12 +203,6 @@ public class CategoriasController {
         txtNombre.setText(
                 seleccionada.getNombre()
         );
-
-        txtDescripcion.setText(
-                seleccionada.getDescripcion() == null
-                ? ""
-                : seleccionada.getDescripcion()
-        );
     }
 
     @FXML
@@ -221,7 +210,6 @@ public class CategoriasController {
 
         txtIdCategoria.clear();
         txtNombre.clear();
-        txtDescripcion.clear();
 
         tablaCategorias
                 .getSelectionModel()
@@ -243,22 +231,24 @@ public class CategoriasController {
                             )
                     );
 
-            Parent root =
-                    loader.load();
+            Parent root = loader.load();
 
             Stage stage =
                     (Stage) txtNombre
                             .getScene()
                             .getWindow();
 
+            stage.setOnCloseRequest(null);
+
             stage.setScene(
                     new Scene(root)
             );
 
             stage.setTitle(
-                    "Dashboard Administrativo"
+                    "Panel Administrador - Librería La Esperanza"
             );
 
+            stage.sizeToScene();
             stage.centerOnScreen();
 
         } catch (IOException e) {
@@ -278,10 +268,7 @@ public class CategoriasController {
                         Alert.AlertType.ERROR
                 );
 
-        alert.setTitle(
-                "Error"
-        );
-
+        alert.setTitle("Error");
         alert.setHeaderText(null);
         alert.setContentText(mensaje);
         alert.showAndWait();
