@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane
+        xmlns="http://javafx.com/javafx/21"
+        xmlns:fx="http://javafx.com/fxml/1"
+        fx:controller="org.esperanza.Controller.ReportesController"
+        stylesheets="@style/dashboard.css"
+        styleClass="root-dashboard">
+
+    <top>
+        <HBox
+                alignment="CENTER_LEFT"
+                spacing="20"
+                styleClass="header-bar">
+
+            <padding>
+                <Insets
+                        top="15"
+                        right="20"
+                        bottom="15"
+                        left="20"/>
+            </padding>
+
+            <Label
+                    text="Librería La Esperanza - Reportes"
+                    styleClass="header-title"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <Button
+                    text="Volver al Inicio"
+                    onAction="#onVolver"
+                    styleClass="btn-logout"/>
+
+        </HBox>
+    </top>
+
+    <center>
+
+        <VBox
+                alignment="TOP_CENTER"
+                spacing="20"
+                styleClass="content-area">
+
+            <padding>
+                <Insets
+                        top="20"
+                        right="40"
+                        bottom="20"
+                        left="40"/>
+            </padding>
+
+            <Label
+                    text="Reporte de Ventas"
+                    styleClass="dash-title"/>
+
+            <HBox
+                    alignment="CENTER_LEFT"
+                    spacing="15"
+                    style="-fx-background-color: white;
+                           -fx-padding: 15;
+                           -fx-background-radius: 8;">
+
+                <Label
+                        text="Filtrar por:"
+                        style="-fx-font-size: 14px;
+                               -fx-font-weight: bold;"/>
+
+                <ComboBox
+                        fx:id="cmbFiltroFecha"
+                        prefWidth="200"
+                        promptText="Seleccione período"/>
+
+                <Button
+                        text="Generar Reporte"
+                        onAction="#onGenerarReporte"
+                        styleClass="btn-accion"/>
+
+            </HBox>
+
+            <TableView
+                    fx:id="tablaReportes"
+                    VBox.vgrow="ALWAYS">
+
+                <placeholder>
+                    <Label text="No hay ventas para mostrar"/>
+                </placeholder>
+
+                <columns>
+
+                    <TableColumn
+                            fx:id="colIdVenta"
+                            prefWidth="100"
+                            text="ID Venta"/>
+
+                    <TableColumn
+                            fx:id="colFecha"
+                            prefWidth="180"
+                            text="Fecha"/>
+
+                    <TableColumn
+                            fx:id="colCliente"
+                            prefWidth="220"
+                            text="CUI Cliente"/>
+
+                    <TableColumn
+                            fx:id="colTotal"
+                            prefWidth="150"
+                            text="Total (Q)"/>
+
+                </columns>
+
+            </TableView>
+
+            <HBox
+                    alignment="CENTER_RIGHT"
+                    spacing="10"
+                    style="-fx-background-color: white;
+                           -fx-padding: 15;
+                           -fx-background-radius: 8;">
+
+                <Label
+                        text="Total Generado:"
+                        style="-fx-font-size: 18px;
+                               -fx-font-weight: bold;"/>
+
+                <Label
+                        fx:id="lblTotalVentas"
+                        text="Q 0.00"
+                        style="-fx-font-size: 18px;
+                               -fx-text-fill: #2ecc71;
+                               -fx-font-weight: bold;"/>
+
+            </HBox>
+
+        </VBox>
+
+    </center>
+
+</BorderPane>
