@@ -17,77 +17,153 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import org.esperanza.dao.LibroDAO;
 import org.esperanza.dao.impl.LibroDAOImpl;
 import org.esperanza.model.Libro;
+import org.esperanza.service.NavegacionRol;
 import org.esperanza.service.Pantallas;
 
-public class LibrosCriticosController implements Initializable {
+public class LibrosCriticosController
+        implements Initializable {
 
-    @FXML private TableView<Libro> tblLibrosCriticos;
-    @FXML private TableColumn<Libro, String> colIsbn;
-    @FXML private TableColumn<Libro, String> colTitulo;
-    @FXML private TableColumn<Libro, Integer> colStockActual;
-    @FXML private TableColumn<Libro, Integer> colStockMinimo;
-    @FXML private Button btnCerrar;
+    @FXML
+    private TableView<Libro> tblLibrosCriticos;
 
-    private final LibroDAO libroDAO = new LibroDAOImpl();
+    @FXML
+    private TableColumn<Libro, String> colIsbn;
+
+    @FXML
+    private TableColumn<Libro, String> colTitulo;
+
+    @FXML
+    private TableColumn<Libro, Integer> colStockActual;
+
+    @FXML
+    private TableColumn<Libro, Integer> colStockMinimo;
+
+    @FXML
+    private Button btnCerrar;
+
+    private final LibroDAO libroDAO =
+            new LibroDAOImpl();
 
     @Override
-    public void initialize(URL url, ResourceBundle resources) {
-        colIsbn.setCellValueFactory(
-                new PropertyValueFactory<>("isbn")
-        );
-        colTitulo.setCellValueFactory(
-                new PropertyValueFactory<>("titulo")
-        );
-        colStockActual.setCellValueFactory(
-                new PropertyValueFactory<>("stockActual")
-        );
-        colStockMinimo.setCellValueFactory(
-                new PropertyValueFactory<>("stockMinimo")
-        );
+    public void initialize(
+            URL url,
+            ResourceBundle resources) {
+
+        if (!NavegacionRol.validarPermiso(
+                "GESTION_INVENTARIO")) {
+            return;
+        }
+
+        configurarColumnas();
 
         tblLibrosCriticos.setPlaceholder(
-                new Label("No hay libros con stock crítico.")
+                new Label(
+                        "No hay libros con stock crítico."
+                )
         );
 
-        btnCerrar.setText("Volver al Dashboard");
+        btnCerrar.setText(
+                "Volver al Dashboard"
+        );
 
         cargarDatos();
     }
 
-    private void cargarDatos() {
-        try {
-            List<Libro> libros = libroDAO.obtenerStockCritico();
+    private void configurarColumnas() {
 
-            tblLibrosCriticos.getItems().setAll(
-                    libros == null ? List.of() : libros
-            );
+        colIsbn.setCellValueFactory(
+                new PropertyValueFactory<>(
+                        "isbn"
+                )
+        );
+
+        colTitulo.setCellValueFactory(
+                new PropertyValueFactory<>(
+                        "titulo"
+                )
+        );
+
+        colStockActual.setCellValueFactory(
+                new PropertyValueFactory<>(
+                        "stockActual"
+                )
+        );
+
+        colStockMinimo.setCellValueFactory(
+                new PropertyValueFactory<>(
+                        "stockMinimo"
+                )
+        );
+    }
+
+    private void cargarDatos() {
+
+        try {
+
+            List<Libro> libros =
+                    libroDAO
+                            .obtenerStockCritico();
+
+            tblLibrosCriticos
+                    .getItems()
+                    .setAll(
+                            libros == null
+                                    ? List.of()
+                                    : libros
+                    );
 
         } catch (Exception ex) {
+
             tblLibrosCriticos.setPlaceholder(
-                    new Label("No se pudo cargar el stock crítico.")
+                    new Label(
+                            "No se pudo cargar el stock crítico."
+                    )
             );
 
-            Platform.runLater(() -> {
-                Alert alerta = new Alert(Alert.AlertType.ERROR);
+            Platform.runLater(
+                    () -> {
 
-                if (tblLibrosCriticos.getScene() != null) {
-                    alerta.initOwner(
-                            tblLibrosCriticos.getScene().getWindow()
-                    );
-                }
+                        Alert alerta =
+                                new Alert(
+                                        Alert.AlertType.ERROR
+                                );
 
-                alerta.setTitle("Stock crítico");
-                alerta.setHeaderText(
-                        "No se pudo consultar el stock crítico"
-                );
-                alerta.setContentText(ex.getMessage());
-                alerta.showAndWait();
-            });
+                        if (tblLibrosCriticos
+                                .getScene() != null
+                                && tblLibrosCriticos
+                                        .getScene()
+                                        .getWindow() != null) {
+
+                            alerta.initOwner(
+                                    tblLibrosCriticos
+                                            .getScene()
+                                            .getWindow()
+                            );
+                        }
+
+                        alerta.setTitle(
+                                "Stock crítico"
+                        );
+
+                        alerta.setHeaderText(
+                                "No se pudo consultar el stock crítico"
+                        );
+
+                        alerta.setContentText(
+                                ex.getMessage()
+                        );
+
+                        alerta.showAndWait();
+                    }
+            );
         }
     }
 
     @FXML
     private void onCerrar() {
-        Pantallas.volver(tblLibrosCriticos);
+
+        Pantallas.volver(
+                tblLibrosCriticos
+        );
     }
 }

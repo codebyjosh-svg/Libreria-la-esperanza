@@ -15,6 +15,7 @@ public class Venta {
 
     private long cuiCliente;
     private int idUsuario;
+    private EstadoVenta estado = EstadoVenta.COMPLETADA;
 
     public Venta() {
 
@@ -44,6 +45,12 @@ public class Venta {
 
     public int getIdVenta() {
         return idVenta;
+    }
+
+    public EstadoVenta getEstado() { return estado; }
+
+    public void setEstado(EstadoVenta estado) {
+        this.estado = Objects.requireNonNull(estado);
     }
 
     public void setIdVenta(int idVenta) {

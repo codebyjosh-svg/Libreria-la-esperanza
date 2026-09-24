@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.esperanza.controller.ProveedoresController"
+            stylesheets="@style/usuarios.css" styleClass="fondo" prefWidth="1120" prefHeight="710"
+            minWidth="1000" minHeight="660">
+    <top>
+        <VBox spacing="6" styleClass="encabezado">
+            <padding><Insets top="20" right="24" bottom="18" left="24"/></padding>
+            <Label text="Gestión de proveedores" styleClass="titulo"/>
+            <Label text="Alta, consulta, edición y desactivación de proveedores" styleClass="subtitulo"/>
+        </VBox>
+    </top>
+    <center>
+        <HBox fx:id="contenido" spacing="20">
+            <padding><Insets top="18" right="24" bottom="12" left="24"/></padding>
+            <VBox spacing="10" HBox.hgrow="ALWAYS" minWidth="540">
+                <Label text="Proveedores registrados" style="-fx-font-size: 17; -fx-font-weight: bold; -fx-text-fill: #26384d;"/>
+                <TextField fx:id="txtBuscar" promptText="Buscar por nombre, NIT o contacto" onAction="#onActualizar"/>
+                <HBox spacing="12" alignment="CENTER_LEFT">
+                    <CheckBox fx:id="chkInactivos" text="Incluir inactivos" onAction="#onActualizar"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="Buscar / actualizar" onAction="#onActualizar" styleClass="btn-secundario"/>
+                </HBox>
+                <TableView fx:id="tablaProveedores" VBox.vgrow="ALWAYS" minHeight="220">
+                    <columns>
+                        <TableColumn fx:id="colNit" text="NIT" prefWidth="110"/>
+                        <TableColumn fx:id="colNombre" text="Nombre" prefWidth="220"/>
+                        <TableColumn fx:id="colTelefono" text="Teléfono" prefWidth="130"/>
+                        <TableColumn fx:id="colEstado" text="Estado" prefWidth="85"/>
+                    </columns>
+                </TableView>
+                <Label text="Seleccione una fila para editarla. Incluya inactivos para reactivar un proveedor."
+                       wrapText="true" style="-fx-text-fill: #475569;"/>
+            </VBox>
+            <VBox spacing="5" prefWidth="340" minWidth="320" maxWidth="360"
+                  style="-fx-background-color: white; -fx-background-radius: 6;">
+                <padding><Insets top="14" right="16" bottom="14" left="16"/></padding>
+                <Label fx:id="lblFormulario" text="Nuevo proveedor"
+                       style="-fx-font-size: 17; -fx-font-weight: bold; -fx-text-fill: #26384d;"/>
+                <Label text="* Campos obligatorios" style="-fx-text-fill: #64748b; -fx-font-size: 11;"/>
+                <Label text="NIT *" labelFor="${txtNit}"/>
+                <TextField fx:id="txtNit" promptText="Identificador fiscal único"/>
+                <Label text="Nombre o razón social *" labelFor="${txtNombre}"/>
+                <TextField fx:id="txtNombre" promptText="Hasta 150 caracteres"/>
+                <Label text="Persona de contacto" labelFor="${txtContacto}"/>
+                <TextField fx:id="txtContacto" promptText="Opcional, hasta 100 caracteres"/>
+                <Label text="Teléfono *" labelFor="${txtTelefono}"/>
+                <TextField fx:id="txtTelefono" promptText="Ejemplo: +502 2222-3333"/>
+                <Label text="Correo" labelFor="${txtCorreo}"/>
+                <TextField fx:id="txtCorreo" promptText="contacto@empresa.com"/>
+                <Label text="Dirección" labelFor="${txtDireccion}"/>
+                <TextField fx:id="txtDireccion" promptText="Opcional, hasta 250 caracteres"/>
+                <Region VBox.vgrow="ALWAYS" minHeight="8"/>
+                <HBox spacing="8">
+                    <Button text="Guardar" onAction="#onGuardar" styleClass="btn-principal"/>
+                    <Button text="Nuevo" onAction="#onNuevo" styleClass="btn-secundario"/>
+                </HBox>
+                <Button fx:id="btnEstado" text="Desactivar" onAction="#onCambiarEstado"
+                        disable="true" styleClass="btn-secundario" maxWidth="Infinity"/>
+            </VBox>
+        </HBox>
+    </center>
+    <bottom>
+        <HBox spacing="16" alignment="CENTER_LEFT">
+            <padding><Insets top="0" right="24" bottom="16" left="24"/></padding>
+            <Label fx:id="lblMensaje" text="" wrapText="true" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+            <Button text="Cerrar" onAction="#onCerrar" styleClass="btn-secundario"/>
+        </HBox>
+    </bottom>
+</BorderPane>

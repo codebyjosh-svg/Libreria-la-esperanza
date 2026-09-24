@@ -27,11 +27,13 @@ public final class SesionUsuario {
     public synchronized boolean iniciarSesion(
             Usuario usuario) {
 
+        cerrarSesion();
+
         if (usuario == null) {
             return false;
         }
 
-        if (!usuario.isActivo()) {
+        if (!usuario.isActivo() || usuario.getId() <= 0) {
             return false;
         }
 
@@ -65,7 +67,10 @@ public final class SesionUsuario {
     public boolean haySesionActiva() {
 
         return usuarioActual != null
-                && rolActual != null;
+                && usuarioActual.isActivo()
+                && usuarioActual.getId() > 0
+                && rolActual != null
+                && Rol.fromString(usuarioActual.getRol()) == rolActual;
     }
 
     public Usuario getUsuarioActual() {
@@ -81,7 +86,7 @@ public final class SesionUsuario {
     public boolean tienePermiso(
             String permiso) {
 
-        return rolActual != null
+        return haySesionActiva()
                 && rolActual
                         .tienePermiso(
                                 permiso

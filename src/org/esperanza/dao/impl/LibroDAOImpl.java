@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.math.BigDecimal;
 
 import org.esperanza.dao.LibroDAO;
 import org.esperanza.dao.ProveedorConexion;
@@ -23,30 +24,28 @@ public class LibroDAOImpl implements LibroDAO {
     }
 
     public LibroDAOImpl(ProveedorConexion proveedorConexion) {
-        this.proveedorConexion =
-                Objects.requireNonNull(proveedorConexion);
+        this.proveedorConexion
+                = Objects.requireNonNull(proveedorConexion);
     }
 
     @Override
     public List<Libro> listarTodos() {
 
-        List<Libro> lista =
-                new ArrayList<>();
+        List<Libro> lista
+                = new ArrayList<>();
 
-        String sql =
-                "{call sp_listarlibros()}";
+        String sql
+                = "{call sp_listarlibros()}";
 
-        try (Connection con =
-                     proveedorConexion.conectar();
-             CallableStatement cs =
-                     con.prepareCall(sql);
-             ResultSet rs =
-                     cs.executeQuery()) {
+        try (Connection con
+                = proveedorConexion.conectar(); CallableStatement cs
+                = con.prepareCall(sql); ResultSet rs
+                = cs.executeQuery()) {
 
             while (rs.next()) {
 
-                Libro libro =
-                        new Libro();
+                Libro libro
+                        = new Libro();
 
                 libro.setIsbn(
                         rs.getString("isbn")
@@ -105,28 +104,27 @@ public class LibroDAOImpl implements LibroDAO {
     @Override
     public Libro buscarLibro(String isbn) {
 
-        String sql =
-                "{call sp_buscarlibro(?)}";
+        String sql
+                = "{call sp_buscarlibro(?)}";
 
         Libro libro = null;
 
-        try (Connection con =
-                     proveedorConexion.conectar();
-             CallableStatement cs =
-                     con.prepareCall(sql)) {
+        try (Connection con
+                = proveedorConexion.conectar(); CallableStatement cs
+                = con.prepareCall(sql)) {
 
             cs.setString(
                     1,
                     isbn
             );
 
-            try (ResultSet rs =
-                         cs.executeQuery()) {
+            try (ResultSet rs
+                    = cs.executeQuery()) {
 
                 if (rs.next()) {
 
-                    libro =
-                            new Libro(
+                    libro
+                            = new Libro(
                                     rs.getString("isbn"),
                                     rs.getString("titulo"),
                                     rs.getDate("fecha_publicacion"),
@@ -163,15 +161,15 @@ public class LibroDAOImpl implements LibroDAO {
     public List<Libro> buscarPorTitulo(
             String titulo) {
 
-        List<Libro> resultado =
-                new ArrayList<>();
+        List<Libro> resultado
+                = new ArrayList<>();
 
         if (titulo == null) {
             return resultado;
         }
 
-        String texto =
-                titulo.toLowerCase();
+        String texto
+                = titulo.toLowerCase();
 
         for (Libro libro : listarTodos()) {
 
@@ -191,15 +189,15 @@ public class LibroDAOImpl implements LibroDAO {
     public List<Libro> buscarPorAutor(
             String autor) {
 
-        List<Libro> resultado =
-                new ArrayList<>();
+        List<Libro> resultado
+                = new ArrayList<>();
 
         if (autor == null) {
             return resultado;
         }
 
-        String texto =
-                autor.toLowerCase();
+        String texto
+                = autor.toLowerCase();
 
         for (Libro libro : listarTodos()) {
 
@@ -218,27 +216,25 @@ public class LibroDAOImpl implements LibroDAO {
     @Override
     public List<Libro> obtenerStockCritico() {
 
-        List<Libro> lista =
-                new ArrayList<>();
+        List<Libro> lista
+                = new ArrayList<>();
 
-        String sql =
-                "SELECT isbn, titulo, stock_actual, stock_minimo "
+        String sql
+                = "SELECT isbn, titulo, stock_actual, stock_minimo "
                 + "FROM libros "
                 + "WHERE stock_actual <= stock_minimo "
                 + "AND activo = TRUE "
                 + "ORDER BY stock_actual ASC, titulo ASC";
 
-        try (Connection con =
-                     proveedorConexion.conectar();
-             PreparedStatement ps =
-                     con.prepareStatement(sql);
-             ResultSet rs =
-                     ps.executeQuery()) {
+        try (Connection con
+                = proveedorConexion.conectar(); PreparedStatement ps
+                = con.prepareStatement(sql); ResultSet rs
+                = ps.executeQuery()) {
 
             while (rs.next()) {
 
-                Libro libro =
-                        new Libro();
+                Libro libro
+                        = new Libro();
 
                 libro.setIsbn(
                         rs.getString("isbn")
@@ -276,13 +272,12 @@ public class LibroDAOImpl implements LibroDAO {
     public boolean insertar(
             Libro libro) {
 
-        String sql =
-                "{call sp_insertarlibro(?, ?, ?, ?, ?, ?, ?, ?, ?)}";
+        String sql
+                = "{call sp_insertarlibro(?, ?, ?, ?, ?, ?, ?, ?, ?)}";
 
-        try (Connection con =
-                     proveedorConexion.conectar();
-             CallableStatement cs =
-                     con.prepareCall(sql)) {
+        try (Connection con
+                = proveedorConexion.conectar(); CallableStatement cs
+                = con.prepareCall(sql)) {
 
             cs.setString(
                     1,
@@ -346,13 +341,12 @@ public class LibroDAOImpl implements LibroDAO {
     public boolean actualizar(
             Libro libro) {
 
-        String sql =
-                "{call sp_actualizarlibro(?, ?, ?, ?, ?, ?, ?, ?)}";
+        String sql
+                = "{call sp_actualizarlibro(?, ?, ?, ?, ?, ?, ?, ?)}";
 
-        try (Connection con =
-                     proveedorConexion.conectar();
-             CallableStatement cs =
-                     con.prepareCall(sql)) {
+        try (Connection con
+                = proveedorConexion.conectar(); CallableStatement cs
+                = con.prepareCall(sql)) {
 
             cs.setString(
                     1,
@@ -411,13 +405,12 @@ public class LibroDAOImpl implements LibroDAO {
     public boolean eliminar(
             String isbn) {
 
-        String sql =
-                "{call sp_eliminarlibro(?)}";
+        String sql
+                = "{call sp_eliminarlibro(?)}";
 
-        try (Connection con =
-                     proveedorConexion.conectar();
-             CallableStatement cs =
-                     con.prepareCall(sql)) {
+        try (Connection con
+                = proveedorConexion.conectar(); CallableStatement cs
+                = con.prepareCall(sql)) {
 
             cs.setString(
                     1,
@@ -430,6 +423,45 @@ public class LibroDAOImpl implements LibroDAO {
 
             System.err.println(
                     "Error desactivar libro: "
+                    + e.getMessage()
+            );
+
+            return false;
+        }
+    }
+
+    @Override
+    public boolean actualizarPrecio(
+            String isbn,
+            BigDecimal nuevoPrecio) {
+
+        String sql
+                = "UPDATE libros "
+                + "SET precio = ? "
+                + "WHERE isbn = ? "
+                + "AND activo = TRUE";
+
+        try (
+                Connection con
+                = proveedorConexion.conectar(); PreparedStatement ps
+                = con.prepareStatement(sql)) {
+
+            ps.setBigDecimal(
+                    1,
+                    nuevoPrecio
+            );
+
+            ps.setString(
+                    2,
+                    isbn
+            );
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+
+            System.err.println(
+                    "Error actualizar precio: "
                     + e.getMessage()
             );
 

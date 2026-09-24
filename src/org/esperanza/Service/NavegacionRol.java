@@ -122,6 +122,8 @@ public final class NavegacionRol {
             Parent root =
                     loader.load();
 
+            stage.setOnCloseRequest(null);
+
             stage.setScene(
                     new Scene(root)
             );
@@ -130,6 +132,7 @@ public final class NavegacionRol {
                     titulo
             );
 
+            stage.sizeToScene();
             stage.centerOnScreen();
 
             stage.show();

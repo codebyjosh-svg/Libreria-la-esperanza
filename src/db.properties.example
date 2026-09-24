@@ -1,0 +1,4 @@
+# Copia este archivo como src/db.properties y usa tus propios datos locales.
+db.url=jdbc:mysql://localhost:3306/TU_BASE_DE_DATOS
+db.user=TU_USUARIO
+db.password=TU_PASSWORD

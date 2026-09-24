@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.esperanza.controller.DevolucionesController"
+      fx:id="formulario" spacing="12" prefWidth="930" prefHeight="710"
+      style="-fx-background-color: #f6f8fb; -fx-font-family: 'Segoe UI';">
+    <padding><Insets top="22" right="24" bottom="20" left="24"/></padding>
+    <Label text="Devoluciones de ventas" style="-fx-font-size: 25; -fx-font-weight: bold; -fx-text-fill: #183446;"/>
+    <Label text="Consulta ventas de los últimos 30 días. Las devoluciones son totales y solo se registran una vez." wrapText="true"/>
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <Label text="ID de venta (opcional):"/>
+        <TextField fx:id="txtIdVenta" promptText="Todas las ventas recientes" prefWidth="220" onAction="#onConsultar"/>
+        <Button text="Consultar / Actualizar" onAction="#onConsultar"/>
+    </HBox>
+    <TableView fx:id="tablaVentas" prefHeight="220" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colVenta" text="Venta" prefWidth="75"/>
+            <TableColumn fx:id="colFecha" text="Fecha" prefWidth="195"/>
+            <TableColumn fx:id="colCliente" text="CUI del cliente" prefWidth="235"/>
+            <TableColumn fx:id="colTotal" text="Total (Q)" prefWidth="155"/>
+            <TableColumn fx:id="colEstado" text="Estado" prefWidth="180"/>
+        </columns>
+    </TableView>
+    <Label fx:id="lblSeleccion" text="Ninguna venta seleccionada." style="-fx-font-weight: bold;"/>
+    <TableView fx:id="tablaDetalles" prefHeight="140" minHeight="100">
+        <columns>
+            <TableColumn fx:id="colIsbn" text="ISBN" prefWidth="320"/>
+            <TableColumn fx:id="colCantidad" text="Cantidad a devolver" prefWidth="170"/>
+            <TableColumn fx:id="colPrecio" text="Precio unitario (Q)" prefWidth="175"/>
+            <TableColumn fx:id="colSubtotal" text="Subtotal (Q)" prefWidth="175"/>
+        </columns>
+    </TableView>
+    <Label text="Motivo de devolución (obligatorio, de 5 a 500 caracteres):"/>
+    <TextArea fx:id="txtMotivo" promptText="Describe por qué se devuelve la venta completa." wrapText="true" prefRowCount="3" prefHeight="78"/>
+    <HBox spacing="12" alignment="CENTER_RIGHT">
+        <Button text="Cerrar" onAction="#onCerrar"/>
+        <Button fx:id="btnDevolver" text="Registrar devolución total" onAction="#onDevolver"
+                style="-fx-background-color: #195b65; -fx-text-fill: white; -fx-font-weight: bold;"/>
+    </HBox>
+    <Label fx:id="lblEstado" text="Preparando consulta…" wrapText="true" style="-fx-text-fill: #35566a;"/>
+</VBox>

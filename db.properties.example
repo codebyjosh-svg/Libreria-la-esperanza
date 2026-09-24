@@ -1,0 +1,5 @@
+# Copiar a src/db.properties y completar con la base local existente.
+# Alternativa: ESPERANZA_DB_URL, ESPERANZA_DB_USER y ESPERANZA_DB_PASSWORD.
+db.url=jdbc:mysql://localhost:3306/libreria_la_esperanza?useSSL=false&serverTimezone=America/Guatemala
+db.user=usuario_libreria
+db.password=CAMBIAR_EN_CONFIGURACION_LOCAL
