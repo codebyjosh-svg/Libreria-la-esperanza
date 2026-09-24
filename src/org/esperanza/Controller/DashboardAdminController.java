@@ -70,8 +70,8 @@ public class DashboardAdminController {
             return;
         }
 
-        usuarioActual =
-                SesionUsuario
+        usuarioActual
+                = SesionUsuario
                         .getInstancia()
                         .getUsuarioActual();
 
@@ -119,8 +119,8 @@ public class DashboardAdminController {
                 "Actualizando indicadores..."
         );
 
-        Task<IndicadoresDashboardAdmin> tarea =
-                new Task<>() {
+        Task<IndicadoresDashboardAdmin> tarea
+                = new Task<>() {
 
             @Override
             protected IndicadoresDashboardAdmin call()
@@ -138,8 +138,8 @@ public class DashboardAdminController {
                 return;
             }
 
-            IndicadoresDashboardAdmin datos =
-                    tarea.getValue();
+            IndicadoresDashboardAdmin datos
+                    = tarea.getValue();
 
             if (datos == null) {
 
@@ -151,13 +151,13 @@ public class DashboardAdminController {
                 return;
             }
 
-            NumberFormat moneda =
-                    NumberFormat.getCurrencyInstance(
+            NumberFormat moneda
+                    = NumberFormat.getCurrencyInstance(
                             Locale.forLanguageTag("es-GT")
                     );
 
-            NumberFormat numero =
-                    NumberFormat.getIntegerInstance(
+            NumberFormat numero
+                    = NumberFormat.getIntegerInstance(
                             Locale.forLanguageTag("es-GT")
                     );
 
@@ -213,8 +213,8 @@ public class DashboardAdminController {
             btnActualizarIndicadores.setDisable(false);
         });
 
-        Thread hilo =
-                new Thread(
+        Thread hilo
+                = new Thread(
                         tarea,
                         "indicadores-dashboard-admin"
                 );
@@ -359,8 +359,8 @@ public class DashboardAdminController {
 
         try {
 
-            FXMLLoader loader =
-                    new FXMLLoader(
+            FXMLLoader loader
+                    = new FXMLLoader(
                             getClass().getResource(
                                     "/org/esperanza/view/Libros.fxml"
                             )
@@ -368,8 +368,8 @@ public class DashboardAdminController {
 
             Parent root = loader.load();
 
-            Stage ventana =
-                    (Stage) lblUsuario
+            Stage ventana
+                    = (Stage) lblUsuario
                             .getScene()
                             .getWindow();
 
@@ -397,7 +397,12 @@ public class DashboardAdminController {
 
     @FXML
     private void onAutoresClick() {
-        mostrarEnConstruccion("Autores");
+
+        Pantallas.catalogo(
+                lblUsuario,
+                "autores",
+                "Autores"
+        );
     }
 
     @FXML
@@ -516,12 +521,12 @@ public class DashboardAdminController {
 
             ventana.setOnCloseRequest(event -> {
 
-                boolean ocupado =
-                        controller instanceof ProveedoresController proveedor
+                boolean ocupado
+                        = controller instanceof ProveedoresController proveedor
                         && proveedor.estaOcupado();
 
-                ocupado =
-                        ocupado
+                ocupado
+                        = ocupado
                         || controller instanceof DevolucionesController devolucion
                         && devolucion.estaOcupado();
 
@@ -725,8 +730,8 @@ public class DashboardAdminController {
 
         try {
 
-            java.net.URL pantalla =
-                    getClass().getResource(
+            java.net.URL pantalla
+                    = getClass().getResource(
                             recurso
                     );
 
@@ -740,13 +745,13 @@ public class DashboardAdminController {
                 return;
             }
 
-            FXMLLoader loader =
-                    new FXMLLoader(pantalla);
+            FXMLLoader loader
+                    = new FXMLLoader(pantalla);
 
             Parent root = loader.load();
 
-            Stage ventana =
-                    (Stage) lblUsuario
+            Stage ventana
+                    = (Stage) lblUsuario
                             .getScene()
                             .getWindow();
 
@@ -843,7 +848,6 @@ public class DashboardAdminController {
         }
     }
 
-
     private Stage obtenerStagePrincipal() {
 
         if (lblUsuario == null
@@ -861,8 +865,8 @@ public class DashboardAdminController {
     private void mostrarEnConstruccion(
             String modulo) {
 
-        Alert alert =
-                new Alert(
+        Alert alert
+                = new Alert(
                         Alert.AlertType.INFORMATION
                 );
 
@@ -881,8 +885,8 @@ public class DashboardAdminController {
     private void mostrarError(
             String mensaje) {
 
-        Alert alert =
-                new Alert(
+        Alert alert
+                = new Alert(
                         Alert.AlertType.ERROR
                 );
 
