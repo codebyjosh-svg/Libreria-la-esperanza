@@ -65,12 +65,6 @@
                         styleClass="sidebar-button"/>
 
                 <Button
-                        text="Autores"
-                        onAction="#onAutoresClick"
-                        maxWidth="Infinity"
-                        styleClass="sidebar-button"/>
-
-                <Button
                         text="Categorías"
                         onAction="#onCategoriasClick"
                         maxWidth="Infinity"
