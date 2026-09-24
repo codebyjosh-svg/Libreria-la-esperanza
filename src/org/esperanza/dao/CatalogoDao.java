@@ -16,6 +16,7 @@ public class CatalogoDao {
             boolean obligatorio,
             boolean generado,
             String defecto) {
+
     }
 
     private final String tabla;
@@ -40,9 +41,12 @@ public class CatalogoDao {
     private void validarAcceso() {
         SesionUsuario sesion = SesionUsuario.getInstancia();
 
-        boolean permitido = sesion.esAdmin()
+        boolean permitido
+                = sesion.esAdmin()
                 || (tabla.equals("clientes") && sesion.esCajero())
-                || (tabla.equals("categorias") && sesion.esBodega());
+                || ((tabla.equals("categorias")
+                || tabla.equals("autores"))
+                && sesion.esBodega());
 
         if (!permitido) {
             throw new SecurityException(
@@ -60,16 +64,15 @@ public class CatalogoDao {
 
         List<Campo> campos = new ArrayList<>();
 
-        try (Connection conexion = Conexion.getInstancia().conectar();
-             ResultSet rs = conexion.getMetaData().getColumns(
-                     conexion.getCatalog(),
-                     null,
-                     tabla,
-                     null)) {
+        try (Connection conexion = Conexion.getInstancia().conectar(); ResultSet rs = conexion.getMetaData().getColumns(
+                conexion.getCatalog(),
+                null,
+                tabla,
+                null)) {
 
             while (rs.next()) {
-                boolean generado =
-                        "YES".equals(rs.getString("IS_AUTOINCREMENT"))
+                boolean generado
+                        = "YES".equals(rs.getString("IS_AUTOINCREMENT"))
                         || "YES".equals(
                                 rs.getString("IS_GENERATEDCOLUMN")
                         );
@@ -79,7 +82,7 @@ public class CatalogoDao {
                         rs.getInt("DATA_TYPE"),
                         rs.getInt("COLUMN_SIZE"),
                         rs.getInt("NULLABLE")
-                                == DatabaseMetaData.columnNoNulls,
+                        == DatabaseMetaData.columnNoNulls,
                         generado,
                         rs.getString("COLUMN_DEF")
                 ));
@@ -103,9 +106,7 @@ public class CatalogoDao {
 
         String sql = "SELECT * FROM " + identificador(tabla);
 
-        try (Connection conexion = Conexion.getInstancia().conectar();
-             PreparedStatement ps = conexion.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (Connection conexion = Conexion.getInstancia().conectar(); PreparedStatement ps = conexion.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
             int cantidadColumnas = rs.getMetaData().getColumnCount();
 
@@ -168,20 +169,17 @@ public class CatalogoDao {
 
             try {
                 convertido = switch (campo.tipo()) {
-                    case Types.INTEGER,
-                         Types.BIGINT,
-                         Types.SMALLINT,
-                         Types.TINYINT -> Long.valueOf(valor);
+                    case Types.INTEGER, Types.BIGINT, Types.SMALLINT, Types.TINYINT ->
+                        Long.valueOf(valor);
 
-                    case Types.DECIMAL,
-                         Types.NUMERIC,
-                         Types.DOUBLE,
-                         Types.FLOAT,
-                         Types.REAL -> new BigDecimal(valor);
+                    case Types.DECIMAL, Types.NUMERIC, Types.DOUBLE, Types.FLOAT, Types.REAL ->
+                        new BigDecimal(valor);
 
-                    case Types.DATE -> java.sql.Date.valueOf(valor);
+                    case Types.DATE ->
+                        java.sql.Date.valueOf(valor);
 
-                    case Types.TIMESTAMP -> Timestamp.valueOf(valor);
+                    case Types.TIMESTAMP ->
+                        Timestamp.valueOf(valor);
 
                     case Types.BOOLEAN, Types.BIT -> {
                         if (!Set.of("0", "1", "true", "false")
@@ -190,7 +188,7 @@ public class CatalogoDao {
                         }
 
                         yield valor.equals("1")
-                                || valor.equalsIgnoreCase("true");
+                        || valor.equalsIgnoreCase("true");
                     }
 
                     default -> {
@@ -244,8 +242,7 @@ public class CatalogoDao {
         String sql = "INSERT INTO " + identificador(tabla)
                 + " (" + columnas + ") VALUES (" + marcas + ")";
 
-        try (Connection conexion = Conexion.getInstancia().conectar();
-             PreparedStatement ps = conexion.prepareStatement(sql)) {
+        try (Connection conexion = Conexion.getInstancia().conectar(); PreparedStatement ps = conexion.prepareStatement(sql)) {
 
             for (int i = 0; i < parametros.size(); i++) {
                 ps.setObject(i + 1, parametros.get(i));

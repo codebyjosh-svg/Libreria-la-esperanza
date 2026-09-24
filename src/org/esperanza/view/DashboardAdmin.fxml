@@ -11,106 +11,112 @@
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane
-        xmlns="http://javafx.com/javafx"
-        xmlns:fx="http://javafx.com/fxml"
-        fx:controller="org.esperanza.controller.DashboardAdminController"
-        stylesheets="@style/dashboard.css"
-        styleClass="root-dashboard"
-        prefWidth="1000"
-        prefHeight="650">
+    xmlns="http://javafx.com/javafx"
+    xmlns:fx="http://javafx.com/fxml"
+    fx:controller="org.esperanza.controller.DashboardAdminController"
+    stylesheets="@style/dashboard.css"
+    styleClass="root-dashboard"
+    prefWidth="1000"
+    prefHeight="650">
 
     <left>
 
         <ScrollPane
-                fitToWidth="true"
-                prefWidth="210"
-                styleClass="sidebar-scroll">
+            fitToWidth="true"
+            prefWidth="210"
+            styleClass="sidebar-scroll">
 
             <VBox
-                    spacing="8"
-                    styleClass="sidebar">
+                spacing="8"
+                styleClass="sidebar">
 
                 <Label
-                        text="Librería La Esperanza"
-                        styleClass="sidebar-brand"/>
+                    text="Librería La Esperanza"
+                    styleClass="sidebar-brand"/>
 
                 <Label
-                        text="Administrador"
-                        styleClass="sidebar-role"/>
+                    text="Administrador"
+                    styleClass="sidebar-role"/>
 
                 <Separator/>
 
                 <Button
-                        text="Usuarios"
-                        onAction="#onUsuariosClick"
-                        maxWidth="Infinity"
-                        styleClass="sidebar-button"/>
+                    text="Usuarios"
+                    onAction="#onUsuariosClick"
+                    maxWidth="Infinity"
+                    styleClass="sidebar-button"/>
 
                 <Button
-                        text="Cambiar contraseña"
-                        onAction="#onCambiarContrasenaClick"
-                        maxWidth="Infinity"
-                        styleClass="sidebar-button"/>
+                    text="Cambiar contraseña"
+                    onAction="#onCambiarContrasenaClick"
+                    maxWidth="Infinity"
+                    styleClass="sidebar-button"/>
 
                 <Button
-                        text="Libros"
-                        onAction="#onLibrosClick"
-                        maxWidth="Infinity"
-                        styleClass="sidebar-button"/>
+                    text="Libros"
+                    onAction="#onLibrosClick"
+                    maxWidth="Infinity"
+                    styleClass="sidebar-button"/>
 
                 <Button
-                        text="Actualizar precio"
-                        onAction="#onActualizarPrecioClick"
-                        maxWidth="Infinity"
-                        styleClass="sidebar-button"/>
+                    text="Actualizar precio"
+                    onAction="#onActualizarPrecioClick"
+                    maxWidth="Infinity"
+                    styleClass="sidebar-button"/>
 
                 <Button
-                        text="Categorías"
-                        onAction="#onCategoriasClick"
-                        maxWidth="Infinity"
-                        styleClass="sidebar-button"/>
+                    text="Categorías"
+                    onAction="#onCategoriasClick"
+                    maxWidth="Infinity"
+                    styleClass="sidebar-button"/>
+                
+                <Button
+                    text="Autores"
+                    onAction="#onAutoresClick"
+                    maxWidth="Infinity"
+                    styleClass="sidebar-button"/>
 
                 <Button
-                        text="Editoriales"
-                        onAction="#onEditorialesClick"
-                        maxWidth="Infinity"
-                        styleClass="sidebar-button"/>
+                    text="Editoriales"
+                    onAction="#onEditorialesClick"
+                    maxWidth="Infinity"
+                    styleClass="sidebar-button"/>
 
                 <Button
-                        text="Proveedores"
-                        onAction="#onProveedoresClick"
-                        maxWidth="Infinity"
-                        styleClass="sidebar-button"/>
+                    text="Proveedores"
+                    onAction="#onProveedoresClick"
+                    maxWidth="Infinity"
+                    styleClass="sidebar-button"/>
 
                 <Button
-                        text="Devoluciones"
-                        onAction="#onDevolucionesClick"
-                        maxWidth="Infinity"
-                        styleClass="sidebar-button"/>
+                    text="Devoluciones"
+                    onAction="#onDevolucionesClick"
+                    maxWidth="Infinity"
+                    styleClass="sidebar-button"/>
 
                 <Button
-                        text="Ventas"
-                        onAction="#onVentasClick"
-                        maxWidth="Infinity"
-                        styleClass="sidebar-button"/>
+                    text="Ventas"
+                    onAction="#onVentasClick"
+                    maxWidth="Infinity"
+                    styleClass="sidebar-button"/>
 
                 <Button
-                        text="Detalle Ventas"
-                        onAction="#onDetalleVentasClick"
-                        maxWidth="Infinity"
-                        styleClass="sidebar-button"/>
+                    text="Detalle Ventas"
+                    onAction="#onDetalleVentasClick"
+                    maxWidth="Infinity"
+                    styleClass="sidebar-button"/>
 
                 <Button
-                        text="Ventas del Día"
-                        onAction="#onVentasDiaClick"
-                        maxWidth="Infinity"
-                        styleClass="sidebar-button"/>
+                    text="Ventas del Día"
+                    onAction="#onVentasDiaClick"
+                    maxWidth="Infinity"
+                    styleClass="sidebar-button"/>
 
                 <Button
-                        text="Reportes"
-                        onAction="#onReportesClick"
-                        maxWidth="Infinity"
-                        styleClass="sidebar-button"/>
+                    text="Reportes"
+                    onAction="#onReportesClick"
+                    maxWidth="Infinity"
+                    styleClass="sidebar-button"/>
 
             </VBox>
 
@@ -121,29 +127,29 @@
     <top>
 
         <HBox
-                alignment="CENTER_LEFT"
-                spacing="10"
-                styleClass="topbar">
+            alignment="CENTER_LEFT"
+            spacing="10"
+            styleClass="topbar">
 
             <Label
-                    text="Panel de Administración"
-                    styleClass="topbar-title"/>
+                text="Panel de Administración"
+                styleClass="topbar-title"/>
 
             <Region HBox.hgrow="ALWAYS"/>
 
             <Label
-                    text="Usuario:"
-                    styleClass="role-label"/>
+                text="Usuario:"
+                styleClass="role-label"/>
 
             <Label
-                    fx:id="lblUsuario"
-                    text="Admin"
-                    styleClass="topbar-user"/>
+                fx:id="lblUsuario"
+                text="Admin"
+                styleClass="topbar-user"/>
 
             <Button
-                    text="Cerrar Sesión"
-                    onAction="#onCerrarSesionClick"
-                    styleClass="logout-button"/>
+                text="Cerrar Sesión"
+                onAction="#onCerrarSesionClick"
+                styleClass="logout-button"/>
 
         </HBox>
 
@@ -152,167 +158,167 @@
     <center>
 
         <VBox
-                spacing="15"
-                styleClass="content-area">
+            spacing="15"
+            styleClass="content-area">
 
             <Label
-                    text="Bienvenido"
-                    styleClass="page-title"/>
+                text="Bienvenido"
+                styleClass="page-title"/>
 
             <Label
-                    text="Accesos rápidos a las funciones principales del sistema"
-                    styleClass="page-subtitle"/>
+                text="Accesos rápidos a las funciones principales del sistema"
+                styleClass="page-subtitle"/>
 
             <HBox
-                    alignment="CENTER_LEFT"
-                    spacing="12">
+                alignment="CENTER_LEFT"
+                spacing="12">
 
                 <Label
-                        text="Indicadores generales"
-                        styleClass="kpi-section-title"/>
+                    text="Indicadores generales"
+                    styleClass="kpi-section-title"/>
 
                 <HBox HBox.hgrow="ALWAYS"/>
 
                 <Button
-                        fx:id="btnActualizarIndicadores"
-                        text="Actualizar"
-                        onAction="#onActualizarIndicadoresClick"
-                        styleClass="primary-button"/>
+                    fx:id="btnActualizarIndicadores"
+                    text="Actualizar"
+                    onAction="#onActualizarIndicadoresClick"
+                    styleClass="primary-button"/>
 
             </HBox>
 
             <HBox
-                    alignment="CENTER_LEFT"
-                    spacing="12">
+                alignment="CENTER_LEFT"
+                spacing="12">
 
                 <VBox
-                        spacing="8"
-                        prefWidth="210"
-                        HBox.hgrow="ALWAYS"
-                        styleClass="kpi-card">
+                    spacing="8"
+                    prefWidth="210"
+                    HBox.hgrow="ALWAYS"
+                    styleClass="kpi-card">
 
                     <Label
-                            text="Ventas totales"
-                            styleClass="kpi-label"/>
+                        text="Ventas totales"
+                        styleClass="kpi-label"/>
 
                     <Label
-                            fx:id="lblVentasTotales"
-                            text="—"
-                            styleClass="kpi-value"/>
+                        fx:id="lblVentasTotales"
+                        text="—"
+                        styleClass="kpi-value"/>
 
                 </VBox>
 
                 <VBox
-                        spacing="8"
-                        prefWidth="210"
-                        HBox.hgrow="ALWAYS"
-                        styleClass="kpi-card">
+                    spacing="8"
+                    prefWidth="210"
+                    HBox.hgrow="ALWAYS"
+                    styleClass="kpi-card">
 
                     <Label
-                            text="Libros activos"
-                            styleClass="kpi-label"/>
+                        text="Libros activos"
+                        styleClass="kpi-label"/>
 
                     <Label
-                            fx:id="lblCantidadLibros"
-                            text="—"
-                            styleClass="kpi-value"/>
+                        fx:id="lblCantidadLibros"
+                        text="—"
+                        styleClass="kpi-value"/>
 
                 </VBox>
 
                 <VBox
-                        spacing="8"
-                        prefWidth="210"
-                        HBox.hgrow="ALWAYS"
-                        styleClass="kpi-card">
+                    spacing="8"
+                    prefWidth="210"
+                    HBox.hgrow="ALWAYS"
+                    styleClass="kpi-card">
 
                     <Label
-                            text="Usuarios activos"
-                            styleClass="kpi-label"/>
+                        text="Usuarios activos"
+                        styleClass="kpi-label"/>
 
                     <Label
-                            fx:id="lblUsuariosActivos"
-                            text="—"
-                            styleClass="kpi-value"/>
+                        fx:id="lblUsuariosActivos"
+                        text="—"
+                        styleClass="kpi-value"/>
 
                 </VBox>
 
             </HBox>
 
             <Label
-                    fx:id="lblEstadoIndicadores"
-                    text="Cargando indicadores..."
-                    wrapText="true"
-                    styleClass="kpi-status"/>
+                fx:id="lblEstadoIndicadores"
+                text="Cargando indicadores..."
+                wrapText="true"
+                styleClass="kpi-status"/>
 
             <Label
-                    text="Accesos rápidos"
-                    styleClass="section-title"/>
+                text="Accesos rápidos"
+                styleClass="section-title"/>
 
             <HBox
-                    spacing="10"
-                    styleClass="quick-row">
+                spacing="10"
+                styleClass="quick-row">
 
                 <Button
-                        text="Nuevo Libro"
-                        onAction="#onLibrosClick"
-                        prefWidth="150"
-                        prefHeight="60"
-                        styleClass="quick-button"/>
+                    text="Nuevo Libro"
+                    onAction="#onLibrosClick"
+                    prefWidth="150"
+                    prefHeight="60"
+                    styleClass="quick-button"/>
 
                 <Button
-                        text="Agregar Venta"
-                        onAction="#onVentasClick"
-                        prefWidth="150"
-                        prefHeight="60"
-                        styleClass="quick-button"/>
+                    text="Agregar Venta"
+                    onAction="#onVentasClick"
+                    prefWidth="150"
+                    prefHeight="60"
+                    styleClass="quick-button"/>
 
                 <Button
-                        text="Gestionar Usuarios"
-                        onAction="#onUsuariosClick"
-                        prefWidth="150"
-                        prefHeight="60"
-                        styleClass="quick-button"/>
+                    text="Gestionar Usuarios"
+                    onAction="#onUsuariosClick"
+                    prefWidth="150"
+                    prefHeight="60"
+                    styleClass="quick-button"/>
 
                 <Button
-                        text="Reportes"
-                        onAction="#onReportesClick"
-                        prefWidth="150"
-                        prefHeight="60"
-                        styleClass="quick-button"/>
+                    text="Reportes"
+                    onAction="#onReportesClick"
+                    prefWidth="150"
+                    prefHeight="60"
+                    styleClass="quick-button"/>
 
             </HBox>
 
             <HBox
-                    spacing="10"
-                    styleClass="quick-row">
+                spacing="10"
+                styleClass="quick-row">
 
                 <Button
-                        text="Actualizar precio"
-                        onAction="#onActualizarPrecioClick"
-                        prefWidth="150"
-                        prefHeight="60"
-                        styleClass="quick-button"/>
+                    text="Actualizar precio"
+                    onAction="#onActualizarPrecioClick"
+                    prefWidth="150"
+                    prefHeight="60"
+                    styleClass="quick-button"/>
 
                 <Button
-                        text="Cambiar contraseña"
-                        onAction="#onCambiarContrasenaClick"
-                        prefWidth="150"
-                        prefHeight="60"
-                        styleClass="quick-button"/>
+                    text="Cambiar contraseña"
+                    onAction="#onCambiarContrasenaClick"
+                    prefWidth="150"
+                    prefHeight="60"
+                    styleClass="quick-button"/>
 
                 <Button
-                        text="Detalle de ventas"
-                        onAction="#onDetalleVentasClick"
-                        prefWidth="150"
-                        prefHeight="60"
-                        styleClass="quick-button"/>
+                    text="Detalle de ventas"
+                    onAction="#onDetalleVentasClick"
+                    prefWidth="150"
+                    prefHeight="60"
+                    styleClass="quick-button"/>
 
                 <Button
-                        text="Ventas del Día"
-                        onAction="#onVentasDiaClick"
-                        prefWidth="150"
-                        prefHeight="60"
-                        styleClass="quick-button"/>
+                    text="Ventas del Día"
+                    onAction="#onVentasDiaClick"
+                    prefWidth="150"
+                    prefHeight="60"
+                    styleClass="quick-button"/>
 
             </HBox>
 
