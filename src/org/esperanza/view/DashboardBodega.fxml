@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane
+        xmlns:fx="http://javafx.com/fxml/1"
+        fx:controller="org.esperanza.controller.DashboardBodegaController"
+        prefWidth="950"
+        prefHeight="620"
+        stylesheets="@style/dashboard.css"
+        styleClass="root-dashboard">
+
+    <top>
+        <HBox styleClass="topbar">
+
+            <Label
+                    text="Panel de Bodega"
+                    styleClass="topbar-title"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <Label
+                    fx:id="lblBienvenida"
+                    styleClass="topbar-user"/>
+
+            <Button
+                    fx:id="btnCerrarSesion"
+                    text="Cerrar sesión"
+                    onAction="#onCerrarSesion"
+                    styleClass="logout-button"/>
+
+        </HBox>
+    </top>
+
+    <left>
+        <ScrollPane
+                fitToWidth="true"
+                prefWidth="200"
+                styleClass="sidebar-scroll">
+
+            <VBox styleClass="sidebar">
+
+                <Label
+                        text="Librería La Esperanza"
+                        wrapText="true"
+                        styleClass="sidebar-brand"/>
+
+                <Label
+                        text="Bodega"
+                        styleClass="sidebar-role"/>
+
+                <Button
+                        text="Libros"
+                        onAction="#onLibros"
+                        maxWidth="Infinity"
+                        styleClass="sidebar-button"/>
+
+                <Button
+                        text="Categorías"
+                        onAction="#onCategorias"
+                        maxWidth="Infinity"
+                        styleClass="sidebar-button"/>
+
+                <Button
+                        text="Inventario"
+                        onAction="#onInventario"
+                        maxWidth="Infinity"
+                        styleClass="sidebar-button"/>
+
+                <Button
+                        text="Ingreso de inventario"
+                        onAction="#onIngresoInventario"
+                        maxWidth="Infinity"
+                        styleClass="sidebar-button"/>
+
+                <Button
+                        text="Salida de inventario"
+                        onAction="#onEntradasSalidas"
+                        maxWidth="Infinity"
+                        styleClass="sidebar-button"/>
+
+                <Button
+                        text="Stock crítico"
+                        onAction="#onVerLibrosCriticos"
+                        maxWidth="Infinity"
+                        styleClass="sidebar-button"/>
+
+                <Button
+                        text="Cambiar contraseña"
+                        onAction="#onCambiarContrasena"
+                        maxWidth="Infinity"
+                        styleClass="sidebar-button"/>
+
+            </VBox>
+        </ScrollPane>
+    </left>
+
+    <center>
+        <ScrollPane fitToWidth="true">
+
+            <VBox styleClass="content-area">
+
+                <Label
+                        text="Bienvenido"
+                        styleClass="page-title"/>
+
+                <Label
+                        text="¿Qué necesitas hacer hoy?"
+                        styleClass="page-subtitle"/>
+
+                <Label
+                        fx:id="lblRol"
+                        styleClass="role-label"/>
+
+                <Label
+                        fx:id="lblPermisos"
+                        visible="false"
+                        managed="false"/>
+
+                <FlowPane hgap="14" vgap="14">
+
+                    <Button
+                            text="Agregar libros"
+                            onAction="#onLibros"
+                            prefWidth="185"
+                            prefHeight="60"
+                            wrapText="true"
+                            styleClass="quick-button"/>
+
+                    <Button
+                            text="Crear categorías"
+                            onAction="#onCategorias"
+                            prefWidth="185"
+                            prefHeight="60"
+                            wrapText="true"
+                            styleClass="quick-button"/>
+
+                    <Button
+                            text="Inventario"
+                            onAction="#onInventario"
+                            prefWidth="185"
+                            prefHeight="60"
+                            wrapText="true"
+                            styleClass="quick-button"/>
+
+                    <Button
+                            text="Ingreso de inventario"
+                            onAction="#onIngresoInventario"
+                            prefWidth="185"
+                            prefHeight="60"
+                            wrapText="true"
+                            styleClass="quick-button"/>
+
+                    <Button
+                            text="Salida de inventario"
+                            onAction="#onEntradasSalidas"
+                            prefWidth="185"
+                            prefHeight="60"
+                            wrapText="true"
+                            styleClass="quick-button"/>
+
+                    <Button
+                            text="Stock crítico"
+                            onAction="#onVerLibrosCriticos"
+                            prefWidth="185"
+                            prefHeight="60"
+                            wrapText="true"
+                            styleClass="quick-button"/>
+
+                    <Button
+                            text="Cambiar contraseña"
+                            onAction="#onCambiarContrasena"
+                            prefWidth="185"
+                            prefHeight="60"
+                            wrapText="true"
+                            styleClass="quick-button"/>
+
+                </FlowPane>
+
+                <VBox styleClass="section-card">
+
+                    <HBox spacing="12">
+
+                        <Label
+                                text="Libros con stock crítico"
+                                styleClass="section-title"/>
+
+                        <Label fx:id="lblCantidadStockCritico"/>
+
+                        <Label
+                                fx:id="lblContadorCritico"
+                                visible="false"
+                                managed="false"/>
+
+                    </HBox>
+
+                    <TableView
+                            fx:id="tablaStockCritico"
+                            prefHeight="180">
+
+                        <placeholder>
+                            <Label text="No hay libros con stock crítico."/>
+                        </placeholder>
+
+                        <columns>
+
+                            <TableColumn
+                                    fx:id="colIsbn"
+                                    text="ISBN"
+                                    prefWidth="150"/>
+
+                            <TableColumn
+                                    fx:id="colTitulo"
+                                    text="Título"
+                                    prefWidth="340"/>
+
+                            <TableColumn
+                                    fx:id="colStock"
+                                    text="Stock"
+                                    prefWidth="90"/>
+
+                        </columns>
+
+                    </TableView>
+
+                </VBox>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+
+</BorderPane>

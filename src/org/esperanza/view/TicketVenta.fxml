@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane
+        xmlns:fx="http://javafx.com/fxml/1"
+        fx:controller="org.esperanza.controller.TicketVentaController"
+        prefWidth="780"
+        prefHeight="650"
+        stylesheets="@style/dashboard.css">
+
+    <top>
+        <HBox spacing="12" alignment="CENTER_RIGHT">
+
+            <padding>
+                <Insets top="12" right="20" bottom="12" left="20"/>
+            </padding>
+
+            <Button
+                    text="Volver"
+                    onAction="#volver"/>
+
+            <Button
+                    text="Imprimir"
+                    onAction="#imprimir"/>
+
+        </HBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true">
+
+            <VBox
+                    spacing="18"
+                    style="-fx-background-color:white;">
+
+                <padding>
+                    <Insets top="25" right="30" bottom="25" left="30"/>
+                </padding>
+
+                <Label
+                        text="LIBRERÍA LA ESPERANZA"
+                        style="-fx-font-size:23px; -fx-font-weight:bold;"/>
+
+                <Label
+                        text="FACTURA"
+                        style="-fx-font-size:20px; -fx-font-weight:bold;"/>
+
+                <Label fx:id="lblVenta"/>
+
+                <Label fx:id="lblFecha"/>
+
+                <Separator/>
+
+                <Label
+                        fx:id="lblCliente"
+                        wrapText="true"/>
+
+                <Label
+                        fx:id="lblCajero"
+                        wrapText="true"/>
+
+                <Separator/>
+
+                <HBox
+                        spacing="8"
+                        style="-fx-font-weight:bold;">
+
+                    <Label
+                            text="Producto / ISBN"
+                            minWidth="280"
+                            prefWidth="280"/>
+
+                    <Label
+                            text="Cant."
+                            minWidth="50"
+                            prefWidth="50"/>
+
+                    <Label
+                            text="Precio"
+                            minWidth="100"
+                            prefWidth="100"
+                            alignment="CENTER_RIGHT"/>
+
+                    <Label
+                            text="Subtotal"
+                            minWidth="110"
+                            prefWidth="110"
+                            alignment="CENTER_RIGHT"/>
+
+                </HBox>
+
+                <VBox
+                        fx:id="boxProductos"
+                        spacing="14"/>
+
+                <Separator/>
+
+                <VBox alignment="CENTER_RIGHT" spacing="12">
+
+                    <Label fx:id="lblSubtotal"/>
+
+                    <Label
+                            fx:id="lblTotal"
+                            style="-fx-font-size:23px; -fx-font-weight:bold;"/>
+
+                </VBox>
+
+                <Separator/>
+
+                <Label text="Gracias por tu compra"/>
+
+            </VBox>
+
+        </ScrollPane>
+    </center>
+
+</BorderPane>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane
+        xmlns:fx="http://javafx.com/fxml/1"
+        fx:controller="org.esperanza.controller.CatalogoController"
+        prefWidth="1040"
+        prefHeight="680"
+        stylesheets="@style/dashboard.css"
+        styleClass="root-dashboard">
+
+    <top>
+        <HBox styleClass="topbar">
+
+            <Label
+                    fx:id="lblTitulo"
+                    styleClass="page-title"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <Button
+                    text="Regresar"
+                    onAction="#volver"/>
+
+        </HBox>
+    </top>
+
+    <left>
+        <ScrollPane
+                fitToWidth="true"
+                prefWidth="380">
+
+            <VBox styleClass="content-area">
+
+                <Label
+                        text="Nuevo registro"
+                        styleClass="section-title"/>
+
+                <GridPane
+                        fx:id="formulario"
+                        hgap="10"
+                        vgap="12"/>
+
+                <Button
+                        text="Guardar"
+                        onAction="#guardar"
+                        styleClass="primary-button"/>
+
+                <Label
+                        fx:id="lblMensaje"
+                        wrapText="true"/>
+
+            </VBox>
+        </ScrollPane>
+    </left>
+
+    <center>
+        <VBox styleClass="content-area">
+
+            <Button
+                    text="Actualizar lista"
+                    onAction="#actualizar"/>
+
+            <TableView
+                    fx:id="tabla"
+                    VBox.vgrow="ALWAYS"/>
+
+        </VBox>
+    </center>
+
+</BorderPane>
