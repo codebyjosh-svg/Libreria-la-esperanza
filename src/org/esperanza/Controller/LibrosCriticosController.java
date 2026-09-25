@@ -1,4 +1,4 @@
-package org.esperanza.controller;
+package org.esperanza.Controller;
 
 import java.net.URL;
 import java.util.List;
@@ -16,9 +16,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
 
 import org.esperanza.dao.LibroDAO;
 import org.esperanza.dao.impl.LibroDAOImpl;
-import org.esperanza.model.Libro;
-import org.esperanza.service.NavegacionRol;
-import org.esperanza.service.Pantallas;
+import org.esperanza.Model.Libro;
+import org.esperanza.Service.NavegacionRol;
+import org.esperanza.Service.Pantallas;
 
 public class LibrosCriticosController
         implements Initializable {

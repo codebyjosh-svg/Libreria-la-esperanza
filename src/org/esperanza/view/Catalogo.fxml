@@ -5,7 +5,7 @@
 
 <BorderPane
         xmlns:fx="http://javafx.com/fxml/1"
-        fx:controller="org.esperanza.controller.CatalogoController"
+        fx:controller="org.esperanza.Controller.CatalogoController"
         prefWidth="1040"
         prefHeight="680"
         stylesheets="@style/dashboard.css"

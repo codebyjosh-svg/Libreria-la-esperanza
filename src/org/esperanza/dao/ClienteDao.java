@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.esperanza.model.Cliente;
+import org.esperanza.Model.Cliente;
 import org.esperanza.util.Conexion;
 
 public class ClienteDao {

@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
-import org.esperanza.model.Proveedor;
-import org.esperanza.model.Usuario;
-import org.esperanza.service.SesionUsuario;
+import org.esperanza.Model.Proveedor;
+import org.esperanza.Model.Usuario;
+import org.esperanza.Service.SesionUsuario;
 import org.esperanza.util.Conexion;
 
 /** CRUD protegido: la baja lógica conserva las referencias y el NIT único. */

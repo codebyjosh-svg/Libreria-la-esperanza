@@ -1,4 +1,4 @@
-package org.esperanza.controller;
+package org.esperanza.Controller;
 
 import java.net.URL;
 import java.util.ResourceBundle;

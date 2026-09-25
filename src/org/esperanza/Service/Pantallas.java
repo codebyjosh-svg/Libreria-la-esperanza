@@ -1,4 +1,4 @@
-package org.esperanza.service;
+package org.esperanza.Service;
 
 import java.net.URL;
 
@@ -9,7 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 
-import org.esperanza.controller.CatalogoController;
+import org.esperanza.Controller.CatalogoController;
 
 public final class Pantallas {
 

@@ -7,7 +7,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.esperanza.dao.impl.LibroDAOImpl;
-import org.esperanza.model.Libro;
+import org.esperanza.Model.Libro;
 
 public class PruebaStockCritico {
 

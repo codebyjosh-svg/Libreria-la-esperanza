@@ -8,8 +8,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.esperanza.model.FiltroFecha;
-import org.esperanza.model.Venta;
+import org.esperanza.Model.FiltroFecha;
+import org.esperanza.Model.Venta;
 import org.esperanza.util.Conexion;
 
 public class ReporteVentasDao {

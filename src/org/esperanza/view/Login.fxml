@@ -9,7 +9,7 @@
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Text?>
 <StackPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-           fx:controller="org.esperanza.controller.LoginController"
+           fx:controller="org.esperanza.Controller.LoginController"
            styleClass="app-background" stylesheets="@style/login.css">
     <VBox alignment="CENTER" spacing="14.0" styleClass="login-card" maxWidth="300.0" maxHeight="360.0">
         <padding>

@@ -1,4 +1,4 @@
-package org.esperanza.service;
+package org.esperanza.Service;
 
 import java.sql.SQLException;
 import java.util.Objects;
@@ -6,7 +6,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.esperanza.dao.UsuarioDao;
-import org.esperanza.model.Usuario;
+import org.esperanza.Model.Usuario;
 import org.esperanza.util.PasswordUtil;
 
 public class AutenticacionService {

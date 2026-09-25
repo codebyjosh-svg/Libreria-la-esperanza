@@ -14,7 +14,7 @@
 <BorderPane
         xmlns="http://javafx.com/javafx/21"
         xmlns:fx="http://javafx.com/fxml/1"
-        fx:controller="org.esperanza.controller.LibroController">
+        fx:controller="org.esperanza.Controller.LibroController">
 
     <left>
         <VBox

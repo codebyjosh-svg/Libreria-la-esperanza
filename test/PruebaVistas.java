@@ -8,10 +8,10 @@ import javafx.scene.control.Label;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.stage.Stage;
 import javax.imageio.ImageIO;
-import org.esperanza.model.Usuario;
-import org.esperanza.service.SesionUsuario;
-import org.esperanza.controller.ProveedoresController;
-import org.esperanza.controller.DevolucionesController;
+import org.esperanza.Model.Usuario;
+import org.esperanza.Service.SesionUsuario;
+import org.esperanza.Controller.ProveedoresController;
+import org.esperanza.Controller.DevolucionesController;
 
 /** Carga FXML real y obtiene capturas; necesita una BD de pruebas ya configurada. */
 public class PruebaVistas {

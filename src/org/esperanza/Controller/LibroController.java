@@ -1,4 +1,4 @@
-package org.esperanza.controller;
+package org.esperanza.Controller;
 
 import java.sql.Date;
 import java.time.LocalDate;
@@ -23,9 +23,9 @@ import javafx.stage.Window;
 
 import org.esperanza.dao.LibroDAO;
 import org.esperanza.dao.impl.LibroDAOImpl;
-import org.esperanza.model.Libro;
-import org.esperanza.service.NavegacionRol;
-import org.esperanza.service.SesionUsuario;
+import org.esperanza.Model.Libro;
+import org.esperanza.Service.NavegacionRol;
+import org.esperanza.Service.SesionUsuario;
 
 public class LibroController {
 
@@ -83,8 +83,8 @@ public class LibroController {
     @FXML
     private TableColumn<Libro, Boolean> colActivo;
 
-    private final LibroDAO libroDao =
-            new LibroDAOImpl();
+    private final LibroDAO libroDao
+            = new LibroDAOImpl();
 
     private boolean modoEdicion = false;
 
@@ -96,8 +96,8 @@ public class LibroController {
             return;
         }
 
-        SesionUsuario sesion =
-                SesionUsuario.getInstancia();
+        SesionUsuario sesion
+                = SesionUsuario.getInstancia();
 
         if (!sesion.esAdmin()
                 && !sesion.esBodega()) {
@@ -223,8 +223,8 @@ public class LibroController {
 
     private void cargarTabla() {
 
-        List<Libro> libros =
-                libroDao.listarTodos();
+        List<Libro> libros
+                = libroDao.listarTodos();
 
         tbLibros.setItems(
                 FXCollections
@@ -243,8 +243,8 @@ public class LibroController {
             return;
         }
 
-        SesionUsuario sesion =
-                SesionUsuario.getInstancia();
+        SesionUsuario sesion
+                = SesionUsuario.getInstancia();
 
         if (!sesion.esAdmin()
                 && !sesion.esBodega()) {
@@ -277,8 +277,8 @@ public class LibroController {
 
         try {
 
-            double precio =
-                    Double.parseDouble(
+            double precio
+                    = Double.parseDouble(
                             txtPrecio
                                     .getText()
                                     .trim()
@@ -296,15 +296,15 @@ public class LibroController {
                 return;
             }
 
-            int idCategoria =
-                    Integer.parseInt(
+            int idCategoria
+                    = Integer.parseInt(
                             txtIdCategoria
                                     .getText()
                                     .trim()
                     );
 
-            int idProveedor =
-                    Integer.parseInt(
+            int idProveedor
+                    = Integer.parseInt(
                             txtIdProveedor
                                     .getText()
                                     .trim()
@@ -323,13 +323,13 @@ public class LibroController {
                 return;
             }
 
-            int stockActual =
-                    leerStock(
+            int stockActual
+                    = leerStock(
                             txtStockActual
                     );
 
-            int stockMinimo =
-                    leerStock(
+            int stockMinimo
+                    = leerStock(
                             txtStockMinimo
                     );
 
@@ -345,15 +345,15 @@ public class LibroController {
                 return;
             }
 
-            LocalDate fecha =
-                    dpFecha.getValue();
+            LocalDate fecha
+                    = dpFecha.getValue();
 
             if (fecha == null) {
                 fecha = LocalDate.now();
             }
 
-            Libro libro =
-                    new Libro();
+            Libro libro
+                    = new Libro();
 
             libro.setIsbn(
                     txtIsbn
@@ -403,15 +403,15 @@ public class LibroController {
 
             if (modoEdicion) {
 
-                guardado =
-                        libroDao.actualizar(
+                guardado
+                        = libroDao.actualizar(
                                 libro
                         );
 
             } else {
 
-                guardado =
-                        libroDao.insertar(
+                guardado
+                        = libroDao.insertar(
                                 libro
                         );
             }
@@ -454,8 +454,8 @@ public class LibroController {
     private int leerStock(
             TextField campo) {
 
-        String texto =
-                campo
+        String texto
+                = campo
                         .getText()
                         .trim();
 
@@ -472,8 +472,8 @@ public class LibroController {
     private void seleccionarLibro(
             MouseEvent event) {
 
-        Libro seleccionado =
-                tbLibros
+        Libro seleccionado
+                = tbLibros
                         .getSelectionModel()
                         .getSelectedItem();
 
@@ -537,21 +537,23 @@ public class LibroController {
                 )
         );
 
-        if (seleccionado
-                .getFechaPublicacion() != null) {
-
-            dpFecha.setValue(
-                    seleccionado
-                            .getFechaPublicacion()
-                            .toLocalDate()
-            );
-
-        } else {
-
-            dpFecha.setValue(
-                    null
-            );
-        }
+     if (seleccionado
+             .getFechaPublicacion() != null){
+         
+         dpFecha.setValue(
+                        new java.sql.Date(
+                                    seleccionado
+                                                .getFechaPublicacion()
+                                                .getTime()
+                        ).toLocalDate()
+         );
+         
+     }else{
+         
+         dpFecha.setValue(
+         null
+         ); 
+     }
 
         btnGuardar.setText(
                 "Guardar cambios"
@@ -587,8 +589,8 @@ public class LibroController {
             return;
         }
 
-        Libro seleccionado =
-                tbLibros
+        Libro seleccionado
+                = tbLibros
                         .getSelectionModel()
                         .getSelectedItem();
 
@@ -615,8 +617,8 @@ public class LibroController {
             return;
         }
 
-        boolean desactivado =
-                libroDao.eliminar(
+        boolean desactivado
+                = libroDao.eliminar(
                         seleccionado.getIsbn()
                 );
 
@@ -697,8 +699,8 @@ public class LibroController {
             return;
         }
 
-        Stage ventana =
-                (Stage) tbLibros
+        Stage ventana
+                = (Stage) tbLibros
                         .getScene()
                         .getWindow();
 
@@ -706,8 +708,8 @@ public class LibroController {
                 null
         );
 
-        Window propietario =
-                ventana.getOwner();
+        Window propietario
+                = ventana.getOwner();
 
         if (propietario != null) {
 
@@ -715,8 +717,8 @@ public class LibroController {
 
             if (propietario instanceof Stage) {
 
-                Stage principal =
-                        (Stage) propietario;
+                Stage principal
+                        = (Stage) propietario;
 
                 principal.toFront();
                 principal.requestFocus();
@@ -749,8 +751,8 @@ public class LibroController {
             return;
         }
 
-        Stage ventana =
-                (Stage) tbLibros
+        Stage ventana
+                = (Stage) tbLibros
                         .getScene()
                         .getWindow();
 
@@ -768,8 +770,8 @@ public class LibroController {
             String titulo,
             String mensaje) {
 
-        Alert alerta =
-                new Alert(
+        Alert alerta
+                = new Alert(
                         tipo
                 );
 

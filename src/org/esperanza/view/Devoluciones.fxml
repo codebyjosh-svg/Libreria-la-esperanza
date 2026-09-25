@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="org.esperanza.controller.DevolucionesController"
+      fx:controller="org.esperanza.Controller.DevolucionesController"
       fx:id="formulario" spacing="12" prefWidth="930" prefHeight="710"
       style="-fx-background-color: #f6f8fb; -fx-font-family: 'Segoe UI';">
     <padding><Insets top="22" right="24" bottom="20" left="24"/></padding>

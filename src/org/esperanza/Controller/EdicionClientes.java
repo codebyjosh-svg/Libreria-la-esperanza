@@ -1,4 +1,4 @@
-package org.esperanza.controller;
+package org.esperanza.Controller;
 
 import java.util.Objects;
 import java.util.function.Function;
@@ -10,9 +10,9 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.esperanza.dao.EdicionClienteDao;
-import org.esperanza.model.Cliente;
-import org.esperanza.service.NavegacionRol;
-import org.esperanza.service.Pantallas;
+import org.esperanza.Model.Cliente;
+import org.esperanza.Service.NavegacionRol;
+import org.esperanza.Service.Pantallas;
 
 public final class EdicionClientes {
 

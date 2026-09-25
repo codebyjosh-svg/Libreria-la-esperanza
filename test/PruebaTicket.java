@@ -6,8 +6,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.Parent;
 import javafx.stage.Stage;
-import org.esperanza.controller.TicketVentaController;
-import org.esperanza.model.DetalleVenta;
+import org.esperanza.Controller.TicketVentaController;
+import org.esperanza.Model.DetalleVenta;
 
 public class PruebaTicket extends Application {
 

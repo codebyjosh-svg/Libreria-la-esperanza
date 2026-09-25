@@ -1,4 +1,4 @@
-package org.esperanza.controller;
+package org.esperanza.Controller;
 
 import java.sql.SQLException;
 
@@ -13,9 +13,9 @@ import javafx.scene.control.TextFormatter;
 
 import org.esperanza.dao.MovimientoInventarioDAO;
 import org.esperanza.dao.MovimientoInventarioDAO.LibroDisponible;
-import org.esperanza.service.NavegacionRol;
-import org.esperanza.service.Pantallas;
-import org.esperanza.service.SesionUsuario;
+import org.esperanza.Service.NavegacionRol;
+import org.esperanza.Service.Pantallas;
+import org.esperanza.Service.SesionUsuario;
 
 public class IngresoInventarioController {
 

@@ -1,4 +1,4 @@
-package org.esperanza.controller;
+package org.esperanza.Controller;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -17,8 +17,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
-import org.esperanza.model.DetalleVenta;
-import org.esperanza.service.NavegacionRol;
+import org.esperanza.Model.DetalleVenta;
+import org.esperanza.Service.NavegacionRol;
 
 public class TicketVentaController {
 

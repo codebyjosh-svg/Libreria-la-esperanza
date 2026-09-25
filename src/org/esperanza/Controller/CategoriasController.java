@@ -16,7 +16,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
 import org.esperanza.dao.CategoriaDao;
-import org.esperanza.model.Categoria;
+import org.esperanza.Model.Categoria;
 
 public class CategoriasController {
 

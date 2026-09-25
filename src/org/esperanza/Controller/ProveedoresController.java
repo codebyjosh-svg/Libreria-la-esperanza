@@ -1,4 +1,4 @@
-package org.esperanza.controller;
+package org.esperanza.Controller;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -20,9 +20,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import org.esperanza.dao.ProveedorDAO;
-import org.esperanza.model.Proveedor;
-import org.esperanza.service.NavegacionRol;
-import org.esperanza.service.SesionUsuario;
+import org.esperanza.Model.Proveedor;
+import org.esperanza.Service.NavegacionRol;
+import org.esperanza.Service.SesionUsuario;
 
 /** Formulario administrativo con consultas JDBC fuera del hilo de JavaFX. */
 public final class ProveedoresController {

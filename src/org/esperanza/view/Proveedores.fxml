@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.esperanza.controller.ProveedoresController"
+            fx:controller="org.esperanza.Controller.ProveedoresController"
             stylesheets="@style/usuarios.css" styleClass="fondo" prefWidth="1120" prefHeight="710"
             minWidth="1000" minHeight="660">
     <top>

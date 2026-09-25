@@ -1,4 +1,4 @@
-package org.esperanza.service;
+package org.esperanza.Service;
 
 import java.io.IOException;
 import java.net.URL;
@@ -9,7 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 
-import org.esperanza.model.Rol;
+import org.esperanza.Model.Rol;
 
 public final class NavegacionRol {
 

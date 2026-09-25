@@ -1,11 +1,11 @@
 import java.math.BigDecimal;
 import java.sql.SQLException;
-import org.esperanza.model.Usuario;
-import org.esperanza.service.SesionUsuario;
+import org.esperanza.Model.Usuario;
+import org.esperanza.Service.SesionUsuario;
 import org.esperanza.dao.VentaDao;
-import org.esperanza.model.CarritoVenta;
-import org.esperanza.model.DescuentoVenta;
-import org.esperanza.model.Venta;
+import org.esperanza.Model.CarritoVenta;
+import org.esperanza.Model.DescuentoVenta;
+import org.esperanza.Model.Venta;
 
 public class PruebaDescuentos {
 
