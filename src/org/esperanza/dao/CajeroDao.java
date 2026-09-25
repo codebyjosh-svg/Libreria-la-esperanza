@@ -3,10 +3,10 @@ package org.esperanza.dao;
 import java.sql.*;
 import java.util.*;
 
-import org.esperanza.model.Libro;
-import org.esperanza.model.Usuario;
-import org.esperanza.model.Venta;
-import org.esperanza.service.SesionUsuario;
+import org.esperanza.Model.Libro;
+import org.esperanza.Model.Usuario;
+import org.esperanza.Model.Venta;
+import org.esperanza.Service.SesionUsuario;
 import org.esperanza.util.Conexion;
 
 public class CajeroDao {

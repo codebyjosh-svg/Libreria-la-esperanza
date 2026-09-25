@@ -5,8 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
-import org.esperanza.model.Cliente;
-import org.esperanza.service.SesionUsuario;
+import org.esperanza.Model.Cliente;
+import org.esperanza.Service.SesionUsuario;
 import org.esperanza.util.Conexion;
 
 public class EdicionClienteDao {

@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.esperanza.dao.LibroDAO;
 import org.esperanza.dao.impl.LibroDAOImpl;
-import org.esperanza.model.Libro;
+import org.esperanza.Model.Libro;
 import org.esperanza.util.Conexion;
 
 public class PruebaInventarioGeneral {

@@ -8,8 +8,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.esperanza.model.ResumenVentasDia;
-import org.esperanza.model.VentaDia;
+import org.esperanza.Model.ResumenVentasDia;
+import org.esperanza.Model.VentaDia;
 import org.esperanza.util.Conexion;
 
 public class VentaDiaDao {

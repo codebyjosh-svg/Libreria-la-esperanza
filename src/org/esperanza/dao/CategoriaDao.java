@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.esperanza.model.Categoria;
+import org.esperanza.Model.Categoria;
 import org.esperanza.util.Conexion;
 
 public class CategoriaDao {

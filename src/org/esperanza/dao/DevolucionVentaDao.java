@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
-import org.esperanza.model.DetalleVenta;
-import org.esperanza.model.EstadoVenta;
-import org.esperanza.model.Usuario;
-import org.esperanza.model.Venta;
-import org.esperanza.service.SesionUsuario;
+import org.esperanza.Model.DetalleVenta;
+import org.esperanza.Model.EstadoVenta;
+import org.esperanza.Model.Usuario;
+import org.esperanza.Model.Venta;
+import org.esperanza.Service.SesionUsuario;
 import org.esperanza.util.Conexion;
 
 /** Devoluciones totales: estado, existencias y auditoría se confirman juntos. */

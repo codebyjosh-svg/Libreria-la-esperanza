@@ -1,4 +1,4 @@
-package org.esperanza.controller;
+package org.esperanza.Controller;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -16,6 +16,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -26,10 +27,9 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import org.esperanza.dao.CajeroDao;
 import org.esperanza.dao.UsuarioDao;
-import org.esperanza.model.Usuario;
-import org.esperanza.service.SesionUsuario;
+import org.esperanza.Model.Usuario;
+import org.esperanza.Service.SesionUsuario;
 
 public class UsuariosController {
 
@@ -68,9 +68,6 @@ public class UsuariosController {
 
     private final UsuarioDao usuarioDao
             = new UsuarioDao();
-
-    private final CajeroDao edicionDao
-            = new CajeroDao();
 
     private final ObservableList<Usuario> datos
             = FXCollections.observableArrayList();
@@ -340,6 +337,38 @@ public class UsuariosController {
                         )
                 );
 
+        ComboBox<String> cmbRol
+                = new ComboBox<>();
+
+        cmbRol.getItems().addAll(
+                "ADMIN",
+                "CAJERO",
+                "BODEGA"
+        );
+
+        String rolActual
+                = Objects.toString(
+                        seleccionado.getRol(),
+                        ""
+                )
+                        .trim()
+                        .toUpperCase();
+
+        cmbRol.getSelectionModel()
+                .select(rolActual);
+
+        Usuario usuarioActual
+                = SesionUsuario
+                        .getInstancia()
+                        .getUsuarioActual();
+
+        if (usuarioActual != null
+                && usuarioActual.getId()
+                == seleccionado.getId()) {
+
+            cmbRol.setDisable(true);
+        }
+
         TextField txtCorreo
                 = new TextField(
                         Objects.toString(
@@ -350,6 +379,10 @@ public class UsuariosController {
 
         txtUsuario.setPrefColumnCount(
                 25
+        );
+
+        cmbRol.setPrefWidth(
+                200
         );
 
         GridPane formulario
@@ -382,6 +415,12 @@ public class UsuariosController {
 
         formulario.addRow(
                 3,
+                new Label("Rol:"),
+                cmbRol
+        );
+
+        formulario.addRow(
+                4,
                 new Label("Correo:"),
                 txtCorreo
         );
@@ -430,11 +469,19 @@ public class UsuariosController {
                                     );
                                 }
 
-                                edicionDao.editarUsuario(
+                                if (cmbRol.getValue() == null) {
+
+                                    throw new IllegalArgumentException(
+                                            "Selecciona un rol."
+                                    );
+                                }
+
+                                usuarioDao.editarUsuario(
                                         seleccionado.getId(),
                                         txtUsuario
                                                 .getText()
                                                 .trim(),
+                                        cmbRol.getValue(),
                                         txtNombre
                                                 .getText()
                                                 .trim(),

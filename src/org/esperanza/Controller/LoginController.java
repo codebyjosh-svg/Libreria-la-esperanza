@@ -1,4 +1,4 @@
-package org.esperanza.controller;
+package org.esperanza.Controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -9,11 +9,11 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
-import org.esperanza.model.Usuario;
-import org.esperanza.service.AutenticacionService;
-import org.esperanza.service.NavegacionRol;
-import org.esperanza.service.ResultadoLogin;
-import org.esperanza.service.SesionUsuario;
+import org.esperanza.Model.Usuario;
+import org.esperanza.Service.AutenticacionService;
+import org.esperanza.Service.NavegacionRol;
+import org.esperanza.Service.ResultadoLogin;
+import org.esperanza.Service.SesionUsuario;
 
 public class LoginController {
 

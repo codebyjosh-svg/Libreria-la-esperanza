@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.esperanza.model.DetalleVenta;
+import org.esperanza.Model.DetalleVenta;
 import org.esperanza.util.Conexion;
 
 public class DatosVentaDao {

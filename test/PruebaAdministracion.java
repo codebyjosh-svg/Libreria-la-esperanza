@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.esperanza.dao.UsuarioDao;
-import org.esperanza.model.Rol;
-import org.esperanza.model.Usuario;
-import org.esperanza.service.SesionUsuario;
+import org.esperanza.Model.Rol;
+import org.esperanza.Model.Usuario;
+import org.esperanza.Service.SesionUsuario;
 import org.esperanza.util.PasswordUtil;
 
 /** Pruebas sin servidor: autorizacion antes de JDBC y flujo administrativo. */

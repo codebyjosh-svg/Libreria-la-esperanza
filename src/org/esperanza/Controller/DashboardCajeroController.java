@@ -1,4 +1,4 @@
-package org.esperanza.controller;
+package org.esperanza.Controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -8,13 +8,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
-import org.esperanza.service.NavegacionRol;
-import org.esperanza.service.Pantallas;
-import org.esperanza.service.SesionUsuario;
+import org.esperanza.Service.NavegacionRol;
+import org.esperanza.Service.Pantallas;
+import org.esperanza.Service.SesionUsuario;
 
 public class DashboardCajeroController {
 
@@ -80,10 +79,10 @@ public class DashboardCajeroController {
 
             Parent root = loader.load();
 
-            CarritoVentaController controller =
+            CarritoVentaController Controller =
                     loader.getController();
 
-            controller.setIdUsuario(
+            Controller.setIdUsuario(
                     SesionUsuario
                             .getInstancia()
                             .getUsuarioActual()
@@ -144,14 +143,14 @@ public class DashboardCajeroController {
 
             Stage stage = ventana();
 
-            DevolucionesController controller =
+            DevolucionesController Controller =
                     loader.getController();
 
             stage.setOnCloseRequest(event -> {
                 event.consume();
 
-                if (controller == null
-                        || !controller.estaOcupado()) {
+                if (Controller == null
+                        || !Controller.estaOcupado()) {
                     NavegacionRol.abrirDashboardSegunRol(stage);
                 }
             });
@@ -198,74 +197,6 @@ public class DashboardCajeroController {
         EdicionClientes.mostrar(
                 ventana()
         );
-    }
-
-    @FXML
-    private void onCambiarContrasena() {
-
-        if (SesionUsuario
-                .getInstancia()
-                .getUsuarioActual() == null) {
-
-            Pantallas.error(
-                    "No se pudo identificar al usuario que inició sesión."
-            );
-
-            return;
-        }
-
-        try {
-
-            FXMLLoader loader =
-                    new FXMLLoader(
-                            getClass().getResource(
-                                    "/org/esperanza/view/CambioContrasenaDashboard.fxml"
-                            )
-                    );
-
-            Parent root = loader.load();
-
-            CambioContrasenaController controller =
-                    loader.getController();
-
-            controller.setIdUsuarioActual(
-                    SesionUsuario
-                            .getInstancia()
-                            .getUsuarioActual()
-                            .getId()
-            );
-
-            Stage modal = new Stage();
-
-            modal.setTitle(
-                    "Cambiar Contraseña"
-            );
-
-            modal.setScene(
-                    new Scene(root)
-            );
-
-            modal.initOwner(
-                    lblBienvenida
-                            .getScene()
-                            .getWindow()
-            );
-
-            modal.initModality(
-                    Modality.WINDOW_MODAL
-            );
-
-            modal.setResizable(false);
-            modal.centerOnScreen();
-            modal.showAndWait();
-
-        } catch (Exception ex) {
-
-            Pantallas.error(
-                    "No se pudo abrir la pantalla de Cambio de Contraseña.\n"
-                    + ex.getMessage()
-            );
-        }
     }
 
     @FXML

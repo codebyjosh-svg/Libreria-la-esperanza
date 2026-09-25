@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import org.esperanza.model.Rol;
-import org.esperanza.model.Usuario;
-import org.esperanza.service.SesionUsuario;
+import org.esperanza.Model.Rol;
+import org.esperanza.Model.Usuario;
+import org.esperanza.Service.SesionUsuario;
 import org.esperanza.util.Conexion;
 import org.esperanza.util.PasswordUtil;
 
@@ -265,6 +265,188 @@ public class UsuarioDao {
             );
 
             return false;
+        }
+    }
+
+    public void editarUsuario(
+            int id,
+            String username,
+            String rol,
+            String nombre,
+            String apellido,
+            String correo)
+            throws SQLException {
+
+        if (!esAdministrador()) {
+
+            throw new SecurityException(
+                    "Solo un administrador puede editar usuarios."
+            );
+        }
+
+        username = username == null
+                ? ""
+                : username.trim();
+
+        nombre = nombre == null
+                ? ""
+                : nombre.trim();
+
+        apellido = apellido == null
+                ? ""
+                : apellido.trim();
+
+        correo = correo == null
+                ? ""
+                : correo.trim();
+
+        Rol rolValidado =
+                Rol.fromString(rol);
+
+        if (id <= 0
+                || !username.matches(
+                        "[A-Za-z0-9._-]{4,20}"
+                )
+                || rolValidado == null
+                || nombre.isBlank()
+                || apellido.isBlank()
+                || !correo.matches(
+                        "[^\\s@]+@[^\\s@]+\\.[^\\s@]+"
+                )) {
+
+            throw new IllegalArgumentException(
+                    "Revisa usuario (4 a 20 caracteres), "
+                    + "rol, nombre, apellido y correo."
+            );
+        }
+
+        SesionUsuario sesion =
+                SesionUsuario.getInstancia();
+
+        Usuario actual =
+                sesion.getUsuarioActual();
+
+        if (actual != null
+                && actual.getId() == id
+                && Rol.fromString(
+                        actual.getRol()
+                ) != rolValidado) {
+
+            throw new IllegalArgumentException(
+                    "No puedes cambiar tu propio rol "
+                    + "mientras tienes la sesión iniciada."
+            );
+        }
+
+        try (
+                Connection con =
+                        conexiones.conectar()
+        ) {
+
+            try (
+                    PreparedStatement ps =
+                            con.prepareStatement(
+                                    "SELECT id FROM usuarios "
+                                    + "WHERE username = ? "
+                                    + "AND id <> ?"
+                            )
+            ) {
+
+                ps.setString(
+                        1,
+                        username
+                );
+
+                ps.setInt(
+                        2,
+                        id
+                );
+
+                try (
+                        ResultSet rs =
+                                ps.executeQuery()
+                ) {
+
+                    if (rs.next()) {
+
+                        throw new IllegalArgumentException(
+                                "Ese usuario ya existe."
+                        );
+                    }
+                }
+            }
+
+            String sql =
+                    "UPDATE usuarios "
+                    + "SET username = ?, "
+                    + "rol = ?, "
+                    + "nombre = ?, "
+                    + "apellido = ?, "
+                    + "correo = ? "
+                    + "WHERE id = ?";
+
+            try (
+                    PreparedStatement ps =
+                            con.prepareStatement(sql)
+            ) {
+
+                ps.setString(
+                        1,
+                        username
+                );
+
+                ps.setString(
+                        2,
+                        rolValidado.name()
+                );
+
+                ps.setString(
+                        3,
+                        nombre
+                );
+
+                ps.setString(
+                        4,
+                        apellido
+                );
+
+                ps.setString(
+                        5,
+                        correo
+                );
+
+                ps.setInt(
+                        6,
+                        id
+                );
+
+                if (ps.executeUpdate() != 1) {
+
+                    throw new SQLException(
+                            "No se pudo actualizar el usuario."
+                    );
+                }
+            }
+        }
+
+        if (actual != null
+                && actual.getId() == id) {
+
+            actual.setUsrname(
+                    username
+            );
+
+            actual.setNombre(
+                    nombre
+            );
+
+            actual.setApellido(
+                    apellido
+            );
+
+            actual.setCorreo(
+                    correo
+            );
         }
     }
 

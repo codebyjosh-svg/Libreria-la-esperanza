@@ -1,4 +1,4 @@
-package org.esperanza.controller;
+package org.esperanza.Controller;
 
 import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
@@ -20,11 +20,11 @@ import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.esperanza.dao.DevolucionVentaDao;
-import org.esperanza.model.DetalleVenta;
-import org.esperanza.model.EstadoVenta;
-import org.esperanza.model.Venta;
-import org.esperanza.service.NavegacionRol;
-import org.esperanza.service.SesionUsuario;
+import org.esperanza.Model.DetalleVenta;
+import org.esperanza.Model.EstadoVenta;
+import org.esperanza.Model.Venta;
+import org.esperanza.Service.NavegacionRol;
+import org.esperanza.Service.SesionUsuario;
 
 public class DevolucionesController {
     @FXML private VBox formulario;

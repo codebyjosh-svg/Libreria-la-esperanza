@@ -1,6 +1,6 @@
-package org.esperanza.service;
+package org.esperanza.Service;
 
-import org.esperanza.model.Usuario;
+import org.esperanza.Model.Usuario;
 
 public class ResultadoLogin {
 

@@ -1,4 +1,4 @@
-package org.esperanza.controller;
+package org.esperanza.Controller;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -21,11 +21,11 @@ import javafx.stage.Stage;
 import org.esperanza.dao.CajeroDao;
 import org.esperanza.dao.DatosVentaDao;
 import org.esperanza.dao.DetalleVentaDao;
-import org.esperanza.model.DetalleVenta;
-import org.esperanza.model.Venta;
-import org.esperanza.service.NavegacionRol;
-import org.esperanza.service.Pantallas;
-import org.esperanza.service.SesionUsuario;
+import org.esperanza.Model.DetalleVenta;
+import org.esperanza.Model.Venta;
+import org.esperanza.Service.NavegacionRol;
+import org.esperanza.Service.Pantallas;
+import org.esperanza.Service.SesionUsuario;
 import org.esperanza.view.ComprobanteVenta;
 
 public final class DetalleVentasAdmin {
@@ -311,13 +311,13 @@ public final class DetalleVentasAdmin {
 
             int idVenta = venta.getIdVenta();
 
-            TicketVentaController controller = ComprobanteVenta.mostrar(
+            TicketVentaController Controller = ComprobanteVenta.mostrar(
                     venta,
                     detalles,
                     ventana
             );
 
-            controller.setAlVolver(() -> {
+            Controller.setAlVolver(() -> {
                 if (!SesionUsuario.getInstancia().esAdmin()) {
                     volver();
                     return;

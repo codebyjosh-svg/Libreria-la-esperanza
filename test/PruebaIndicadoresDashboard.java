@@ -6,7 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.esperanza.dao.DashboardIndicadoresDao;
-import org.esperanza.model.IndicadoresDashboardAdmin;
+import org.esperanza.Model.IndicadoresDashboardAdmin;
 
 /** Pruebas sin base de datos para la consulta de indicadores. */
 public class PruebaIndicadoresDashboard {

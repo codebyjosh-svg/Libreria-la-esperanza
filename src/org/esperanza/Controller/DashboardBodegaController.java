@@ -1,4 +1,4 @@
-package org.esperanza.controller;
+package org.esperanza.Controller;
 
 import java.util.List;
 import java.util.function.BooleanSupplier;
@@ -14,31 +14,40 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import org.esperanza.dao.LibroDAO;
 import org.esperanza.dao.impl.LibroDAOImpl;
-import org.esperanza.model.Libro;
-import org.esperanza.model.Rol;
-import org.esperanza.service.NavegacionRol;
-import org.esperanza.service.Pantallas;
-import org.esperanza.service.SesionUsuario;
+import org.esperanza.Model.Libro;
+import org.esperanza.Model.Rol;
+import org.esperanza.Service.NavegacionRol;
+import org.esperanza.Service.Pantallas;
+import org.esperanza.Service.SesionUsuario;
 
 public class DashboardBodegaController {
 
-    @FXML private Label lblBienvenida;
-    @FXML private Label lblRol;
-    @FXML private Label lblPermisos;
-    @FXML private Button btnCerrarSesion;
+    @FXML
+    private Label lblBienvenida;
+    @FXML
+    private Label lblRol;
+    @FXML
+    private Label lblPermisos;
+    @FXML
+    private Button btnCerrarSesion;
 
-    @FXML private Label lblCantidadStockCritico;
-    @FXML private Label lblContadorCritico;
+    @FXML
+    private Label lblCantidadStockCritico;
+    @FXML
+    private Label lblContadorCritico;
 
-    @FXML private TableView<Libro> tablaStockCritico;
-    @FXML private TableColumn<Libro, String> colIsbn;
-    @FXML private TableColumn<Libro, String> colTitulo;
-    @FXML private TableColumn<Libro, Integer> colStock;
+    @FXML
+    private TableView<Libro> tablaStockCritico;
+    @FXML
+    private TableColumn<Libro, String> colIsbn;
+    @FXML
+    private TableColumn<Libro, String> colTitulo;
+    @FXML
+    private TableColumn<Libro, Integer> colStock;
 
     private final LibroDAO libroDAO = new LibroDAOImpl();
 
@@ -111,10 +120,10 @@ public class DashboardBodegaController {
                 lblCantidadStockCritico.setText(cantidad);
                 lblCantidadStockCritico.setStyle(
                         libros.isEmpty()
-                                ? "-fx-text-fill:#10B981;"
-                                  + "-fx-font-weight:bold;"
-                                : "-fx-text-fill:#EF4444;"
-                                  + "-fx-font-weight:bold;"
+                        ? "-fx-text-fill:#10B981;"
+                        + "-fx-font-weight:bold;"
+                        : "-fx-text-fill:#EF4444;"
+                        + "-fx-font-weight:bold;"
                 );
             }
 
@@ -153,53 +162,7 @@ public class DashboardBodegaController {
             );
         }
     }
-
-    @FXML
-    private void onCambiarContrasena() {
-        if (SesionUsuario.getInstancia().getUsuarioActual() == null) {
-            Pantallas.error(
-                    "No se pudo identificar al usuario que inició sesión."
-            );
-            return;
-        }
-
-        try {
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource(
-                            "/org/esperanza/view/CambioContrasenaDashboard.fxml"
-                    )
-            );
-
-            Parent root = loader.load();
-
-            CambioContrasenaController controller =
-                    loader.getController();
-
-            controller.setIdUsuarioActual(
-                    SesionUsuario.getInstancia()
-                            .getUsuarioActual()
-                            .getId()
-            );
-
-            Stage ventana = new Stage();
-            ventana.setTitle("Cambiar Contraseña");
-            ventana.setScene(new Scene(root));
-
-            ventana.initOwner(lblBienvenida.getScene().getWindow());
-            ventana.initModality(Modality.WINDOW_MODAL);
-
-            ventana.setResizable(false);
-            ventana.centerOnScreen();
-            ventana.showAndWait();
-
-        } catch (Exception ex) {
-            Pantallas.error(
-                    "No se pudo abrir la pantalla de Cambio de Contraseña.\n"
-                    + ex.getMessage()
-            );
-        }
-    }
-
+    
     private void mostrarEnMismaVentana(
             Parent contenido,
             String titulo,
@@ -278,10 +241,10 @@ public class DashboardBodegaController {
 
             Parent contenido = loader.load();
 
-            IngresoInventarioController controller =
-                    loader.getController();
+            IngresoInventarioController Controller
+                    = loader.getController();
 
-            controller.setIdUsuarioActual(
+            Controller.setIdUsuarioActual(
                     SesionUsuario.getInstancia()
                             .getUsuarioActual()
                             .getId()
@@ -316,13 +279,13 @@ public class DashboardBodegaController {
 
             Parent contenido = loader.load();
 
-            SalidaInventarioController controller =
-                    loader.getController();
+            SalidaInventarioController Controller
+                    = loader.getController();
 
             mostrarEnMismaVentana(
                     contenido,
                     "Salida de inventario",
-                    controller::estaOcupado
+                    Controller::estaOcupado
             );
 
         } catch (Exception ex) {
@@ -368,9 +331,23 @@ public class DashboardBodegaController {
     }
 
     @FXML
+    private void onAutores() {
+
+        if (!NavegacionRol.validarRol(Rol.BODEGA)) {
+            return;
+        }
+
+        Pantallas.catalogo(
+                lblBienvenida,
+                "autores",
+                "Autores"
+        );
+    }
+
+    @FXML
     private void abrirFichaLibro() {
-        Libro libro =
-                tablaStockCritico.getSelectionModel().getSelectedItem();
+        Libro libro
+                = tablaStockCritico.getSelectionModel().getSelectedItem();
 
         if (libro == null) {
             Pantallas.error("Selecciona un libro de la tabla.");

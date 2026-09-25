@@ -1,4 +1,4 @@
-package org.esperanza.model;
+package org.esperanza.Model;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.esperanza.dao.VentaDao;
+
 
 public class CarritoVenta {
 
@@ -191,7 +192,7 @@ public class CarritoVenta {
         );
     }
 
-    public Venta confirmarVenta(
+    public boolean confirmarVenta(
             long cuiCliente,
             int idUsuario,
             VentaDao ventaDao)
@@ -205,7 +206,7 @@ public class CarritoVenta {
         );
     }
 
-    public Venta confirmarVenta(
+    public boolean confirmarVenta(
             long cuiCliente,
             int idUsuario,
             VentaDao ventaDao,
@@ -254,20 +255,22 @@ public class CarritoVenta {
                         "El descuento no puede ser nulo."
                 );
 
-        Venta venta =
-                ventaDao.registrar(
-                        cuiCliente,
-                        idUsuario,
-                        detalles,
-                        descuentoAplicado
-                );
+    boolean registrado =
+        ventaDao.registrarVenta(
+                String.valueOf(cuiCliente),
+                idUsuario,
+                detalles,
+                descuentoAplicado
+        );
 
-        if (venta == null) {
 
-            throw new SQLException(
-                    "No fue posible registrar la venta."
-            );
-        }
+if (!registrado) {
+
+    throw new SQLException(
+            "No fue posible registrar la venta."
+    );
+}
+        
 
         /*
          * El carrito solamente se vacía
@@ -275,7 +278,7 @@ public class CarritoVenta {
          */
         vaciar();
 
-        return venta;
+        return true;
     }
 
     private String validarIsbn(

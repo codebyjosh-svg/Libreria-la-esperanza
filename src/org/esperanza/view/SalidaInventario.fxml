@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="org.esperanza.controller.SalidaInventarioController"
+      fx:controller="org.esperanza.Controller.SalidaInventarioController"
       prefWidth="600" spacing="16" style="-fx-background-color: #f5f7fa;">
     <padding><Insets top="24" right="28" bottom="24" left="28"/></padding>
     <Label text="Registrar salida de inventario" style="-fx-font-size: 23; -fx-font-weight: bold;"/>

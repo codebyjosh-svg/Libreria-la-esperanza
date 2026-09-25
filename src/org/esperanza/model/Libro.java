@@ -1,78 +1,37 @@
-package org.esperanza.model;
+package org.esperanza.Model;
 
-import java.sql.Date;
+import java.util.Date;
+import java.math.BigDecimal;
 
 public class Libro {
 
     private String isbn;
     private String titulo;
+    private int stockActual;
+    private int stockMinimo;
     private Date fechaPublicacion;
-    private double precio;
     private int idCategoria;
     private String nitEditorial;
     private int idProveedor;
-    private int stockActual;
-    private int stockMinimo;
     private boolean activo;
-    private String nombreAutor;
+    private double precio;
 
     public Libro() {
     }
 
-    public Libro(
-            String isbn,
-            String titulo,
-            Date fechaPublicacion,
-            double precio,
-            int idCategoria,
-            String nitEditorial,
-            int idProveedor,
-            int stockActual,
-            int stockMinimo,
-            boolean activo) {
-
+    public Libro(String isbn, String titulo, int stockActual, int stockMinimo, Date fechaPublicacion, int idCategoria, String nitEditorial, int idProveedor, boolean activo) {
         this.isbn = isbn;
         this.titulo = titulo;
+        this.stockActual = stockActual;
+        this.stockMinimo = stockMinimo;
         this.fechaPublicacion = fechaPublicacion;
-        this.precio = precio;
         this.idCategoria = idCategoria;
         this.nitEditorial = nitEditorial;
         this.idProveedor = idProveedor;
-        this.stockActual = stockActual;
-        this.stockMinimo = stockMinimo;
         this.activo = activo;
     }
 
-    public Libro(
-            String isbn,
-            String titulo,
-            Date fechaPublicacion,
-            double precio,
-            int idCategoria,
-            String nitEditorial,
-            int idProveedor,
-            int stockActual,
-            int stockMinimo,
-            boolean activo,
-            String nombreAutor) {
-
-        this.isbn = isbn;
-        this.titulo = titulo;
-        this.fechaPublicacion = fechaPublicacion;
-        this.precio = precio;
-        this.idCategoria = idCategoria;
-        this.nitEditorial = nitEditorial;
-        this.idProveedor = idProveedor;
-        this.stockActual = stockActual;
-        this.stockMinimo = stockMinimo;
-        this.activo = activo;
-        this.nombreAutor = nombreAutor;
-    }
-
-    public boolean esStockCritico() {
-        return stockActual <= stockMinimo;
-    }
-
+    // --- Getters y Setters ---
     public String getIsbn() {
         return isbn;
     }
@@ -89,12 +48,20 @@ public class Libro {
         this.titulo = titulo;
     }
 
-    public Date getFechaPublicacion() {
-        return fechaPublicacion;
+    public int getStock() {
+        return stockActual;
     }
 
-    public void setFechaPublicacion(Date fechaPublicacion) {
-        this.fechaPublicacion = fechaPublicacion;
+    public void setStock(int stock) {
+        this.stockActual = stock;
+    }
+
+    public int getStockActual() {
+        return stockActual;
+    }
+
+    public void setStockActual(int stockActual) {
+        this.stockActual = stockActual;
     }
 
     public double getPrecio() {
@@ -103,6 +70,26 @@ public class Libro {
 
     public void setPrecio(double precio) {
         this.precio = precio;
+    }
+
+    public void setPrecio(BigDecimal precio) {
+        this.precio = precio.doubleValue();
+    }
+
+    public int getStockMinimo() {
+        return stockMinimo;
+    }
+
+    public void setStockMinimo(int stockMinimo) {
+        this.stockMinimo = stockMinimo;
+    }
+
+    public Date getFechaPublicacion() {
+        return fechaPublicacion;
+    }
+
+    public void setFechaPublicacion(Date fechaPublicacion) {
+        this.fechaPublicacion = fechaPublicacion;
     }
 
     public int getIdCategoria() {
@@ -129,22 +116,6 @@ public class Libro {
         this.idProveedor = idProveedor;
     }
 
-    public int getStockActual() {
-        return stockActual;
-    }
-
-    public void setStockActual(int stockActual) {
-        this.stockActual = stockActual;
-    }
-
-    public int getStockMinimo() {
-        return stockMinimo;
-    }
-
-    public void setStockMinimo(int stockMinimo) {
-        this.stockMinimo = stockMinimo;
-    }
-
     public boolean isActivo() {
         return activo;
     }
@@ -153,11 +124,8 @@ public class Libro {
         this.activo = activo;
     }
 
-    public String getNombreAutor() {
-        return nombreAutor;
-    }
-
-    public void setNombreAutor(String nombreAutor) {
-        this.nombreAutor = nombreAutor;
+    // --- Métodos de Negocio ---
+    public boolean esStockCritico() {
+        return this.stockActual <= this.stockMinimo;
     }
 }

@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import org.esperanza.model.DetalleVenta;
+import org.esperanza.Model.DetalleVenta;
 import org.esperanza.util.Conexion;
 
 public class DetalleVentaDao {

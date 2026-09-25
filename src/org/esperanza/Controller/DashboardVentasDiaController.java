@@ -1,4 +1,4 @@
-package org.esperanza.controller;
+package org.esperanza.Controller;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
@@ -14,10 +14,10 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.stage.Stage;
 
-import org.esperanza.service.NavegacionRol;
+import org.esperanza.Service.NavegacionRol;
 import org.esperanza.dao.VentaDiaDao;
-import org.esperanza.model.ResumenVentasDia;
-import org.esperanza.model.VentaDia;
+import org.esperanza.Model.ResumenVentasDia;
+import org.esperanza.Model.VentaDia;
 
 public class DashboardVentasDiaController {
 
@@ -68,7 +68,7 @@ public class DashboardVentasDiaController {
 
     @FXML
     private void initialize() {
-        if (!org.esperanza.service.NavegacionRol.validarPermiso("VENTAS")) return;
+        if (!org.esperanza.Service.NavegacionRol.validarPermiso("VENTAS")) return;
 
         configurarTabla();
         cargarDatos();
@@ -144,7 +144,7 @@ public class DashboardVentasDiaController {
 
     @FXML
     private void actualizar() {
-        if (!org.esperanza.service.NavegacionRol.validarPermiso("VENTAS")) return;
+        if (!org.esperanza.Service.NavegacionRol.validarPermiso("VENTAS")) return;
 
         cargarDatos();
     }

@@ -1,4 +1,4 @@
-package org.esperanza.controller;
+package org.esperanza.Controller;
 
 import java.io.IOException;
 import java.net.URL;
@@ -19,12 +19,12 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import org.esperanza.dao.DashboardIndicadoresDao;
-import org.esperanza.model.IndicadoresDashboardAdmin;
-import org.esperanza.model.Rol;
-import org.esperanza.model.Usuario;
-import org.esperanza.service.NavegacionRol;
-import org.esperanza.service.Pantallas;
-import org.esperanza.service.SesionUsuario;
+import org.esperanza.Model.IndicadoresDashboardAdmin;
+import org.esperanza.Model.Rol;
+import org.esperanza.Model.Usuario;
+import org.esperanza.Service.NavegacionRol;
+import org.esperanza.Service.Pantallas;
+import org.esperanza.Service.SesionUsuario;
 
 public class DashboardAdminController {
 
@@ -70,8 +70,8 @@ public class DashboardAdminController {
             return;
         }
 
-        usuarioActual =
-                SesionUsuario
+        usuarioActual
+                = SesionUsuario
                         .getInstancia()
                         .getUsuarioActual();
 
@@ -119,8 +119,8 @@ public class DashboardAdminController {
                 "Actualizando indicadores..."
         );
 
-        Task<IndicadoresDashboardAdmin> tarea =
-                new Task<>() {
+        Task<IndicadoresDashboardAdmin> tarea
+                = new Task<>() {
 
             @Override
             protected IndicadoresDashboardAdmin call()
@@ -138,8 +138,8 @@ public class DashboardAdminController {
                 return;
             }
 
-            IndicadoresDashboardAdmin datos =
-                    tarea.getValue();
+            IndicadoresDashboardAdmin datos
+                    = tarea.getValue();
 
             if (datos == null) {
 
@@ -151,13 +151,13 @@ public class DashboardAdminController {
                 return;
             }
 
-            NumberFormat moneda =
-                    NumberFormat.getCurrencyInstance(
+            NumberFormat moneda
+                    = NumberFormat.getCurrencyInstance(
                             Locale.forLanguageTag("es-GT")
                     );
 
-            NumberFormat numero =
-                    NumberFormat.getIntegerInstance(
+            NumberFormat numero
+                    = NumberFormat.getIntegerInstance(
                             Locale.forLanguageTag("es-GT")
                     );
 
@@ -213,8 +213,8 @@ public class DashboardAdminController {
             btnActualizarIndicadores.setDisable(false);
         });
 
-        Thread hilo =
-                new Thread(
+        Thread hilo
+                = new Thread(
                         tarea,
                         "indicadores-dashboard-admin"
                 );
@@ -317,10 +317,10 @@ public class DashboardAdminController {
             FXMLLoader loader = new FXMLLoader(recurso);
             Parent root = loader.load();
 
-            CambioContrasenaController controller
+            CambioContrasenaController Controller
                     = loader.getController();
 
-            controller.setIdUsuarioActual(
+            Controller.setIdUsuarioActual(
                     usuarioActual.getId()
             );
 
@@ -359,8 +359,8 @@ public class DashboardAdminController {
 
         try {
 
-            FXMLLoader loader =
-                    new FXMLLoader(
+            FXMLLoader loader
+                    = new FXMLLoader(
                             getClass().getResource(
                                     "/org/esperanza/view/Libros.fxml"
                             )
@@ -368,8 +368,8 @@ public class DashboardAdminController {
 
             Parent root = loader.load();
 
-            Stage ventana =
-                    (Stage) lblUsuario
+            Stage ventana
+                    = (Stage) lblUsuario
                             .getScene()
                             .getWindow();
 
@@ -397,7 +397,12 @@ public class DashboardAdminController {
 
     @FXML
     private void onAutoresClick() {
-        mostrarEnConstruccion("Autores");
+
+        Pantallas.catalogo(
+                lblUsuario,
+                "autores",
+                "Autores"
+        );
     }
 
     @FXML
@@ -512,17 +517,17 @@ public class DashboardAdminController {
                 return;
             }
 
-            Object controller = loader.getController();
+            Object Controller = loader.getController();
 
             ventana.setOnCloseRequest(event -> {
 
-                boolean ocupado =
-                        controller instanceof ProveedoresController proveedor
+                boolean ocupado
+                        = Controller instanceof ProveedoresController proveedor
                         && proveedor.estaOcupado();
 
-                ocupado =
-                        ocupado
-                        || controller instanceof DevolucionesController devolucion
+                ocupado
+                        = ocupado
+                        || Controller instanceof DevolucionesController devolucion
                         && devolucion.estaOcupado();
 
                 event.consume();
@@ -584,10 +589,10 @@ public class DashboardAdminController {
             FXMLLoader loader = new FXMLLoader(recurso);
             Parent root = loader.load();
 
-            CarritoVentaController controller
+            CarritoVentaController Controller
                     = loader.getController();
 
-            controller.setIdUsuario(
+            Controller.setIdUsuario(
                     usuarioActual.getId()
             );
 
@@ -725,8 +730,8 @@ public class DashboardAdminController {
 
         try {
 
-            java.net.URL pantalla =
-                    getClass().getResource(
+            java.net.URL pantalla
+                    = getClass().getResource(
                             recurso
                     );
 
@@ -740,13 +745,13 @@ public class DashboardAdminController {
                 return;
             }
 
-            FXMLLoader loader =
-                    new FXMLLoader(pantalla);
+            FXMLLoader loader
+                    = new FXMLLoader(pantalla);
 
             Parent root = loader.load();
 
-            Stage ventana =
-                    (Stage) lblUsuario
+            Stage ventana
+                    = (Stage) lblUsuario
                             .getScene()
                             .getWindow();
 
@@ -843,7 +848,6 @@ public class DashboardAdminController {
         }
     }
 
-
     private Stage obtenerStagePrincipal() {
 
         if (lblUsuario == null
@@ -861,8 +865,8 @@ public class DashboardAdminController {
     private void mostrarEnConstruccion(
             String modulo) {
 
-        Alert alert =
-                new Alert(
+        Alert alert
+                = new Alert(
                         Alert.AlertType.INFORMATION
                 );
 
@@ -881,8 +885,8 @@ public class DashboardAdminController {
     private void mostrarError(
             String mensaje) {
 
-        Alert alert =
-                new Alert(
+        Alert alert
+                = new Alert(
                         Alert.AlertType.ERROR
                 );
 

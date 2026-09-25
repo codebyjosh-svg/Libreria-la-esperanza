@@ -1,4 +1,4 @@
-package org.esperanza.controller;
+package org.esperanza.Controller;
 
 import java.io.IOException;
 import java.net.URL;
@@ -26,7 +26,7 @@ import javafx.stage.Stage;
 
 import org.esperanza.dao.LibroDAO;
 import org.esperanza.dao.impl.LibroDAOImpl;
-import org.esperanza.model.Libro;
+import org.esperanza.Model.Libro;
 
 public class BuscadorLibrosController implements Initializable {
 
