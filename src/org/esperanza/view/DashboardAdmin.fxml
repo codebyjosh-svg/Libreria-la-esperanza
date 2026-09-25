@@ -13,7 +13,7 @@
 <BorderPane
     xmlns="http://javafx.com/javafx"
     xmlns:fx="http://javafx.com/fxml"
-    fx:controller="org.esperanza.controller.DashboardAdminController"
+    fx:controller="org.esperanza.Controller.DashboardAdminController"
     stylesheets="@style/dashboard.css"
     styleClass="root-dashboard"
     prefWidth="1000"

@@ -1,4 +1,4 @@
-package org.esperanza.controller;
+package org.esperanza.Controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -9,7 +9,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import org.esperanza.dao.UsuarioDao;
-import org.esperanza.service.SesionUsuario;
+import org.esperanza.Service.SesionUsuario;
 import org.esperanza.util.PasswordUtil;
 
 public class UsuarioAltaController {

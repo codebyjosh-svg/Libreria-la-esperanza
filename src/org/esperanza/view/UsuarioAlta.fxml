@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="org.esperanza.controller.UsuarioAltaController"
+      fx:controller="org.esperanza.Controller.UsuarioAltaController"
       stylesheets="@style/usuarios.css" styleClass="fondo" spacing="14">
     <padding><Insets top="25" right="35" bottom="25" left="35"/></padding>
     <Label text="Alta de usuario" styleClass="titulo"/>

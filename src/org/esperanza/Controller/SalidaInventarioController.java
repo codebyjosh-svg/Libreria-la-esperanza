@@ -1,4 +1,4 @@
-package org.esperanza.controller;
+package org.esperanza.Controller;
 
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
@@ -17,8 +17,8 @@ import org.esperanza.Model.SalidaInventario;
 import org.esperanza.Model.TipoSalida;
 import org.esperanza.dao.SalidaInventarioDao;
 import org.esperanza.dao.StockDao;
-import org.esperanza.service.Pantallas;
-import org.esperanza.service.SesionUsuario;
+import org.esperanza.Service.Pantallas;
+import org.esperanza.Service.SesionUsuario;
 
 public class SalidaInventarioController {
 

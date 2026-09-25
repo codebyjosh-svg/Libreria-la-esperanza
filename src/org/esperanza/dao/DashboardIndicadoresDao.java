@@ -6,7 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Objects;
-import org.esperanza.model.IndicadoresDashboardAdmin;
+import org.esperanza.Model.IndicadoresDashboardAdmin;
 import org.esperanza.util.Conexion;
 
 /** Lee los tres indicadores del dashboard en una sola consulta. */

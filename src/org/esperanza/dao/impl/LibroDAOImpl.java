@@ -1,51 +1,127 @@
 package org.esperanza.dao.impl;
 
-import java.sql.CallableStatement;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.math.BigDecimal;
 
 import org.esperanza.dao.LibroDAO;
-import org.esperanza.dao.ProveedorConexion;
-import org.esperanza.model.Libro;
+import org.esperanza.Model.Libro;
 import org.esperanza.util.Conexion;
+
 
 public class LibroDAOImpl implements LibroDAO {
 
-    private final ProveedorConexion proveedorConexion;
 
-    public LibroDAOImpl() {
-        this(() -> Conexion.getInstancia().conectar());
+    @Override
+    public List<Libro> listarDisponibles() throws SQLException {
+
+        List<Libro> lista = new ArrayList<>();
+
+        String sql =
+                "SELECT * FROM libros "
+                + "WHERE stock_actual > 0 "
+                + "AND activo = 1";
+
+
+        try (
+            Connection conn = Conexion.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery()
+        ) {
+
+
+            while (rs.next()) {
+
+                Libro libro = new Libro();
+
+
+                libro.setIsbn(
+                        rs.getString("isbn")
+                );
+
+
+                libro.setTitulo(
+                        rs.getString("titulo")
+                );
+
+
+                libro.setPrecio(
+                        rs.getDouble("precio")
+                );
+
+
+                libro.setStockActual(
+                        rs.getInt("stock_actual")
+                );
+
+
+                libro.setStockMinimo(
+                        rs.getInt("stock_minimo")
+                );
+
+
+                libro.setFechaPublicacion(
+                        rs.getDate("fecha_publicacion")
+                );
+
+
+                libro.setIdCategoria(
+                        rs.getInt("id_categoria")
+                );
+
+
+                libro.setNitEditorial(
+                        rs.getString("nit_editorial")
+                );
+
+
+                libro.setIdProveedor(
+                        rs.getInt("id_proveedor")
+                );
+
+
+                libro.setActivo(
+                        rs.getBoolean("activo")
+                );
+
+
+                lista.add(libro);
+
+            }
+
+        }
+
+
+        return lista;
     }
 
-    public LibroDAOImpl(ProveedorConexion proveedorConexion) {
-        this.proveedorConexion
-                = Objects.requireNonNull(proveedorConexion);
-    }
+
 
     @Override
     public List<Libro> listarTodos() {
 
-        List<Libro> lista
-                = new ArrayList<>();
 
-        String sql
-                = "{call sp_listarlibros()}";
+        List<Libro> lista = new ArrayList<>();
 
-        try (Connection con
-                = proveedorConexion.conectar(); CallableStatement cs
-                = con.prepareCall(sql); ResultSet rs
-                = cs.executeQuery()) {
+        String sql =
+                "SELECT * FROM libros";
 
-            while (rs.next()) {
 
-                Libro libro
-                        = new Libro();
+        try (
+            Connection conn = Conexion.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery()
+        ) {
+
+
+            while(rs.next()) {
+
+                Libro libro = new Libro();
+
 
                 libro.setIsbn(
                         rs.getString("isbn")
@@ -53,419 +129,255 @@ public class LibroDAOImpl implements LibroDAO {
 
                 libro.setTitulo(
                         rs.getString("titulo")
-                );
-
-                libro.setFechaPublicacion(
-                        rs.getDate("fecha_publicacion")
                 );
 
                 libro.setPrecio(
                         rs.getDouble("precio")
                 );
 
-                libro.setIdCategoria(
-                        rs.getInt("id_categoria")
-                );
-
-                libro.setNitEditorial(
-                        rs.getString("nit_editorial")
-                );
-
-                libro.setIdProveedor(
-                        rs.getInt("id_proveedor")
-                );
-
                 libro.setStockActual(
                         rs.getInt("stock_actual")
                 );
 
-                libro.setStockMinimo(
-                        rs.getInt("stock_minimo")
-                );
-
-                libro.setActivo(
-                        rs.getBoolean("activo")
-                );
 
                 lista.add(libro);
+
             }
 
-        } catch (SQLException e) {
 
-            System.err.println(
-                    "Error listar libros: "
-                    + e.getMessage()
-            );
+        } catch(SQLException e){
+
+            e.printStackTrace();
+
         }
+
 
         return lista;
     }
 
+
+
     @Override
     public Libro buscarLibro(String isbn) {
 
-        String sql
-                = "{call sp_buscarlibro(?)}";
 
-        Libro libro = null;
+        String sql =
+                "SELECT * FROM libros WHERE isbn = ?";
 
-        try (Connection con
-                = proveedorConexion.conectar(); CallableStatement cs
-                = con.prepareCall(sql)) {
 
-            cs.setString(
-                    1,
-                    isbn
-            );
+        try(
+            Connection conn = Conexion.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)
+        ){
 
-            try (ResultSet rs
-                    = cs.executeQuery()) {
 
-                if (rs.next()) {
+            stmt.setString(1, isbn);
 
-                    libro
-                            = new Libro(
-                                    rs.getString("isbn"),
-                                    rs.getString("titulo"),
-                                    rs.getDate("fecha_publicacion"),
-                                    rs.getDouble("precio"),
-                                    rs.getInt("id_categoria"),
-                                    rs.getString("nit_editorial"),
-                                    rs.getInt("id_proveedor"),
-                                    rs.getInt("stock_actual"),
-                                    rs.getInt("stock_minimo"),
-                                    rs.getBoolean("activo")
-                            );
-                }
-            }
 
-        } catch (SQLException e) {
+            ResultSet rs =
+                    stmt.executeQuery();
 
-            System.err.println(
-                    "Error buscar libro: "
-                    + e.getMessage()
-            );
-        }
 
-        return libro;
-    }
+            if(rs.next()){
 
-    @Override
-    public Libro buscarPorIsbn(
-            String isbn) {
 
-        return buscarLibro(isbn);
-    }
+                Libro libro = new Libro();
 
-    @Override
-    public List<Libro> buscarPorTitulo(
-            String titulo) {
-
-        List<Libro> resultado
-                = new ArrayList<>();
-
-        if (titulo == null) {
-            return resultado;
-        }
-
-        String texto
-                = titulo.toLowerCase();
-
-        for (Libro libro : listarTodos()) {
-
-            if (libro.getTitulo() != null
-                    && libro.getTitulo()
-                            .toLowerCase()
-                            .contains(texto)) {
-
-                resultado.add(libro);
-            }
-        }
-
-        return resultado;
-    }
-
-    @Override
-    public List<Libro> buscarPorAutor(
-            String autor) {
-
-        List<Libro> resultado
-                = new ArrayList<>();
-
-        if (autor == null) {
-            return resultado;
-        }
-
-        String texto
-                = autor.toLowerCase();
-
-        for (Libro libro : listarTodos()) {
-
-            if (libro.getNombreAutor() != null
-                    && libro.getNombreAutor()
-                            .toLowerCase()
-                            .contains(texto)) {
-
-                resultado.add(libro);
-            }
-        }
-
-        return resultado;
-    }
-
-    @Override
-    public List<Libro> obtenerStockCritico() {
-
-        List<Libro> lista
-                = new ArrayList<>();
-
-        String sql
-                = "SELECT isbn, titulo, stock_actual, stock_minimo "
-                + "FROM libros "
-                + "WHERE stock_actual <= stock_minimo "
-                + "AND activo = TRUE "
-                + "ORDER BY stock_actual ASC, titulo ASC";
-
-        try (Connection con
-                = proveedorConexion.conectar(); PreparedStatement ps
-                = con.prepareStatement(sql); ResultSet rs
-                = ps.executeQuery()) {
-
-            while (rs.next()) {
-
-                Libro libro
-                        = new Libro();
 
                 libro.setIsbn(
                         rs.getString("isbn")
                 );
 
+
                 libro.setTitulo(
                         rs.getString("titulo")
                 );
+
+
+                libro.setPrecio(
+                        rs.getDouble("precio")
+                );
+
 
                 libro.setStockActual(
                         rs.getInt("stock_actual")
                 );
 
-                libro.setStockMinimo(
-                        rs.getInt("stock_minimo")
-                );
 
-                libro.setActivo(true);
+                return libro;
 
-                lista.add(libro);
             }
 
-        } catch (SQLException e) {
 
-            throw new IllegalStateException(
-                    "No se pudo consultar el stock crítico.",
-                    e
-            );
+        }catch(SQLException e){
+
+            e.printStackTrace();
+
         }
+
+
+        return null;
+    }
+
+
+
+    @Override
+    public Libro buscarPorIsbn(String isbn) {
+
+        return buscarLibro(isbn);
+
+    }
+
+
+
+    @Override
+    public List<Libro> buscarPorTitulo(String titulo) {
+
+        return new ArrayList<>();
+
+    }
+
+
+
+    @Override
+    public List<Libro> buscarPorAutor(String autor) {
+
+        return new ArrayList<>();
+
+    }
+
+
+
+    @Override
+    public List<Libro> obtenerStockCritico() {
+
+
+        List<Libro> lista = new ArrayList<>();
+
+
+        String sql =
+                "SELECT * FROM libros "
+                + "WHERE stock_actual <= stock_minimo";
+
+
+        try(
+            Connection conn = Conexion.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery()
+        ){
+
+
+            while(rs.next()){
+
+
+                Libro libro = new Libro();
+
+
+                libro.setIsbn(
+                        rs.getString("isbn")
+                );
+
+
+                libro.setTitulo(
+                        rs.getString("titulo")
+                );
+
+
+                libro.setPrecio(
+                        rs.getDouble("precio")
+                );
+
+
+                libro.setStockActual(
+                        rs.getInt("stock_actual")
+                );
+
+
+                lista.add(libro);
+
+            }
+
+
+        }catch(SQLException e){
+
+            e.printStackTrace();
+
+        }
+
 
         return lista;
     }
 
-    @Override
-    public boolean insertar(
-            Libro libro) {
 
-        String sql
-                = "{call sp_insertarlibro(?, ?, ?, ?, ?, ?, ?, ?, ?)}";
-
-        try (Connection con
-                = proveedorConexion.conectar(); CallableStatement cs
-                = con.prepareCall(sql)) {
-
-            cs.setString(
-                    1,
-                    libro.getIsbn()
-            );
-
-            cs.setString(
-                    2,
-                    libro.getTitulo()
-            );
-
-            cs.setDate(
-                    3,
-                    libro.getFechaPublicacion()
-            );
-
-            cs.setDouble(
-                    4,
-                    libro.getPrecio()
-            );
-
-            cs.setInt(
-                    5,
-                    libro.getIdCategoria()
-            );
-
-            cs.setString(
-                    6,
-                    libro.getNitEditorial()
-            );
-
-            cs.setInt(
-                    7,
-                    libro.getIdProveedor()
-            );
-
-            cs.setInt(
-                    8,
-                    libro.getStockActual()
-            );
-
-            cs.setInt(
-                    9,
-                    libro.getStockMinimo()
-            );
-
-            return cs.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-
-            System.err.println(
-                    "Error insertar libro: "
-                    + e.getMessage()
-            );
-
-            return false;
-        }
-    }
 
     @Override
-    public boolean actualizar(
-            Libro libro) {
+    public boolean insertar(Libro libro) {
 
-        String sql
-                = "{call sp_actualizarlibro(?, ?, ?, ?, ?, ?, ?, ?)}";
+        return false;
 
-        try (Connection con
-                = proveedorConexion.conectar(); CallableStatement cs
-                = con.prepareCall(sql)) {
-
-            cs.setString(
-                    1,
-                    libro.getIsbn()
-            );
-
-            cs.setString(
-                    2,
-                    libro.getTitulo()
-            );
-
-            cs.setDate(
-                    3,
-                    libro.getFechaPublicacion()
-            );
-
-            cs.setDouble(
-                    4,
-                    libro.getPrecio()
-            );
-
-            cs.setInt(
-                    5,
-                    libro.getIdCategoria()
-            );
-
-            cs.setString(
-                    6,
-                    libro.getNitEditorial()
-            );
-
-            cs.setInt(
-                    7,
-                    libro.getIdProveedor()
-            );
-
-            cs.setInt(
-                    8,
-                    libro.getStockMinimo()
-            );
-
-            return cs.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-
-            System.err.println(
-                    "Error actualizar libro: "
-                    + e.getMessage()
-            );
-
-            return false;
-        }
     }
+
+
 
     @Override
-    public boolean eliminar(
-            String isbn) {
+    public boolean actualizar(Libro libro) {
 
-        String sql
-                = "{call sp_eliminarlibro(?)}";
+        return false;
 
-        try (Connection con
-                = proveedorConexion.conectar(); CallableStatement cs
-                = con.prepareCall(sql)) {
-
-            cs.setString(
-                    1,
-                    isbn
-            );
-
-            return cs.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-
-            System.err.println(
-                    "Error desactivar libro: "
-                    + e.getMessage()
-            );
-
-            return false;
-        }
     }
+
+
+
+    @Override
+    public boolean eliminar(String isbn) {
+
+        return false;
+
+    }
+
+
 
     @Override
     public boolean actualizarPrecio(
             String isbn,
             BigDecimal nuevoPrecio) {
 
-        String sql
-                = "UPDATE libros "
+
+        String sql =
+                "UPDATE libros "
                 + "SET precio = ? "
-                + "WHERE isbn = ? "
-                + "AND activo = TRUE";
+                + "WHERE isbn = ?";
 
-        try (
-                Connection con
-                = proveedorConexion.conectar(); PreparedStatement ps
-                = con.prepareStatement(sql)) {
 
-            ps.setBigDecimal(
+        try(
+            Connection conn = Conexion.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)
+        ){
+
+
+            stmt.setBigDecimal(
                     1,
                     nuevoPrecio
             );
 
-            ps.setString(
+
+            stmt.setString(
                     2,
                     isbn
             );
 
-            return ps.executeUpdate() > 0;
 
-        } catch (SQLException e) {
+            return stmt.executeUpdate() > 0;
 
-            System.err.println(
-                    "Error actualizar precio: "
-                    + e.getMessage()
-            );
 
-            return false;
+        }catch(SQLException e){
+
+            e.printStackTrace();
+
         }
+
+
+        return false;
     }
+
 }

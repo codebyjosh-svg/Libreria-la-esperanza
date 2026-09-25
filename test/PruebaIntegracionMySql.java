@@ -13,10 +13,10 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import org.esperanza.dao.DevolucionVentaDao;
 import org.esperanza.dao.ProveedorDAO;
-import org.esperanza.model.EstadoVenta;
-import org.esperanza.model.Proveedor;
-import org.esperanza.model.Usuario;
-import org.esperanza.service.SesionUsuario;
+import org.esperanza.Model.EstadoVenta;
+import org.esperanza.Model.Proveedor;
+import org.esperanza.Model.Usuario;
+import org.esperanza.Service.SesionUsuario;
 
 /**
  * Integración real para una base DE PRUEBA local, previamente creada con

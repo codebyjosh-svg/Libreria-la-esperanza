@@ -9,12 +9,12 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import org.esperanza.controller.TicketVentaController;
+import org.esperanza.Controller.TicketVentaController;
 import org.esperanza.dao.CajeroDao;
 import org.esperanza.dao.DatosVentaDao;
-import org.esperanza.model.DetalleVenta;
-import org.esperanza.model.Venta;
-import org.esperanza.service.SesionUsuario;
+import org.esperanza.Model.DetalleVenta;
+import org.esperanza.Model.Venta;
+import org.esperanza.Service.SesionUsuario;
 
 public final class ComprobanteVenta {
 

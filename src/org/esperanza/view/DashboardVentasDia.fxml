@@ -12,7 +12,7 @@
 
 <BorderPane
         xmlns:fx="http://javafx.com/fxml/1"
-        fx:controller="org.esperanza.controller.DashboardVentasDiaController"
+        fx:controller="org.esperanza.Controller.DashboardVentasDiaController"
         prefWidth="1100"
         prefHeight="650"
         style="-fx-background-color: #f3f4f6;">

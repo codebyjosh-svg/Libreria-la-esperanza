@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-            fx:controller="org.esperanza.controller.LibrosCriticosController"
+            fx:controller="org.esperanza.Controller.LibrosCriticosController"
             style="-fx-background-color: #f8fafc;" prefWidth="650" prefHeight="400">
     <top>
         <HBox alignment="CENTER_LEFT" style="-fx-background-color: #EF4444; -fx-padding: 15;">

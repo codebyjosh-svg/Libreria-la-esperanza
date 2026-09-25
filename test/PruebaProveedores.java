@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import org.esperanza.dao.ProveedorDAO;
-import org.esperanza.model.Proveedor;
-import org.esperanza.model.Usuario;
-import org.esperanza.service.SesionUsuario;
+import org.esperanza.Model.Proveedor;
+import org.esperanza.Model.Usuario;
+import org.esperanza.Service.SesionUsuario;
 
 /** Prueba autónoma sin servidor: CRUD persistido en un doble JDBC y autorización real. */
 public final class PruebaProveedores {

@@ -1,4 +1,4 @@
-package org.esperanza.controller;
+package org.esperanza.Controller;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -28,8 +28,8 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import org.esperanza.dao.UsuarioDao;
-import org.esperanza.model.Usuario;
-import org.esperanza.service.SesionUsuario;
+import org.esperanza.Model.Usuario;
+import org.esperanza.Service.SesionUsuario;
 
 public class UsuariosController {
 

@@ -1,1292 +1,613 @@
-package org.esperanza.controller;
+package org.esperanza.Controller;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import org.esperanza.service.NavegacionRol;
-import org.esperanza.service.SesionUsuario;
-import org.esperanza.dao.ClienteDao;
+import org.esperanza.Model.CarritoVenta;
+import org.esperanza.Model.DetalleVenta;
+import org.esperanza.Model.DescuentoVenta;
+import org.esperanza.Model.Libro;
+
+import org.esperanza.Service.NavegacionRol;
+
 import org.esperanza.dao.LibroDAO;
-import org.esperanza.dao.VentaDao;
 import org.esperanza.dao.impl.LibroDAOImpl;
-import org.esperanza.model.CarritoVenta;
-import org.esperanza.model.Cliente;
-import org.esperanza.model.DetalleVenta;
-import org.esperanza.model.DescuentoVenta;
-import org.esperanza.model.Libro;
-import org.esperanza.model.Venta;
-import org.esperanza.view.ComprobanteVenta;
 
 public class CarritoVentaController {
 
-    @FXML private TextField txtBuscarCliente;
-    @FXML private TableView<Cliente> tblClientes;
-    @FXML private TableColumn<Cliente, Long> colClienteCui;
-    @FXML private TableColumn<Cliente, String> colClienteNombre;
-    @FXML private TableColumn<Cliente, String> colClienteApellido;
-    @FXML private TableColumn<Cliente, String> colClienteCorreo;
-    @FXML private Label lblClienteSeleccionado;
+    @FXML
+    private TextField txtBuscar;
+    @FXML
+    private TextField txtCantidad;
+    @FXML
+    private TextField txtNuevaCantidad;
+    @FXML
+    private TableView<Libro> tblDisponibles;
+    @FXML
+    private TableColumn<Libro, String> colDisponibleIsbn;
+    @FXML
+    private TableColumn<Libro, String> colDisponibleTitulo;
+    @FXML
+    private TableColumn<Libro, Double> colDisponiblePrecio;
+    @FXML
+    private TableColumn<Libro, Integer> colDisponibleStock;
+    @FXML
+    private TableView<DetalleVenta> tabla;
+    @FXML
+    private TableColumn<DetalleVenta, String> colIsbn;
+    @FXML
+    private TableColumn<DetalleVenta, Integer> colCantidad;
+    @FXML
+    private TableColumn<DetalleVenta, BigDecimal> colPrecio;
+    @FXML
+    private TableColumn<DetalleVenta, BigDecimal> colSubtotal;
+    @FXML
+    private Button btnAgregar;
+    @FXML
+    private Button btnActualizar;
+    @FXML
+    private Button btnEliminar;
+    @FXML
+    private Button btnVaciar;
+    @FXML
+    private Button btnConfirmar;
+    @FXML
+    private ComboBox<String> cmbTipoDescuento;
+    @FXML
+    private TextField txtValorDescuento;
+    @FXML
+    private Label lblSubtotalVenta;
+    @FXML
+    private Label lblDescuentoVenta;
+    @FXML
+    private Label lblTotal;
+    @FXML
+    private Label lblAvisoDescuento;
+    @FXML
+    private Label lblMensaje;
 
-    @FXML private VBox panelNuevoCliente;
-    @FXML private TextField txtNuevoCui;
-    @FXML private TextField txtNuevoNombre;
-    @FXML private TextField txtNuevoApellido;
-    @FXML private TextField txtNuevoCorreo;
+    private final CarritoVenta carrito
+            = new CarritoVenta();
 
-    @FXML private TextField txtBuscar;
-    @FXML private TextField txtCantidad;
-    @FXML private TextField txtNuevaCantidad;
+    private final LibroDAO libroDAO
+            = new LibroDAOImpl();
 
-    @FXML private TableView<Libro> tblDisponibles;
-    @FXML private TableColumn<Libro, String> colDisponibleIsbn;
-    @FXML private TableColumn<Libro, String> colDisponibleTitulo;
-    @FXML private TableColumn<Libro, Double> colDisponiblePrecio;
-    @FXML private TableColumn<Libro, Integer> colDisponibleStock;
+    private final ObservableList<Libro> librosDisponibles
+            = FXCollections.observableArrayList();
 
-    @FXML private TableView<DetalleVenta> tabla;
-    @FXML private TableColumn<DetalleVenta, String> colIsbn;
-    @FXML private TableColumn<DetalleVenta, Integer> colCantidad;
-    @FXML private TableColumn<DetalleVenta, BigDecimal> colPrecio;
-    @FXML private TableColumn<DetalleVenta, BigDecimal> colSubtotal;
-
-    @FXML private Button btnAgregar;
-    @FXML private Button btnActualizar;
-    @FXML private Button btnEliminar;
-    @FXML private Button btnVaciar;
-    @FXML private Button btnConfirmar;
-
-    @FXML private ComboBox<DescuentoVenta.Tipo> cmbTipoDescuento;
-    @FXML private TextField txtValorDescuento;
-    @FXML private Label lblSubtotalVenta;
-    @FXML private Label lblDescuentoVenta;
-    @FXML private Label lblAvisoDescuento;
-    @FXML private Label lblTotal;
-    @FXML private Label lblMensaje;
-
-    private final CarritoVenta carrito = new CarritoVenta();
-    private final VentaDao ventaDao = new VentaDao();
-    private final LibroDAO libroDAO = new LibroDAOImpl();
-    private final ClienteDao clienteDao = new ClienteDao();
-
-    private final ObservableList<Libro> librosDisponibles =
-            FXCollections.observableArrayList();
-
-    private final ObservableList<Cliente> clientes =
-            FXCollections.observableArrayList();
+    private final ObservableList<DetalleVenta> detallesObservable
+            = FXCollections.observableArrayList();
 
     private FilteredList<Libro> librosFiltrados;
-    private FilteredList<Cliente> clientesFiltrados;
 
-    private int idUsuario = 0;
+    private int idUsuario;
 
     @FXML
     public void initialize() {
-        if (!org.esperanza.service.NavegacionRol.validarPermiso("VENTAS")) return;
-        configurarTablaClientes();
-        configurarTablaDisponibles();
-        configurarTablaCarrito();
-        configurarSeleccionTabla();
 
-        cargarClientes();
-        cargarLibrosDisponibles();
-
-        configurarBusquedaClientes();
-        configurarBusquedaLibros();
+        if (!NavegacionRol.validarPermiso("VENTAS")) {
+            return;
+        }
 
         txtCantidad.setText("1");
         txtNuevaCantidad.setText("1");
-        lblTotal.setText("Total: Q0.00");
+        configurarTablaDisponibles();
+        configurarTablaCarrito();
+        configurarBusqueda();
+        cargarLibros();
         configurarDescuento();
-
-        lblClienteSeleccionado.setText(
-                "Cliente seleccionado: ninguno"
-        );
-
+        actualizarTotales();
         btnAgregar.disableProperty().bind(
-                tblDisponibles
-                        .getSelectionModel()
+                tblDisponibles.getSelectionModel()
                         .selectedItemProperty()
                         .isNull()
         );
 
         btnActualizar.disableProperty().bind(
-                tabla
-                        .getSelectionModel()
+                tabla.getSelectionModel()
                         .selectedItemProperty()
                         .isNull()
         );
 
         btnEliminar.disableProperty().bind(
-                tabla
-                        .getSelectionModel()
+                tabla.getSelectionModel()
                         .selectedItemProperty()
                         .isNull()
         );
 
         btnVaciar.disableProperty().bind(
-                Bindings.isEmpty(
-                        tabla.getItems()
-                )
+                Bindings.isEmpty(tabla.getItems())
         );
 
         btnConfirmar.disableProperty().bind(
-                Bindings.isEmpty(
-                        tabla.getItems()
-                )
+                Bindings.isEmpty(tabla.getItems())
         );
 
-        configurarCierre();
     }
 
-    private void configurarSeleccionTabla() {
-        tblClientes
-                .getSelectionModel()
-                .selectedItemProperty()
-                .addListener(
-                        (obs, anterior, cliente) -> {
-
-                            if (cliente == null) {
-                                lblClienteSeleccionado.setText(
-                                        "Cliente seleccionado: ninguno"
-                                );
-                            } else {
-                                lblClienteSeleccionado.setText(
-                                        "Cliente seleccionado: "
-                                        + cliente.getNombreCompleto()
-                                        + " - CUI: "
-                                        + cliente.getCui()
-                                );
-                            }
-                        }
-                );
-
-        tabla
-                .getSelectionModel()
-                .selectedItemProperty()
-                .addListener(
-                        (obs, anterior, seleccionado) -> {
-
-                            if (seleccionado != null) {
-                                txtNuevaCantidad.setText(
-                                        String.valueOf(
-                                                seleccionado.getCantidad()
-                                        )
-                                );
-                            }
-                        }
-                );
-    }
-
-    private void configurarDescuento() {
-        boolean admin = SesionUsuario.getInstancia().esAdmin();
-
-        cmbTipoDescuento
-                .getItems()
-                .setAll(
-                        DescuentoVenta.Tipo.values()
-                );
-
-        cmbTipoDescuento
-                .getSelectionModel()
-                .select(
-                        DescuentoVenta.Tipo.NINGUNO
-                );
-
-        cmbTipoDescuento.setDisable(!admin);
-        txtValorDescuento.setDisable(true);
-
-        cmbTipoDescuento
-                .valueProperty()
-                .addListener(
-                        (obs, anterior, nuevo) -> {
-
-                            txtValorDescuento.clear();
-
-                            txtValorDescuento.setDisable(
-                                    !admin
-                                    || nuevo
-                                    == DescuentoVenta.Tipo.NINGUNO
-                            );
-
-                            actualizarTotales();
-                        }
-                );
-
-        txtValorDescuento
-                .textProperty()
-                .addListener(
-                        (obs, anterior, nuevo)
-                        -> actualizarTotales()
-                );
-
-        actualizarTotales();
-    }
-
-    private DescuentoVenta leerDescuento() {
-
-        DescuentoVenta.Tipo tipo =
-                cmbTipoDescuento.getValue();
-
-        if (tipo == null
-                || tipo
-                == DescuentoVenta.Tipo.NINGUNO) {
-
-            return DescuentoVenta
-                    .sinDescuento();
-        }
-
-        if (!SesionUsuario
-                .getInstancia()
-                .esAdmin()) {
-
-            throw new SecurityException(
-                    "Solo un administrador puede aplicar descuentos."
-            );
-        }
-
-        String texto =
-                txtValorDescuento
-                        .getText()
-                        .trim();
-
-        if (!texto.matches(
-                "\\d+([.,]\\d{1,2})?")) {
-
-            throw new IllegalArgumentException(
-                    "Ingresa un descuento válido con hasta dos decimales."
-            );
-        }
-
-        BigDecimal valor =
-                new BigDecimal(
-                        texto.replace(
-                                ',',
-                                '.'
-                        )
-                );
-
-        return tipo
-                == DescuentoVenta.Tipo.PORCENTAJE
-                        ? DescuentoVenta
-                                .porcentaje(valor)
-                        : DescuentoVenta
-                                .monto(valor);
-    }
-
-    private void actualizarTotales() {
-
-        BigDecimal subtotal =
-                carrito.getTotal();
-
-        lblSubtotalVenta.setText(
-                "Subtotal: Q"
-                + subtotal.toPlainString()
-        );
-
+    private void cargarLibros() {
         try {
-
-            BigDecimal descuento =
-                    leerDescuento()
-                            .calcularMonto(
-                                    subtotal
-                            );
-
-            lblDescuentoVenta.setText(
-                    "Descuento: -Q"
-                    + descuento.toPlainString()
+            librosDisponibles.setAll(
+                    libroDAO.listarDisponibles()
             );
-
-            lblTotal.setText(
-                    "Total: Q"
-                    + subtotal
-                            .subtract(descuento)
-                            .toPlainString()
-            );
-
-            lblAvisoDescuento.setText(
-                    SesionUsuario
-                            .getInstancia()
-                            .esAdmin()
-                            ? "Descuento autorizado para administrador."
-                            : "Solo un administrador puede aplicar descuentos."
-            );
-
-        } catch (IllegalArgumentException
-                | SecurityException e) {
-
-            lblDescuentoVenta.setText(
-                    "Descuento: valor inválido"
-            );
-
-            lblTotal.setText(
-                    "Total: —"
-            );
-
-            lblAvisoDescuento.setText(
-                    e.getMessage()
-            );
-        }
-    }
-
-    private void configurarTablaClientes() {
-        colClienteCui.setCellValueFactory(
-                c -> new ReadOnlyObjectWrapper<>(
-                        c.getValue().getCui()
-                )
-        );
-
-        colClienteNombre.setCellValueFactory(
-                c -> new ReadOnlyObjectWrapper<>(
-                        c.getValue().getNombre()
-                )
-        );
-
-        colClienteApellido.setCellValueFactory(
-                c -> new ReadOnlyObjectWrapper<>(
-                        c.getValue().getApellido()
-                )
-        );
-
-        colClienteCorreo.setCellValueFactory(
-                c -> new ReadOnlyObjectWrapper<>(
-                        c.getValue().getCorreo()
-                )
-        );
-
-        tblClientes.setColumnResizePolicy(
-                TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
-        );
-
-        tblClientes.setPlaceholder(
-                new Label(
-                        "No hay clientes registrados."
-                )
-        );
-    }
-
-    private void cargarClientes() {
-        try {
-            clientes.setAll(
-                    clienteDao.listar()
-            );
-
-            clientesFiltrados =
-                    new FilteredList<>(
-                            clientes,
-                            cliente -> true
-                    );
-
-            tblClientes.setItems(
-                    clientesFiltrados
-            );
-
         } catch (SQLException e) {
             mostrarError(
-                    "No se pudieron cargar los clientes: "
-                    + e.getMessage()
+                    "No se pudieron cargar los libros."
             );
         }
-    }
-
-    private void configurarBusquedaClientes() {
-        txtBuscarCliente
-                .textProperty()
-                .addListener(
-                        (obs, anterior, nuevo) -> {
-
-                            if (clientesFiltrados == null) {
-                                return;
-                            }
-
-                            String criterio =
-                                    nuevo == null
-                                            ? ""
-                                            : nuevo
-                                                    .trim()
-                                                    .toLowerCase();
-
-                            clientesFiltrados.setPredicate(
-                                    cliente -> {
-
-                                        if (criterio.isEmpty()) {
-                                            return true;
-                                        }
-
-                                        String cui =
-                                                String.valueOf(
-                                                        cliente.getCui()
-                                                );
-
-                                        String nombre =
-                                                cliente.getNombre() == null
-                                                        ? ""
-                                                        : cliente
-                                                                .getNombre()
-                                                                .toLowerCase();
-
-                                        String apellido =
-                                                cliente.getApellido() == null
-                                                        ? ""
-                                                        : cliente
-                                                                .getApellido()
-                                                                .toLowerCase();
-
-                                        String correo =
-                                                cliente.getCorreo() == null
-                                                        ? ""
-                                                        : cliente
-                                                                .getCorreo()
-                                                                .toLowerCase();
-
-                                        return cui.contains(criterio)
-                                                || nombre.contains(criterio)
-                                                || apellido.contains(criterio)
-                                                || correo.contains(criterio);
-                                    }
-                            );
-                        }
-                );
-    }
-
-    @FXML
-    private void mostrarNuevoCliente() {
-        panelNuevoCliente.setVisible(
-                true
-        );
-
-        panelNuevoCliente.setManaged(
-                true
-        );
-
-        txtNuevoCui.requestFocus();
-    }
-
-    @FXML
-    private void cancelarNuevoCliente() {
-        panelNuevoCliente.setVisible(
-                false
-        );
-
-        panelNuevoCliente.setManaged(
-                false
-        );
-
-        limpiarFormularioCliente();
-    }
-
-    @FXML
-    private void guardarNuevoCliente() {
-        if (!org.esperanza.service.NavegacionRol.validarPermiso("VENTAS")) return;
-        try {
-            String cuiTexto =
-                    txtNuevoCui
-                            .getText()
-                            .trim();
-
-            if (!cuiTexto.matches("\\d{13}")) {
-                throw new IllegalArgumentException(
-                        "El CUI debe contener 13 dígitos."
-                );
-            }
-
-            long cui =
-                    Long.parseLong(
-                            cuiTexto
-                    );
-
-            String nombre =
-                    txtNuevoNombre
-                            .getText()
-                            .trim();
-
-            String apellido =
-                    txtNuevoApellido
-                            .getText()
-                            .trim();
-
-            String correo =
-                    txtNuevoCorreo
-                            .getText()
-                            .trim();
-
-            if (nombre.isEmpty()) {
-                throw new IllegalArgumentException(
-                        "El nombre es obligatorio."
-                );
-            }
-
-            if (apellido.isEmpty()) {
-                throw new IllegalArgumentException(
-                        "El apellido es obligatorio."
-                );
-            }
-
-            if (!correo.isEmpty()
-                    && !correo.matches(
-                            "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"
-                    )) {
-
-                throw new IllegalArgumentException(
-                        "El correo electrónico no es válido."
-                );
-            }
-
-            if (clienteDao.buscarPorCui(cui) != null) {
-                throw new IllegalArgumentException(
-                        "Ya existe un cliente con ese CUI."
-                );
-            }
-
-            Cliente nuevoCliente =
-                    new Cliente(
-                            cui,
-                            nombre,
-                            apellido,
-                            correo
-                    );
-
-            if (!clienteDao.insertar(
-                    nuevoCliente
-            )) {
-                throw new SQLException(
-                        "No se pudo registrar el cliente."
-                );
-            }
-
-            txtBuscarCliente.clear();
-
-            cargarClientes();
-
-            seleccionarCliente(
-                    cui
-            );
-
-            cancelarNuevoCliente();
-
-            mostrarExito(
-                    "Cliente registrado y seleccionado."
-            );
-
-        } catch (NumberFormatException e) {
-            mostrarError(
-                    "El CUI no es válido."
-            );
-
-        } catch (IllegalArgumentException
-                | SQLException e) {
-
-            mostrarError(
-                    e.getMessage()
-            );
-        }
-    }
-
-    private void seleccionarCliente(
-            long cui) {
-
-        for (Cliente cliente
-                : tblClientes.getItems()) {
-
-            if (cliente.getCui() == cui) {
-
-                tblClientes
-                        .getSelectionModel()
-                        .select(cliente);
-
-                tblClientes.scrollTo(
-                        cliente
-                );
-
-                break;
-            }
-        }
-    }
-
-    private void limpiarFormularioCliente() {
-        txtNuevoCui.clear();
-        txtNuevoNombre.clear();
-        txtNuevoApellido.clear();
-        txtNuevoCorreo.clear();
     }
 
     private void configurarTablaDisponibles() {
         colDisponibleIsbn.setCellValueFactory(
-                c -> new ReadOnlyObjectWrapper<>(
-                        c.getValue().getIsbn()
+                dato -> new ReadOnlyObjectWrapper<>(
+                        dato.getValue().getIsbn()
                 )
         );
 
         colDisponibleTitulo.setCellValueFactory(
-                c -> new ReadOnlyObjectWrapper<>(
-                        c.getValue().getTitulo()
+                dato -> new ReadOnlyObjectWrapper<>(
+                        dato.getValue().getTitulo()
                 )
         );
 
         colDisponiblePrecio.setCellValueFactory(
-                c -> new ReadOnlyObjectWrapper<>(
-                        c.getValue().getPrecio()
+                dato -> new ReadOnlyObjectWrapper<>(
+                        dato.getValue().getPrecio()
                 )
         );
 
         colDisponibleStock.setCellValueFactory(
-                c -> new ReadOnlyObjectWrapper<>(
-                        c.getValue().getStockActual()
+                dato -> new ReadOnlyObjectWrapper<>(
+                        dato.getValue().getStockActual()
                 )
         );
 
-        tblDisponibles.setColumnResizePolicy(
-                TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
-        );
-
-        tblDisponibles.setPlaceholder(
-                new Label(
-                        "No hay libros disponibles."
-                )
-        );
-
-        tblDisponibles.setOnMouseClicked(
-                event -> {
-
-                    if (event.getClickCount() == 2
-                            && tblDisponibles
-                                    .getSelectionModel()
-                                    .getSelectedItem() != null) {
-
-                        agregarProducto();
-                    }
-                }
-        );
-    }
-
-    private void configurarTablaCarrito() {
-        colIsbn.setCellValueFactory(
-                c -> new ReadOnlyObjectWrapper<>(
-                        c.getValue().getIsbn()
-                )
-        );
-
-        colCantidad.setCellValueFactory(
-                c -> new ReadOnlyObjectWrapper<>(
-                        c.getValue().getCantidad()
-                )
-        );
-
-        colPrecio.setCellValueFactory(
-                c -> new ReadOnlyObjectWrapper<>(
-                        c.getValue().getPrecioUnitario()
-                )
-        );
-
-        colSubtotal.setCellValueFactory(
-                c -> new ReadOnlyObjectWrapper<>(
-                        c.getValue().getSubtotal()
-                )
-        );
-
-        tabla.setColumnResizePolicy(
-                TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
-        );
-
-        tabla.setPlaceholder(
-                new Label(
-                        "Agrega libros para iniciar la venta."
-                )
-        );
-    }
-
-    private void cargarLibrosDisponibles() {
-        librosDisponibles.clear();
-
-        List<Libro> libros =
-                libroDAO.listarTodos();
-
-        if (libros != null) {
-
-            for (Libro libro : libros) {
-
-                if (libro.getStockActual() > 0) {
-
-                    librosDisponibles.add(
-                            libro
-                    );
-                }
-            }
-        }
-
-        librosFiltrados =
-                new FilteredList<>(
+        librosFiltrados
+                = new FilteredList<>(
                         librosDisponibles,
-                        libro -> true
+                        p -> true
                 );
 
         tblDisponibles.setItems(
                 librosFiltrados
         );
+
     }
 
-    private void configurarBusquedaLibros() {
-        txtBuscar
-                .textProperty()
+    private void configurarTablaCarrito() {
+
+        colIsbn.setCellValueFactory(
+                dato -> new ReadOnlyObjectWrapper<>(
+                        dato.getValue().getIsbn()
+                )
+        );
+
+        colCantidad.setCellValueFactory(
+                dato -> new ReadOnlyObjectWrapper<>(
+                        dato.getValue().getCantidad()
+                )
+        );
+
+        colPrecio.setCellValueFactory(
+                dato -> new ReadOnlyObjectWrapper<>(
+                        dato.getValue().getPrecioUnitario()
+                )
+        );
+
+        colSubtotal.setCellValueFactory(
+                dato -> new ReadOnlyObjectWrapper<>(
+                        dato.getValue().getSubtotal()
+                )
+        );
+
+        tabla.setItems(
+                detallesObservable
+        );
+
+    }
+
+    private void configurarBusqueda() {
+
+        txtBuscar.textProperty()
                 .addListener(
-                        (obs, anterior, nuevo) -> {
-
-                            if (librosFiltrados == null) {
-                                return;
-                            }
-
-                            String criterio =
-                                    nuevo == null
-                                            ? ""
-                                            : nuevo
-                                                    .trim()
-                                                    .toLowerCase();
+                        (obs, viejo, texto) -> {
 
                             librosFiltrados.setPredicate(
                                     libro -> {
 
-                                        if (criterio.isEmpty()) {
+                                        if (texto == null || texto.isBlank()) {
                                             return true;
                                         }
 
-                                        String isbn =
-                                                libro.getIsbn() == null
-                                                        ? ""
-                                                        : libro
-                                                                .getIsbn()
-                                                                .toLowerCase();
+                                        String filtro
+                                        = texto.toLowerCase();
 
-                                        String titulo =
-                                                libro.getTitulo() == null
-                                                        ? ""
-                                                        : libro
-                                                                .getTitulo()
-                                                                .toLowerCase();
+                                        return libro.getIsbn()
+                                                .toLowerCase()
+                                                .contains(filtro)
+                                        || libro.getTitulo()
+                                                .toLowerCase()
+                                                .contains(filtro);
 
-                                        String autor =
-                                                libro.getNombreAutor() == null
-                                                        ? ""
-                                                        : libro
-                                                                .getNombreAutor()
-                                                                .toLowerCase();
+                                    });
 
-                                        return isbn.contains(criterio)
-                                                || titulo.contains(criterio)
-                                                || autor.contains(criterio);
-                                    }
-                            );
-                        }
+                        });
+
+    }
+
+    private void configurarDescuento() {
+
+        cmbTipoDescuento.getItems()
+                .addAll(
+                        "SIN DESCUENTO",
+                        "PORCENTAJE",
+                        "MONTO FIJO"
                 );
+
+        cmbTipoDescuento.setValue(
+                "SIN DESCUENTO"
+        );
+
     }
 
     @FXML
-    private void agregarProducto() {
-        ejecutar(() -> {
+private void volver(){
 
-            Libro libro =
-                    tblDisponibles
-                            .getSelectionModel()
-                            .getSelectedItem();
+    Stage stage =
+            (Stage) btnConfirmar
+                    .getScene()
+                    .getWindow();
 
-            if (libro == null) {
-                throw new IllegalArgumentException(
-                        "Selecciona un libro de la lista."
-                );
-            }
 
-            int cantidad =
-                    enteroPositivo(
-                            txtCantidad.getText(),
-                            "La cantidad"
-                    );
+    NavegacionRol
+            .abrirDashboardSegunRol(stage);
 
-            int cantidadActual =
-                    obtenerCantidadEnCarrito(
-                            libro.getIsbn()
-                    );
+}
+    @FXML
+    private void agregarLibro() {
 
-            if (cantidadActual + cantidad
-                    > libro.getStockActual()) {
+        Libro libro
+                = tblDisponibles
+                        .getSelectionModel()
+                        .getSelectedItem();
 
-                throw new IllegalArgumentException(
-                        "No hay suficiente stock. Disponible: "
-                        + libro.getStockActual()
-                );
-            }
-
-            BigDecimal precio =
-                    BigDecimal.valueOf(
-                            libro.getPrecio()
-                    );
-
-            carrito.agregarProducto(
-                    libro.getIsbn(),
-                    cantidad,
-                    precio
-            );
-
-            refrescar(
-                    libro.getIsbn()
-            );
-
-            txtCantidad.setText(
-                    "1"
-            );
-
-        }, "Libro agregado al carrito.");
-    }
-
-    private int obtenerCantidadEnCarrito(
-            String isbn) {
-
-        for (DetalleVenta detalle
-                : carrito.getDetalles()) {
-
-            if (detalle
-                    .getIsbn()
-                    .equals(isbn)) {
-
-                return detalle.getCantidad();
-            }
+        if (libro == null) {
+            return;
         }
 
-        return 0;
+        int cantidad;
+
+        try {
+
+            cantidad
+                    = Integer.parseInt(
+                            txtCantidad.getText()
+                    );
+
+        } catch (Exception e) {
+
+            mostrarError(
+                    "Cantidad inválida."
+            );
+
+            return;
+        }
+
+        if (cantidad <= 0) {
+
+            mostrarError(
+                    "La cantidad debe ser mayor a cero."
+            );
+
+            return;
+        }
+
+        if (cantidad > libro.getStockActual()) {
+
+            mostrarError(
+                    "No hay suficiente stock."
+            );
+
+            return;
+
+        }
+
+        DetalleVenta detalle
+                = new DetalleVenta();
+
+        detalle.setIsbn(
+                libro.getIsbn()
+        );
+
+        detalle.setCantidad(
+                cantidad
+        );
+
+        detalle.setPrecioUnitario(
+                BigDecimal.valueOf(
+                        libro.getPrecio()
+                )
+        );
+
+        detallesObservable.add(
+                detalle
+        );
+
+        actualizarTotales();
+        lblMensaje.setText(
+                "Producto agregado correctamente."
+        );
+
     }
 
     @FXML
     private void actualizarCantidad() {
-        ejecutar(() -> {
+        DetalleVenta seleccionado
+                = tabla.getSelectionModel()
+                        .getSelectedItem();
+        if (seleccionado == null) {
+            return;
+        }
 
-            DetalleVenta detalle =
-                    tabla
-                            .getSelectionModel()
-                            .getSelectedItem();
+        try {
 
-            if (detalle == null) {
-                throw new IllegalArgumentException(
-                        "Selecciona un libro del carrito."
-                );
-            }
-
-            int cantidad =
-                    enteroPositivo(
-                            txtNuevaCantidad.getText(),
-                            "La cantidad"
+            int cantidad
+                    = Integer.parseInt(
+                            txtNuevaCantidad.getText()
                     );
 
-            Libro libro =
-                    buscarLibroDisponible(
-                            detalle.getIsbn()
-                    );
-
-            if (libro != null
-                    && cantidad
-                    > libro.getStockActual()) {
-
-                throw new IllegalArgumentException(
-                        "No hay suficiente stock. Disponible: "
-                        + libro.getStockActual()
-                );
-            }
-
-            carrito.cambiarCantidad(
-                    detalle.getIsbn(),
+            seleccionado.setCantidad(
                     cantidad
             );
 
-            refrescar(
-                    detalle.getIsbn()
-            );
+            tabla.refresh();
 
-        }, "Cantidad actualizada.");
-    }
+            actualizarTotales();
 
-    private Libro buscarLibroDisponible(
-            String isbn) {
+        } catch (Exception e) {
 
-        for (Libro libro
-                : librosDisponibles) {
-
-            if (libro
-                    .getIsbn()
-                    .equals(isbn)) {
-
-                return libro;
-            }
+            mostrarError(
+                    "Cantidad inválida.");
         }
-
-        return null;
     }
 
     @FXML
-    private void eliminarProducto() {
-        ejecutar(() -> {
+    private void eliminarLibro() {
 
-            DetalleVenta detalle =
-                    tabla
-                            .getSelectionModel()
-                            .getSelectedItem();
+        DetalleVenta seleccionado
+                = tabla.getSelectionModel()
+                        .getSelectedItem();
 
-            if (detalle == null) {
-                throw new IllegalArgumentException(
-                        "Selecciona un libro."
-                );
-            }
+        if (seleccionado != null) {
 
-            carrito.quitarProducto(
-                    detalle.getIsbn()
-            );
+            detallesObservable.remove(
+                    seleccionado);
 
-            refrescar(
-                    null
-            );
-
-            txtNuevaCantidad.setText(
-                    "1"
-            );
-
-        }, "Libro eliminado.");
+            actualizarTotales();
+        }
     }
 
     @FXML
     private void vaciarCarrito() {
-        ejecutar(() -> {
 
-            carrito.vaciar();
+        detallesObservable.clear();
 
-            refrescar(
-                    null
-            );
+        actualizarTotales();
 
-            txtNuevaCantidad.setText(
-                    "1"
-            );
+        lblMensaje.setText(
+                "Carrito vacío.");
+    }
 
-        }, "Carrito vacío.");
+    private void actualizarTotales() {
+
+        BigDecimal subtotal
+                = BigDecimal.ZERO;
+
+        for (DetalleVenta detalle
+                : detallesObservable) {
+
+            subtotal
+                    = subtotal.add(
+                            detalle.getSubtotal());
+        }
+
+        BigDecimal descuento
+                = calcularDescuento(
+                        subtotal);
+
+        BigDecimal total
+                = subtotal.subtract(
+                        descuento
+                );
+
+        lblSubtotalVenta.setText(
+                "Subtotal: Q"
+                + subtotal
+        );
+
+        lblDescuentoVenta.setText(
+                "Descuento: -Q"
+                + descuento
+        );
+
+        lblTotal.setText(
+                "Total: Q"
+                + total
+        );
+
+    }
+
+    private BigDecimal calcularDescuento(
+            BigDecimal subtotal) {
+
+        if (cmbTipoDescuento.getValue() == null) {
+
+            return BigDecimal.ZERO;
+
+        }
+
+        String tipo
+                = cmbTipoDescuento.getValue();
+
+        try {
+
+            BigDecimal valor
+                    = new BigDecimal(
+                            txtValorDescuento.getText()
+                    );
+
+            if (tipo.equals("PORCENTAJE")) {
+
+                return subtotal
+                        .multiply(valor)
+                        .divide(
+                                new BigDecimal("100")
+                        );
+
+            }
+
+            if (tipo.equals("MONTO FIJO")) {
+
+                return valor;
+
+            }
+
+        } catch (Exception e) {
+
+            return BigDecimal.ZERO;
+
+        }
+
+        return BigDecimal.ZERO;
+
     }
 
     @FXML
     private void confirmarVenta() {
-        if (!org.esperanza.service.NavegacionRol.validarPermiso("VENTAS")) return;
-        idUsuario = org.esperanza.service.SesionUsuario.getInstancia().getUsuarioActual().getId();
+
+        if (detallesObservable.isEmpty()) {
+
+            mostrarError(
+                    "El carrito está vacío."
+            );
+
+            return;
+
+        }
+
         try {
-            if (idUsuario <= 0) {
-                throw new IllegalArgumentException(
-                        "No se ha identificado al usuario de la sesión."
-                );
-            }
 
-            Cliente cliente =
-                    tblClientes
-                            .getSelectionModel()
-                            .getSelectedItem();
-
-            if (cliente == null) {
-                throw new IllegalArgumentException(
-                        "Debe seleccionar un cliente para la venta."
-                );
-            }
-
-            if (carrito.getDetalles().isEmpty()) {
-                throw new IllegalArgumentException(
-                        "No hay productos en el carrito."
-                );
-            }
-
-            List<DetalleVenta> detalles =
-                    new ArrayList<>(
-                            carrito.getDetalles()
+            FXMLLoader loader
+                    = new FXMLLoader(
+                            getClass()
+                                    .getResource(
+                                            "/org/esperanza/view/ConfirmarVenta.fxml"
+                                    )
                     );
 
-            DescuentoVenta descuento =
-                    leerDescuento();
+            Parent root
+                    = loader.load();
 
-            Venta venta =
-                    carrito.confirmarVenta(
-                            cliente.getCui(),
-                            idUsuario,
-                            ventaDao,
+            ConfirmarVentaController controller
+                    = loader.getController();
+
+            BigDecimal subtotal
+                    = detallesObservable.stream()
+                            .map(DetalleVenta::getSubtotal)
+                            .reduce(
+                                    BigDecimal.ZERO,
+                                    BigDecimal::add
+                            );
+
+            BigDecimal descuento
+                    = calcularDescuento(
+                            subtotal
+                    );
+
+            BigDecimal total
+                    = subtotal.subtract(
                             descuento
                     );
 
-            if (venta == null) {
-                throw new IllegalArgumentException(
-                        "No fue posible registrar la venta."
-                );
-            }
+          DescuentoVenta descuentoVenta =
+        DescuentoVenta.sinDescuento();
+          
+            controller.cargarDatos(
+        "",
+        idUsuario,
+        detallesObservable,
+        total,
+        descuentoVenta
+);
 
-            Stage stage =
-                    (Stage) btnConfirmar
+            Stage stage
+                    = (Stage) btnConfirmar
                             .getScene()
                             .getWindow();
 
-            ComprobanteVenta.mostrar(
-                    venta,
-                    detalles,
-                    stage
+            stage.setScene(
+                    new Scene(root)
             );
 
-            cmbTipoDescuento
-                    .getSelectionModel()
-                    .select(
-                            DescuentoVenta.Tipo.NINGUNO
-                    );
-
-            txtValorDescuento.clear();
-
-            refrescar(
-                    null
-            );
-
-            cargarLibrosDisponibles();
-
-            tblClientes
-                    .getSelectionModel()
-                    .clearSelection();
-
-            txtBuscarCliente.clear();
-            txtBuscar.clear();
-
-            lblClienteSeleccionado.setText(
-                    "Cliente seleccionado: ninguno"
-            );
-
-            txtCantidad.setText(
-                    "1"
-            );
-
-            txtNuevaCantidad.setText(
-                    "1"
-            );
-
-        } catch (IllegalArgumentException
-                | SecurityException e) {
-
-            mostrarError(
-                    e.getMessage()
-            );
-
-        } catch (SQLException e) {
-            mostrarError(
-                    "No fue posible registrar la venta en la base de datos."
-            );
-
-            e.printStackTrace();
+            stage.show();
 
         } catch (IOException e) {
+
             mostrarError(
-                    "La venta fue procesada, pero no se pudo mostrar el comprobante."
+                    "No se pudo abrir confirmación de venta."
             );
 
             e.printStackTrace();
 
-        } catch (Exception e) {
-            mostrarError(
-                    "Ocurrió un error inesperado al confirmar la venta."
-            );
-
-            e.printStackTrace();
         }
+
     }
 
-    private void refrescar(
-            String isbnSeleccionado) {
+    public void setIdUsuario(int idUsuario) {
 
-        tabla.getItems().setAll(
-                carrito.getDetalles()
-        );
+        this.idUsuario = idUsuario;
 
-        actualizarTotales();
+    }
 
-        if (isbnSeleccionado == null) {
+    private void mostrarError(String mensaje) {
 
-            tabla
-                    .getSelectionModel()
-                    .clearSelection();
-
-            return;
-        }
-
-        for (DetalleVenta detalle
-                : tabla.getItems()) {
-
-            if (detalle
-                    .getIsbn()
-                    .equals(isbnSeleccionado)) {
-
-                tabla
-                        .getSelectionModel()
-                        .select(detalle);
-
-                tabla.scrollTo(
-                        detalle
+        Alert alerta
+                = new Alert(
+                        Alert.AlertType.ERROR
                 );
 
-                break;
-            }
-        }
-    }
-
-    private int enteroPositivo(
-            String texto,
-            String nombre) {
-
-        try {
-            int valor =
-                    Integer.parseInt(
-                            texto.trim()
-                    );
-
-            if (valor > 0) {
-                return valor;
-            }
-
-        } catch (NumberFormatException ignored) {
-        }
-
-        throw new IllegalArgumentException(
-                nombre
-                + " debe ser un entero mayor que cero."
-        );
-    }
-
-    private void ejecutar(
-            Runnable accion,
-            String mensajeExito) {
-
-        try {
-            accion.run();
-
-            mostrarExito(
-                    mensajeExito
-            );
-
-        } catch (IllegalArgumentException e) {
-            mostrarError(
-                    e.getMessage()
-            );
-
-        } catch (ArithmeticException e) {
-            mostrarError(
-                    "Revisa los valores numéricos ingresados."
-            );
-
-        } catch (Exception e) {
-            mostrarError(
-                    e.getMessage() == null
-                            ? "Ocurrió un error inesperado."
-                            : e.getMessage()
-            );
-        }
-    }
-
-    private void mostrarExito(
-            String mensaje) {
-
-        if (lblMensaje == null) {
-            return;
-        }
-
-        lblMensaje.setStyle(
-                "-fx-text-fill: #166534;"
+        alerta.setTitle(
+                "Error"
         );
 
-        lblMensaje.setText(
-                mensaje == null
-                        ? ""
-                        : mensaje
-        );
-    }
-
-    private void mostrarError(
-            String mensaje) {
-
-        if (lblMensaje == null) {
-            return;
-        }
-
-        lblMensaje.setStyle(
-                "-fx-text-fill: #b91c1c;"
-        );
-
-        lblMensaje.setText(
-                mensaje == null
-                || mensaje.isBlank()
-                        ? "Ocurrió un error."
-                        : mensaje
-        );
-    }
-
-    private void configurarCierre() {
-        Platform.runLater(() -> {
-
-            if (tabla == null
-                    || tabla.getScene() == null
-                    || !(tabla.getScene()
-                            .getWindow()
-                            instanceof Stage stage)) {
-
-                return;
-            }
-
-            stage.setOnCloseRequest(
-                    event -> {
-
-                        event.consume();
-
-                        regresarDashboard(
-                                stage
-                        );
-                    }
-            );
-        });
-    }
-
-    private void regresarDashboard(
-            Stage stage) {
-
-        if (stage == null) {
-            return;
-        }
-
-        stage.setOnCloseRequest(
+        alerta.setHeaderText(
                 null
         );
 
-        NavegacionRol
-                .abrirDashboardSegunRol(
-                        stage
-                );
-    }
+        alerta.setContentText(
+                mensaje
+        );
 
-    public void setIdUsuario(
-            int idUsuario) {
-
-        if (idUsuario <= 0) {
-            throw new IllegalArgumentException(
-                    "El usuario no es válido."
-            );
-        }
-
-        this.idUsuario =
-                idUsuario;
+        alerta.showAndWait();
     }
 }

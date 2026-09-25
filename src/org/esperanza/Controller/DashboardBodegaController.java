@@ -1,4 +1,4 @@
-package org.esperanza.controller;
+package org.esperanza.Controller;
 
 import java.util.List;
 import java.util.function.BooleanSupplier;
@@ -18,11 +18,11 @@ import javafx.stage.Stage;
 
 import org.esperanza.dao.LibroDAO;
 import org.esperanza.dao.impl.LibroDAOImpl;
-import org.esperanza.model.Libro;
-import org.esperanza.model.Rol;
-import org.esperanza.service.NavegacionRol;
-import org.esperanza.service.Pantallas;
-import org.esperanza.service.SesionUsuario;
+import org.esperanza.Model.Libro;
+import org.esperanza.Model.Rol;
+import org.esperanza.Service.NavegacionRol;
+import org.esperanza.Service.Pantallas;
+import org.esperanza.Service.SesionUsuario;
 
 public class DashboardBodegaController {
 
@@ -241,10 +241,10 @@ public class DashboardBodegaController {
 
             Parent contenido = loader.load();
 
-            IngresoInventarioController controller
+            IngresoInventarioController Controller
                     = loader.getController();
 
-            controller.setIdUsuarioActual(
+            Controller.setIdUsuarioActual(
                     SesionUsuario.getInstancia()
                             .getUsuarioActual()
                             .getId()
@@ -279,13 +279,13 @@ public class DashboardBodegaController {
 
             Parent contenido = loader.load();
 
-            SalidaInventarioController controller
+            SalidaInventarioController Controller
                     = loader.getController();
 
             mostrarEnMismaVentana(
                     contenido,
                     "Salida de inventario",
-                    controller::estaOcupado
+                    Controller::estaOcupado
             );
 
         } catch (Exception ex) {

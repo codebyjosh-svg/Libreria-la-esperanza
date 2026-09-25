@@ -1,427 +1,290 @@
 package org.esperanza.dao;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-
-import java.time.LocalDateTime;
-
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
-import org.esperanza.model.Rol;
-import org.esperanza.model.Usuario;
-import org.esperanza.service.SesionUsuario;
-import org.esperanza.model.DescuentoVenta;
-import org.esperanza.model.DetalleVenta;
-import org.esperanza.model.EstadoVenta;
-import org.esperanza.model.Venta;
+import org.esperanza.Model.DetalleVenta;
+import org.esperanza.Model.DescuentoVenta;
 import org.esperanza.util.Conexion;
+
 
 public class VentaDao {
 
-    private final ProveedorConexion conexiones;
-    private final DetalleVentaDao detalleVentaDao;
-    private final StockDao stockDao;
 
-    public VentaDao() {
-
-        this(
-                () -> Conexion
-                        .getInstancia()
-                        .conectar()
-        );
-    }
-
-    public VentaDao(
-            ProveedorConexion conexiones) {
-
-        this.conexiones =
-                Objects.requireNonNull(
-                        conexiones,
-                        "El proveedor de conexion es obligatorio"
-                );
-
-        this.detalleVentaDao =
-                new DetalleVentaDao(conexiones);
-
-        this.stockDao =
-                new StockDao(conexiones);
-    }
-
-    public Venta registrar(
-            long cuiCliente,
-            int idUsuario,
-            List<DetalleVenta> detalles) throws SQLException {
-        return registrar(cuiCliente, idUsuario, detalles,
-                DescuentoVenta.sinDescuento());
-    }
-
-    public Venta registrar(
-            long cuiCliente,
+    public boolean registrarVenta(
+            String cuiCliente,
             int idUsuario,
             List<DetalleVenta> detalles,
-            DescuentoVenta descuentoSolicitado) throws SQLException {
-        Objects.requireNonNull(descuentoSolicitado, "descuentoSolicitado");
+            DescuentoVenta descuento
+    ) throws SQLException {
 
-        if (cuiCliente <= 0) {
 
-            throw new IllegalArgumentException(
-                    "El CUI del cliente es obligatorio"
-            );
-        }
+        Connection conexion = null;
 
-        if (idUsuario <= 0) {
 
-            throw new IllegalArgumentException(
-                    "El usuario debe ser valido"
-            );
-        }
+        try {
 
-        Objects.requireNonNull(
-                detalles,
-                "Los detalles son obligatorios"
-        );
 
-        if (detalles.isEmpty()) {
+            conexion = Conexion.getInstancia()
+                    .conectar();
 
-            throw new IllegalArgumentException(
-                    "La venta debe tener productos"
-            );
-        }
-
-        List<DetalleVenta> copia =
-                new ArrayList<>();
-
-        BigDecimal subtotal =
-                BigDecimal.ZERO;
-
-        for (DetalleVenta detalle : detalles) {
-
-            Objects.requireNonNull(
-                    detalle,
-                    "No se permiten detalles nulos"
-            );
-
-            BigDecimal precio =
-                    detalle
-                            .getPrecioUnitario()
-                            .setScale(
-                                    2,
-                                    RoundingMode.UNNECESSARY
-                            );
-
-            DetalleVenta item =
-                    new DetalleVenta(
-                            0,
-                            0,
-                            detalle.getIsbn(),
-                            detalle.getCantidad(),
-                            precio
-                    );
-
-            copia.add(item);
-
-            subtotal =
-                    subtotal.add(
-                            item.getSubtotal()
-                    );
-        }
-
-        BigDecimal descuento = descuentoSolicitado.calcularMonto(subtotal);
-
-        if (descuento.signum() > 0) {
-            SesionUsuario sesion = SesionUsuario.getInstancia();
-            Usuario actual = sesion.getUsuarioActual();
-            if (!sesion.esAdmin() || actual == null || actual.getId() != idUsuario) {
-                throw new SecurityException(
-                        "Solo un administrador con sesión activa puede aplicar descuentos.");
-            }
-        }
-
-        BigDecimal total =
-                subtotal.subtract(
-                        descuento
-                );
-
-        Venta venta =
-                new Venta(
-                        0,
-                        LocalDateTime.now()
-                                .withNano(0),
-                        subtotal,
-                        descuento,
-                        total,
-                        cuiCliente,
-                        idUsuario
-                );
-
-        try (Connection conexion =
-                conexiones.conectar()) {
 
             conexion.setAutoCommit(false);
 
-            try {
-                if (descuento.signum() > 0) {
-                    validarAdministrador(conexion, idUsuario);
-                }
 
-                for (DetalleVenta detalle : copia) {
 
-                    stockDao.validarStock(
-                            conexion,
-                            detalle.getIsbn(),
-                            detalle.getCantidad()
-                    );
-                }
+            BigDecimal subtotalVenta =
+                    BigDecimal.ZERO;
 
-                String sqlVenta = """
-                        INSERT INTO ventas
-                        (
-                            subtotal,
-                            descuento,
-                            total,
-                            estado,
-                            cui_cliente,
-                            id_usuario
-                        )
-                        VALUES (?, ?, ?, 'COMPLETADA', ?, ?)
-                        """;
 
-                try (PreparedStatement ps =
-                        conexion.prepareStatement(
-                                sqlVenta,
-                                Statement.RETURN_GENERATED_KEYS
-                        )) {
 
-                    ps.setBigDecimal(
-                            1,
-                            subtotal
-                    );
+            for(DetalleVenta detalle : detalles){
 
-                    ps.setBigDecimal(
-                            2,
-                            descuento
-                    );
-
-                    ps.setBigDecimal(
-                            3,
-                            total
-                    );
-
-                    ps.setLong(
-                            4,
-                            cuiCliente
-                    );
-
-                    ps.setInt(
-                            5,
-                            idUsuario
-                    );
-
-                    int filas =
-                            ps.executeUpdate();
-
-                    if (filas != 1) {
-
-                        throw new SQLException(
-                                "No se pudo registrar la venta"
+                subtotalVenta =
+                        subtotalVenta.add(
+                                detalle.getSubtotal()
                         );
-                    }
-
-                    try (ResultSet claves =
-                            ps.getGeneratedKeys()) {
-
-                        if (!claves.next()) {
-
-                            throw new SQLException(
-                                    "No se obtuvo el ID de la venta"
-                            );
-                        }
-
-                        venta.setIdVenta(
-                                claves.getInt(1)
-                        );
-                    }
-                }
-
-                for (DetalleVenta detalle : copia) {
-
-                    detalleVentaDao.insertar(
-                            conexion,
-                            venta.getIdVenta(),
-                            detalle
-                    );
-
-                    stockDao.descontarStock(
-                            conexion,
-                            detalle.getIsbn(),
-                            detalle.getCantidad()
-                    );
-                }
-
-                conexion.commit();
-
-            } catch (SQLException
-                    | RuntimeException e) {
-
-                try {
-
-                    conexion.rollback();
-
-                } catch (SQLException rollbackError) {
-
-                    e.addSuppressed(
-                            rollbackError
-                    );
-                }
-
-                throw e;
 
             }
-        }
 
-        return venta;
-    }
 
-    private void validarAdministrador(Connection conexion, int idUsuario)
-            throws SQLException {
-        String sql = "SELECT rol, activo FROM usuarios WHERE id = ?";
-        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
-            ps.setInt(1, idUsuario);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (!rs.next() || !rs.getBoolean("activo")
-                        || Rol.fromString(rs.getString("rol")) != Rol.ADMIN) {
-                    throw new SecurityException(
-                            "El usuario no tiene autorización vigente para aplicar descuentos.");
-                }
-            }
-        }
-    }
 
-    public Optional<Venta> buscarPorId(
-            int idVenta)
-            throws SQLException {
+            BigDecimal montoDescuento =
+                    descuento.calcularMonto(
+                            subtotalVenta
+                    );
 
-        String sql = """
-                SELECT
-                    id_venta,
-                    fecha_venta,
-                    subtotal,
-                    descuento,
-                    total,
-                    cui_cliente,
-                    id_usuario,
-                    estado
-                FROM ventas
-                WHERE id_venta = ?
-                """;
 
-        try (
-                Connection conexion =
-                        conexiones.conectar();
 
+            BigDecimal total =
+                    subtotalVenta.subtract(
+                            montoDescuento
+                    );
+
+
+
+            String sqlVenta =
+                    """
+                    INSERT INTO ventas
+                    (
+                        subtotal,
+                        descuento,
+                        total,
+                        estado,
+                        cui_cliente,
+                        id_usuario
+                    )
+                    VALUES
+                    (?, ?, ?, 'COMPLETADA', ?, ?)
+                    """;
+
+
+
+            int idVenta;
+
+
+
+            try(
                 PreparedStatement ps =
-                        conexion.prepareStatement(sql)
-        ) {
+                    conexion.prepareStatement(
+                        sqlVenta,
+                        PreparedStatement.RETURN_GENERATED_KEYS
+                    )
+            ){
 
-            ps.setInt(
-                    1,
-                    idVenta
-            );
 
-            try (ResultSet rs =
-                    ps.executeQuery()) {
+                ps.setBigDecimal(
+                        1,
+                        subtotalVenta
+                );
 
-                if (rs.next()) {
 
-                    return Optional.of(
-                            leer(rs)
-                    );
-                }
+                ps.setBigDecimal(
+                        2,
+                        montoDescuento
+                );
 
-                return Optional.empty();
-            }
-        }
-    }
 
-    public List<Venta> listar()
-            throws SQLException {
+                ps.setBigDecimal(
+                        3,
+                        total
+                );
 
-        List<Venta> ventas =
-                new ArrayList<>();
 
-        String sql = """
-                SELECT
-                    id_venta,
-                    fecha_venta,
-                    subtotal,
-                    descuento,
-                    total,
-                    cui_cliente,
-                    id_usuario,
-                    estado
-                FROM ventas
-                ORDER BY id_venta DESC
-                """;
+                ps.setLong(
+                        4,
+                        Long.parseLong(cuiCliente)
+                );
 
-        try (
-                Connection conexion =
-                        conexiones.conectar();
 
-                PreparedStatement ps =
-                        conexion.prepareStatement(sql);
+                ps.setInt(
+                        5,
+                        idUsuario
+                );
+
+
+                ps.executeUpdate();
+
+
 
                 ResultSet rs =
-                        ps.executeQuery()
-        ) {
+                        ps.getGeneratedKeys();
 
-            while (rs.next()) {
 
-                ventas.add(
-                        leer(rs)
-                );
+
+                if(!rs.next()){
+
+                    throw new SQLException(
+                            "No se generó el ID de venta."
+                    );
+
+                }
+
+
+                idVenta =
+                        rs.getInt(1);
+
             }
+
+
+
+
+            String sqlDetalle =
+                    """
+                    INSERT INTO detalle_venta
+                    (
+                        id_venta,
+                        isbn,
+                        cantidad,
+                        precio_unitario,
+                        subtotal
+                    )
+                    VALUES
+                    (?, ?, ?, ?, ?)
+                    """;
+
+
+
+            String sqlStock =
+                    """
+                    UPDATE libros
+                    SET stock_actual = stock_actual - ?,
+                        activo = 1
+                    WHERE isbn = ?
+                    """;
+
+
+
+            try(
+                PreparedStatement psDetalle =
+                    conexion.prepareStatement(sqlDetalle);
+
+                PreparedStatement psStock =
+                    conexion.prepareStatement(sqlStock)
+            ){
+
+
+
+                for(DetalleVenta detalle : detalles){
+
+
+
+                    psDetalle.setInt(
+                            1,
+                            idVenta
+                    );
+
+
+                    psDetalle.setString(
+                            2,
+                            detalle.getIsbn()
+                    );
+
+
+                    psDetalle.setInt(
+                            3,
+                            detalle.getCantidad()
+                    );
+
+
+                    psDetalle.setBigDecimal(
+                            4,
+                            detalle.getPrecioUnitario()
+                    );
+
+
+                    psDetalle.setBigDecimal(
+                            5,
+                            detalle.getSubtotal()
+                    );
+
+
+                    psDetalle.executeUpdate();
+
+
+
+                    psStock.setInt(
+                            1,
+                            detalle.getCantidad()
+                    );
+
+
+                    psStock.setString(
+                            2,
+                            detalle.getIsbn()
+                    );
+
+
+                    psStock.executeUpdate();
+
+
+
+                }
+
+            }
+
+
+
+            conexion.commit();
+
+
+            return true;
+
+
+
+        }catch(Exception e){
+
+
+            if(conexion != null){
+
+                conexion.rollback();
+
+            }
+
+
+            throw new SQLException(
+                    "Error registrando venta: "
+                    + e.getMessage()
+            );
+
+
+
+        }finally{
+
+
+            if(conexion != null){
+
+                conexion.close();
+
+            }
+
+
         }
 
-        return ventas;
     }
 
-    private Venta leer(
-            ResultSet rs)
-            throws SQLException {
-
-        Venta venta = new Venta(
-                rs.getInt(
-                        "id_venta"
-                ),
-                rs.getTimestamp(
-                        "fecha_venta"
-                ).toLocalDateTime(),
-                rs.getBigDecimal(
-                        "subtotal"
-                ),
-                rs.getBigDecimal(
-                        "descuento"
-                ),
-                rs.getBigDecimal(
-                        "total"
-                ),
-                rs.getLong(
-                        "cui_cliente"
-                ),
-                rs.getInt(
-                        "id_usuario"
-                )
-        );
-        venta.setEstado(EstadoVenta.desdeBaseDatos(rs.getString("estado")));
-        return venta;
-    }
 }

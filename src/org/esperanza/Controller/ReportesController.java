@@ -24,8 +24,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
 import org.esperanza.dao.ReporteVentasDao;
-import org.esperanza.model.FiltroFecha;
-import org.esperanza.model.Venta;
+import org.esperanza.Model.FiltroFecha;
+import org.esperanza.Model.Venta;
 
 public class ReportesController {
 

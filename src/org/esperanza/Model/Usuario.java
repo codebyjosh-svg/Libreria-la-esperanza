@@ -1,4 +1,4 @@
-package org.esperanza.model;
+package org.esperanza.Model;
 
 public class Usuario {
     private int id;

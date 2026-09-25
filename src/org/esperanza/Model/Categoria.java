@@ -1,4 +1,4 @@
-package org.esperanza.model;
+package org.esperanza.Model;
 
 public class Categoria {
 

@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.sql.*;
 import java.util.*;
 
-import org.esperanza.service.SesionUsuario;
+import org.esperanza.Service.SesionUsuario;
 import org.esperanza.util.Conexion;
 
 public class CatalogoDao {

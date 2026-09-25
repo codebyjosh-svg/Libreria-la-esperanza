@@ -18,10 +18,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 import org.esperanza.dao.DevolucionVentaDao;
-import org.esperanza.model.EstadoVenta;
-import org.esperanza.model.Usuario;
-import org.esperanza.model.Venta;
-import org.esperanza.service.SesionUsuario;
+import org.esperanza.Model.EstadoVenta;
+import org.esperanza.Model.Usuario;
+import org.esperanza.Model.Venta;
+import org.esperanza.Service.SesionUsuario;
 
 /** Pruebas JDBC simuladas. No sustituyen las pruebas concurrentes contra MySQL real. */
 public class PruebaDevoluciones {

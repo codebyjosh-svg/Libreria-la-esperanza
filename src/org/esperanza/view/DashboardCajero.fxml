@@ -13,7 +13,7 @@
 
 <BorderPane
         xmlns:fx="http://javafx.com/fxml/1"
-        fx:controller="org.esperanza.controller.DashboardCajeroController"
+        fx:controller="org.esperanza.Controller.DashboardCajeroController"
         prefWidth="950"
         prefHeight="620"
         stylesheets="@style/dashboard.css"

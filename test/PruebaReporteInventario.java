@@ -4,8 +4,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.List;
 
-import org.esperanza.model.LibroMasVendido;
-import org.esperanza.model.StockValorizado;
+import org.esperanza.Model.LibroMasVendido;
+import org.esperanza.Model.StockValorizado;
 import org.esperanza.dao.ReporteInventarioDao;
 import org.esperanza.util.Conexion;
 

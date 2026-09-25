@@ -1,4 +1,4 @@
-package org.esperanza.controller;
+package org.esperanza.Controller;
 
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Types;
@@ -14,7 +14,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 
 import org.esperanza.dao.CatalogoDao;
-import org.esperanza.service.Pantallas;
+import org.esperanza.Service.Pantallas;
 
 public class CatalogoController {
 

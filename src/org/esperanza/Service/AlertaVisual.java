@@ -1,4 +1,4 @@
-package org.esperanza.service;
+package org.esperanza.Service;
 
 import java.io.IOException;
 
@@ -9,8 +9,8 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import org.esperanza.controller.AlertaModalController;
-import org.esperanza.controller.AlertaModalController.TipoAlerta;
+import org.esperanza.Controller.AlertaModalController;
+import org.esperanza.Controller.AlertaModalController.TipoAlerta;
 
 public class AlertaVisual {
 

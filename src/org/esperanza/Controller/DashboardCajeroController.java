@@ -1,4 +1,4 @@
-package org.esperanza.controller;
+package org.esperanza.Controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -11,9 +11,9 @@ import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
-import org.esperanza.service.NavegacionRol;
-import org.esperanza.service.Pantallas;
-import org.esperanza.service.SesionUsuario;
+import org.esperanza.Service.NavegacionRol;
+import org.esperanza.Service.Pantallas;
+import org.esperanza.Service.SesionUsuario;
 
 public class DashboardCajeroController {
 
@@ -79,10 +79,10 @@ public class DashboardCajeroController {
 
             Parent root = loader.load();
 
-            CarritoVentaController controller =
+            CarritoVentaController Controller =
                     loader.getController();
 
-            controller.setIdUsuario(
+            Controller.setIdUsuario(
                     SesionUsuario
                             .getInstancia()
                             .getUsuarioActual()
@@ -143,14 +143,14 @@ public class DashboardCajeroController {
 
             Stage stage = ventana();
 
-            DevolucionesController controller =
+            DevolucionesController Controller =
                     loader.getController();
 
             stage.setOnCloseRequest(event -> {
                 event.consume();
 
-                if (controller == null
-                        || !controller.estaOcupado()) {
+                if (Controller == null
+                        || !Controller.estaOcupado()) {
                     NavegacionRol.abrirDashboardSegunRol(stage);
                 }
             });

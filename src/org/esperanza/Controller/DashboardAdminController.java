@@ -1,4 +1,4 @@
-package org.esperanza.controller;
+package org.esperanza.Controller;
 
 import java.io.IOException;
 import java.net.URL;
@@ -19,12 +19,12 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import org.esperanza.dao.DashboardIndicadoresDao;
-import org.esperanza.model.IndicadoresDashboardAdmin;
-import org.esperanza.model.Rol;
-import org.esperanza.model.Usuario;
-import org.esperanza.service.NavegacionRol;
-import org.esperanza.service.Pantallas;
-import org.esperanza.service.SesionUsuario;
+import org.esperanza.Model.IndicadoresDashboardAdmin;
+import org.esperanza.Model.Rol;
+import org.esperanza.Model.Usuario;
+import org.esperanza.Service.NavegacionRol;
+import org.esperanza.Service.Pantallas;
+import org.esperanza.Service.SesionUsuario;
 
 public class DashboardAdminController {
 
@@ -317,10 +317,10 @@ public class DashboardAdminController {
             FXMLLoader loader = new FXMLLoader(recurso);
             Parent root = loader.load();
 
-            CambioContrasenaController controller
+            CambioContrasenaController Controller
                     = loader.getController();
 
-            controller.setIdUsuarioActual(
+            Controller.setIdUsuarioActual(
                     usuarioActual.getId()
             );
 
@@ -517,17 +517,17 @@ public class DashboardAdminController {
                 return;
             }
 
-            Object controller = loader.getController();
+            Object Controller = loader.getController();
 
             ventana.setOnCloseRequest(event -> {
 
                 boolean ocupado
-                        = controller instanceof ProveedoresController proveedor
+                        = Controller instanceof ProveedoresController proveedor
                         && proveedor.estaOcupado();
 
                 ocupado
                         = ocupado
-                        || controller instanceof DevolucionesController devolucion
+                        || Controller instanceof DevolucionesController devolucion
                         && devolucion.estaOcupado();
 
                 event.consume();
@@ -589,10 +589,10 @@ public class DashboardAdminController {
             FXMLLoader loader = new FXMLLoader(recurso);
             Parent root = loader.load();
 
-            CarritoVentaController controller
+            CarritoVentaController Controller
                     = loader.getController();
 
-            controller.setIdUsuario(
+            Controller.setIdUsuario(
                     usuarioActual.getId()
             );
 

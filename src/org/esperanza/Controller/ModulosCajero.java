@@ -1,4 +1,4 @@
-package org.esperanza.controller;
+package org.esperanza.Controller;
 
 import java.util.Objects;
 import java.util.function.Function;
@@ -15,11 +15,11 @@ import javafx.stage.Stage;
 
 import org.esperanza.dao.CajeroDao;
 import org.esperanza.dao.DetalleVentaDao;
-import org.esperanza.model.Libro;
-import org.esperanza.model.Usuario;
-import org.esperanza.model.Venta;
-import org.esperanza.service.NavegacionRol;
-import org.esperanza.service.Pantallas;
+import org.esperanza.Model.Libro;
+import org.esperanza.Model.Usuario;
+import org.esperanza.Model.Venta;
+import org.esperanza.Service.NavegacionRol;
+import org.esperanza.Service.Pantallas;
 import org.esperanza.view.ComprobanteVenta;
 
 public final class ModulosCajero {
@@ -239,17 +239,17 @@ public final class ModulosCajero {
                     venta.getIdVenta()
             );
 
-            TicketVentaController controller =
+            TicketVentaController Controller =
                     ComprobanteVenta.mostrar(
                             venta,
                             detalles,
                             ventana
                     );
 
-            controller.setAlVolver(() -> ventas(ventana));
+            Controller.setAlVolver(() -> ventas(ventana));
 
             if (imprimir) {
-                controller.imprimir();
+                Controller.imprimir();
             }
         });
     }

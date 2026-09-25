@@ -1,4 +1,4 @@
-package org.esperanza.controller;
+package org.esperanza.Controller;
 
 import java.math.BigDecimal;
 import java.net.URL;
@@ -19,8 +19,8 @@ import java.time.LocalDate;
 import javafx.scene.control.DatePicker;
 
 import org.esperanza.dao.ReporteInventarioDao;
-import org.esperanza.model.LibroMasVendido;
-import org.esperanza.model.StockValorizado;
+import org.esperanza.Model.LibroMasVendido;
+import org.esperanza.Model.StockValorizado;
 
 public class ReporteInventarioController implements Initializable {
 
